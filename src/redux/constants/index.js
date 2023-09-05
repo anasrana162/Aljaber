@@ -1,0 +1,16 @@
+export const TOKEN = 'TOKEN';
+export const LANGUAGE = 'LANGUAGE';
+export const USER = 'USER_DATA';
+export const ADMINTOKEN ='ADMINTOKEN';
+export const DEFAULTCAT ='DEFAULTCAT';
+// export const MISSING_DATA = 'MISSING_DATA';
+// export const SELECTED_PROGRAM = 'SELECTED_PROGRAM';
+// export const SHOPS = 'SHOPS';
+// export const ORDER_ADDRESS = 'ORDER_ADDRESS';
+// export const ITEM_DETAILS = 'ITEM_DETAILS';
+// export const ORDER_DETAILS = 'ORDER_DETAILS';
+// export const SELECTED_VARIENT = 'SELECTED_VARIENT';
+// export const PLAN_DETAILS = 'PLAN_DETAILS';
+// export const MENU_DETAILS = 'MENU_DETAILS';
+// export const PRICE_DETAILS = 'PRICE_DETAILS';
+// export const SUBSCRIPTIONS = 'SUBSCRIPTIONS';
