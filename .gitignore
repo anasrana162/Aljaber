@@ -2,6 +2,12 @@
 #
 .DS_Store
 
+#IOS
+ios/
+
+#Android
+android/
+
 # Xcode
 #
 build/
