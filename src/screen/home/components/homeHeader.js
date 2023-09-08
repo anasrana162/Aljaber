@@ -47,8 +47,11 @@ const styles = StyleSheet.create({
         width: width,
         justifyContent: "center",
         backgroundColor: "white",
-        // position: "absolute",
-        // top: 0
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 1.5,
     },
     inner_mainContainer: {
         width: width,
@@ -74,18 +77,18 @@ const styles = StyleSheet.create({
         left: 5
     },
 
-    searchIcon:{
+    searchIcon: {
         position: "absolute",
         right: 130
     },
 
-    favourateIcon:{
+    favourateIcon: {
         position: "absolute",
-        right:70,
+        right: 70,
     },
-    cartIcon:{
+    cartIcon: {
         position: "absolute",
-        right:10
+        right: 10
     }
 
 })

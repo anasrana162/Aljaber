@@ -4,6 +4,7 @@ import HomeHeader from '../home/components/homeHeader';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import HomeCategories from '../home/components/homeCategories';
 import api from '../../api/api';
+import { ImageArray } from './categoryData';
 
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
@@ -22,24 +23,275 @@ class Categories extends Component {
             defaultCategories: null,
             loader: false,
             selectedCat: null,
+            selectedSubCat: null,
+            tempArray: [],
         };
     }
 
     componentDidMount = () => {
-        const { action, userData: { defaultcategory } } = this.props
-        console.log("defaultcategory in categories", defaultcategory)
-        setImmediate(() => {
-            this.setState({ defaultCategories: defaultcategory })
-        })
-    }
-    selectedItems = (item, index) => {
-        console.log("Selected Item: ", item)
-        setImmediate(() => {
-            this.setState({ selectedCat: item })
-        })
+        this.defaultCategories()
     }
 
+    defaultCategories = () => {
+        const { action, userData: { defaultcategory, admintoken } } = this.props
+        var { tempArray } = this.state
+        // console.log("defaultcategory in categories", defaultcategory)
+        // setImmediate(() => {
+        //     this.setState({ defaultCategories: defaultcategory })
+        // })
+
+        if (Object.keys(defaultcategory).length !== 0) {
+            //console.log("working")
+            var { children_data } = defaultcategory
+            var obj = {}
+            var tempArray1 = [];
+
+
+
+            for (let i = 0; i < children_data.length; i++) {
+                console.log(children_data[i]?.children_data.length)
+                // console.log("")
+                // console.log("children_data", ç[i]?.id, " ", children_data[i]?.children_data)
+
+                for (let j = 0; j < ImageArray.length; j++) {
+
+                    if (ImageArray[j]?.id == children_data[i]?.id) {
+                        var obj = {
+                            "id": children_data[i]?.id,
+                            "parent_id": children_data[i]?.parent_id,
+                            "name": children_data[i]?.name,
+                            "is_active": children_data[i]?.is_active,
+                            "position": children_data[i]?.position,
+                            "level": children_data[i]?.level,
+                            "product_count": children_data[i]?.product_count,
+                            "img": ImageArray[j]?.img,
+                            "placeHolder": ImageArray[j]?.placeHolder,
+                            "children_data": []
+                        };
+                        tempArray1.push(obj)
+
+                        break;
+
+                    }
+                    if (ImageArray[i]?.id == undefined) {
+                           var obj = {
+                            "id": children_data[i]?.id,
+                            "parent_id": children_data[i]?.parent_id,
+                            "name": children_data[i]?.name,
+                            "is_active": children_data[i]?.is_active,
+                            "position": children_data[i]?.position,
+                            "level": children_data[i]?.level,
+                            "product_count": children_data[i]?.product_count,
+                            "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
+                            "placeHolder": true,
+                            "children_data": []
+                        };
+                        // tempArray1.push(obj)
+                        // break;
+
+                        for (let tA = 0; tA < tempArray1.length; tA++) {
+                            if (tempArray1[tA]?.length == children_data[i]?.length) {
+                                break;
+                            } else {
+
+                                tempArray1[tA]?.push(obj)
+                            }
+
+                        }
+
+                    }
+                    // else {
+                    //     var obj = {
+                    //         "id": children_data[i]?.id,
+                    //         "parent_id": children_data[i]?.parent_id,
+                    //         "name": children_data[i]?.name,
+                    //         "is_active": children_data[i]?.is_active,
+                    //         "position": children_data[i]?.position,
+                    //         "level": children_data[i]?.level,
+                    //         "product_count": children_data[i]?.product_count,
+                    //         "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
+                    //         "placeHolder": true,
+                    //         "children_data": []
+                    //     };
+                    //     tempArray1.push(obj)
+                    //     break;
+                    // }
+
+
+                }
+
+
+
+                for (let j = 0; j < ImageArray.length; j++) {
+                    // console.log(" ImageArray[j]?.children_data.length)", ImageArray[j]?.children_data.length)
+
+                    //  Sub Cat
+                    if (children_data[i]?.children_data.length !== 0) {
+
+                        for (let ccl = 0; ccl < children_data[i]?.children_data.length; ccl++) {
+
+
+                            for (let iA = 0; iA < ImageArray[j]?.children_data?.length; iA++) {
+
+                                // console.log(ImageArray[j]?.children_data[iA])
+                                var obj2 = {}
+                                if (ImageArray[j]?.children_data[iA]?.id == children_data[i]?.children_data[ccl]?.id) {
+
+
+                                    obj2 = {
+                                        "id": children_data[i]?.children_data[ccl]?.id,
+                                        "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
+                                        "name": children_data[i]?.children_data[ccl]?.name,
+                                        "is_active": children_data[i]?.children_data[ccl]?.is_active,
+                                        "position": children_data[i]?.children_data[ccl]?.position,
+                                        "level": children_data[i]?.children_data[ccl]?.level,
+                                        "product_count": children_data[i]?.children_data[ccl]?.product_count,
+                                        "img": ImageArray[j]?.children_data[iA]?.img,
+                                        "placeHolder": ImageArray[j]?.children_data[iA]?.placeHolder,
+                                        "children_data": []
+                                    };
+
+                                    for (let tA = 0; tA < tempArray1.length; tA++) {
+                                        if (children_data[i]?.id == tempArray1[tA]?.id) {
+                                            tempArray1[tA]?.children_data.push(obj2)
+                                            break;
+                                        }
+                                    }
+                                    // 
+
+
+                                    // break;
+
+                                    // Sub Sub Cat
+
+
+                                    // if (children_data[i]?.children_data[ccl]?.children_data.length !== 0) {
+                                    //      console.log(children_data[i]?.children_data[ccl])
+
+                                    //     // for (let cccl = 0; children_data[i]?.children_data[ccl]?.children_data.length; cccl++) {
+
+                                    //     //     if (ImageArray[j]?.children_data[iA]?.children_data.length !== 0) {
+
+                                    //     //         console.log("Innner DATAAAAA",children_data[i]?.children_data[ccl])
+
+                                    //     //         // for (let iiA = 0; iiA < ImageArray[j]?.children_data[iA]?.children_data.length; iiA++) {
+                                    //     //         //     var obj2 = {}
+
+                                    //     //         //     if (ImageArray[j]?.children_data[iA]?.children_data[iiA]?.id == children_data[i]?.children_data[ccl]?.children_data[cccl]?.id) {
+
+
+                                    //     //         //         obj2 = {
+                                    //     //         //             "id": children_data[i]?.children_data[ccl]?.children_data[cccl]?.id,
+                                    //     //         //             "parent_id": children_data[i]?.children_data[ccl]?.children_data[cccl]?.parent_id,
+                                    //     //         //             "name": children_data[i]?.children_data[ccl]?.children_data[cccl]?.name,
+                                    //     //         //             "is_active": children_data[i]?.children_data[ccl]?.children_data[cccl]?.is_active,
+                                    //     //         //             "position": children_data[i]?.children_data[ccl]?.children_data[cccl]?.position,
+                                    //     //         //             "level": children_data[i]?.children_data[ccl]?.children_data[cccl]?.level,
+                                    //     //         //             "product_count": children_data[i]?.children_data[ccl]?.children_data[cccl]?.product_count,
+                                    //     //         //             "img": ImageArray[j]?.children_data[iA]?.children_data[iiA]?.img,
+                                    //     //         //             "placeHolder": ImageArray[j]?.children_data[iA]?.children_data[iiA]?.placeHolder,
+                                    //     //         //             "children_data": []
+                                    //     //         //         };
+
+                                    //     //         //         for (let tA = 0; tA < tempArray1.length; tA++) {
+                                    //     //         //             for (let ttA = 0; ttA < tempArray1[tA].children_data.length; ttA++) {
+                                    //     //         //                 if (children_data[i]?.children_data[ccl]?.id == tempArray1[tA]?.children_data[ttA].id) {
+                                    //     //         //                     tempArray1[tA]?.children_data[ttA]?.children_data.push(obj2)
+                                    //     //         //                     break;
+                                    //     //         //                 }
+                                    //     //         //             }
+                                    //     //         //         }
+                                    //     //         //         // 
+
+
+                                    //     //         //         break;
+                                    //     //         //     }
+                                    //     //         // }
+                                    //     //     }
+                                    //     // }
+                                    // }
+
+
+
+                                }
+                            }
+
+                            if (ImageArray[i]?.children_data[ccl]?.id == undefined) {
+                                var obj2 = {
+                                    "id": children_data[i]?.children_data[ccl]?.id,
+                                    "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
+                                    "name": children_data[i]?.children_data[ccl]?.name,
+                                    "is_active": children_data[i]?.children_data[ccl]?.is_active,
+                                    "position": children_data[i]?.children_data[ccl]?.position,
+                                    "level": children_data[i]?.level,
+                                    "product_count": children_data[i]?.children_data[ccl]?.product_count,
+                                    "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
+                                    "placeHolder": true,
+                                    "children_data": []
+                                };
+
+                                for (let tA = 0; tA < tempArray1.length; tA++) {
+                                    if (tempArray1[tA]?.children_data.length == children_data[i]?.children_data.length) {
+                                        break;
+                                    } else {
+
+                                        tempArray1[tA]?.children_data.push(obj2)
+                                    }
+
+                                }
+
+                            }
+
+
+
+
+
+                        }
+                    }
+
+                }
+
+
+            }
+
+
+        }
+        console.log("tempArray1------------------", tempArray1)
+        this.setState({
+            defaultCategories: tempArray1
+        })
+        // for (let tA = 0; tA < tempArray1.length; tA++) {
+        //     console.log("tempArray1------------------", tempArray1[tA]?.children_data.length)
+
+        // }
+
+
+
+
+
+    }
+
+    selectedItems = (item, index, key) => {
+        switch (key) {
+            case 'main':
+                // console.log("Selected Item: ", item)
+                setImmediate(() => {
+                    this.setState({ selectedCat: item })
+                })
+                break;
+
+            case 'sub':
+                // console.log("Selected Item: ", item)
+                this.props.navigation.navigate("Products", { item, defaultCategories: this.state.defaultCategories })
+            // setImmediate(() => {
+            //     this.setState({ selectedSubCat: item })
+            // })
+        }
+    }
+
+
     render() {
+        // console.log("tempArray Outside", this.state.tempArray)
         return (
             <View style={styles.mainContainer}>
                 {/* <HomeHeader /> */}
@@ -51,11 +303,11 @@ class Categories extends Component {
                             <View style={styles.flatList_outerCont}>
 
                                 {
-                                    this.state.defaultCategories?.children_data.map((item, index) => {
+                                    this.state.defaultCategories?.map((item, index) => {
                                         return (
 
                                             <TouchableOpacity
-                                                onPress={() => this.selectedItems(item, index)}
+                                                onPress={() => this.selectedItems(item, index, 'main')}
                                                 style={styles.flatList_Cont}>
 
                                                 <View style={{
@@ -68,8 +320,9 @@ class Categories extends Component {
                                                     overflow: "hidden",
                                                     zIndex: 150,
                                                 }}>
-
-                                                    <Image source={require('../../../assets/placeholder.jpeg')} style={{ width: "100%", height: "100%" }} />
+                                                    {/* https://wpstaging51.a2zcreatorz.com/ */}
+                                                    {item?.placeHolder == "false" && <Image source={{ uri: "http://wpstaging51.a2zcreatorz.com" + item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                    {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
                                                 </View>
                                                 <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
                                             </TouchableOpacity>
@@ -94,7 +347,7 @@ class Categories extends Component {
                                         return (
 
                                             <TouchableOpacity
-                                                //  onPress={() => selectedItems(item, index)}
+                                                onPress={() => this.selectedItems(item, index, 'sub')}
                                                 style={styles.flatList_Cont_sub}>
 
                                                 <View style={{
@@ -108,7 +361,8 @@ class Categories extends Component {
                                                     zIndex: 150,
                                                 }}>
 
-                                                    <Image source={require('../../../assets/placeholder.jpeg')} style={{ width: "100%", height: "100%" }} />
+                                                    {item?.placeHolder == "false" && <Image source={{ uri: "http://wpstaging51.a2zcreatorz.com" + item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                    {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
                                                 </View>
                                                 <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
                                             </TouchableOpacity>

@@ -83,11 +83,11 @@ class HomeScreen extends Component {
         };
     }
 
-    getDefaultCategories = () => {
+    getDefaultCategories = async () => {
 
         const { actions, userData } = this.props
 
-        api.get('categories', {
+       await api.get('categories', {
             headers: {
                 Authorization: `Bearer ${userData?.admintoken}`,
             },
@@ -105,7 +105,8 @@ class HomeScreen extends Component {
 
         }).catch((err) => {
             //alert("Network Error Code: (CAT#1)")
-            console.log("categories Api error: ", err)
+            console.log("categories Api error: ", err.response)
+            this.getDefaultCategories()
             setImmediate(() => {
                 this.setState({
                     loader: false
