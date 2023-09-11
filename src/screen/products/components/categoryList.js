@@ -2,6 +2,7 @@ import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView
 import React, { Component } from 'react'
 const width = Dimensions.get("screen").width
 const CategoryList = ({ categories,selectedItem }) => {
+    console.log("CategoryList",categories)
     return (
         <View style={styles.mainContainer}>
 
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         height: 60,
+        marginTop:10,
       //  backgroundColor: "#bbb"
     },
 })

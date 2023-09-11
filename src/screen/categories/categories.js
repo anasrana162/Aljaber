@@ -281,8 +281,8 @@ class Categories extends Component {
                 break;
 
             case 'sub':
-                // console.log("Selected Item: ", item)
-                this.props.navigation.navigate("Products", { item, defaultCategories: this.state.defaultCategories })
+                 console.log("Selected Item: ", this.state.selectedCat )
+               this.props.navigation.navigate("Products", { item, defaultCategories: this.state.defaultCategories,mainCat_selected:this.state.selectedCat?.position })
             // setImmediate(() => {
             //     this.setState({ selectedSubCat: item })
             // })
@@ -321,7 +321,7 @@ class Categories extends Component {
                                                     zIndex: 150,
                                                 }}>
                                                     {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                                    {item?.placeHolder == "false" && <Image source={{ uri: "http://wpstaging51.a2zcreatorz.com" + item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                    {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
                                                     {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
                                                 </View>
                                                 <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
@@ -361,7 +361,7 @@ class Categories extends Component {
                                                     zIndex: 150,
                                                 }}>
 
-                                                    {item?.placeHolder == "false" && <Image source={{ uri: "http://wpstaging51.a2zcreatorz.com" + item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                    {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
                                                     {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
                                                 </View>
                                                 <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>

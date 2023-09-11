@@ -11,6 +11,7 @@ import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
 import ImageView from './components/ImageView';
 import CategoryList from './components/categoryList';
+import ProductList from './components/productList';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -23,6 +24,7 @@ class Products extends Component {
             categories: null,
             item: this.props?.route?.params?.item,
             original: null,
+            loader:false,
         };
     }
 
@@ -30,24 +32,31 @@ class Products extends Component {
     // then send its sku from the data to Single Product Detail API with loop
     // then add that data to an array
 
-    createData = () => {
+    createData = async () => {
         var { item } = this.state;
         const { userData: { admintoken }, actions, userData } = this.props
         // console.log("item Products Screen", item)
 
+        setImmediate(() => {
+            this.setState({
+                loader: true,
+               
+            })
+        })
+
         let products = []
-        api.get('/categories/' + item.id + '/products', {
+        await api.get('/categories/' + item.id + '/products', {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
-        }).then((res) => {
+        }).then(async (res) => {
             // console.log("Product Api:", res?.data)
             var temp = res?.data
-            // console.log("Products Index:", temp?.length)
+            console.log("Products Index:", temp?.length)
             for (let p = 0; p < temp.length; p++) {
-                // console.log("res?.data?:", temp[p]?.sku)
+                //console.log("res?.data?:", temp[p]?.sku)
 
-                api.get('/products/' + temp[p]?.sku, {
+                await api.get('/products/' + temp[p]?.sku, {
                     headers: {
                         Authorization: `Bearer ${admintoken}`,
                     },
@@ -56,17 +65,24 @@ class Products extends Component {
 
                     products.push(prod?.data)
                     // console.log("Api Array index current", p)
-                    if (p == temp.length - 1) {
+                     if (p == temp.length - 1) {
 
                         setImmediate(() => {
                             this.setState({
                                 loader: false,
-                                products: products,
-                                original: products,
+                               
                             })
                             // console.log("Products State", this.state.products)
                         })
                     }
+                    setImmediate(() => {
+                        this.setState({
+                          
+                            products: products,
+                            original: products,
+                        })
+                        // console.log("Products State", this.state.products)
+                    })
 
 
                 }).catch((err) => {
@@ -92,19 +108,30 @@ class Products extends Component {
         })
     }
     inner_Categories = () => {
-        var { item, defaultCategories: { children_data } } = this.props?.route?.params;
-        console.log("children_data", item.children_data.length)
+        var { item, defaultCategories, mainCat_selected } = this.props?.route?.params;
+        var { userData: { defaultcategory, admintoken } } = this.props
+        // console.log("children_data", item)
+        var mainIndex = mainCat_selected - 1
+        if (mainIndex == 0) {
+            mainIndex = 0
+        } else {
+            mainIndex = mainIndex - 1
+        }
+        // console.log("children_data", mainIndex)
+        // console.log("defaultCategories", defaultcategory?.children_data[mainIndex]?.children_data[item.position - 1]?.children_data)
+
+        var inner_cats = defaultcategory?.children_data[mainIndex]?.children_data[item.position - 1]?.children_data
 
         setImmediate(() => {
             this.setState({
-                categories: item.children_data.length == 0 ? null : item.children_data
+                categories: inner_cats == 0 ? null : inner_cats
             })
         })
     }
 
     selectedItems = (item, index) => {
 
-        console.log("Selected Item: ", item)
+        // console.log("Selected Item: ", item)
         if (item.children_data.length !== 0) {
 
             setImmediate(() => {
@@ -125,7 +152,7 @@ class Products extends Component {
 
     render() {
         var { item } = this.props?.route?.params;
-        // console.log("Products State", this.state.products)
+        console.log("Products State", this.state.products)
         return (
             <View style={styles.mainContainer}>
                 {/** Screen Header */}
@@ -133,7 +160,7 @@ class Products extends Component {
 
                 {/** Top Image & Category Name */}
                 <ImageView
-                    source={require('../../../assets/Sunglasses_6.jpg')}
+                    source={{ uri: "https://aljaberoptical.com/" + item?.img }}
                     textEN={item?.name}
                     textAR={""}
                 />
@@ -147,6 +174,9 @@ class Products extends Component {
                 }
 
                 {/* Product List */}
+
+
+                {this.state.products != null && < ProductList data={this.state.products} loader={this.state.loader} />}
 
 
             </View>

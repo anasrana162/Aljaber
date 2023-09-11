@@ -1,14 +1,238 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView } from 'react-native'
+import React, { Component } from 'react'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+const width = Dimensions.get("screen").width
+const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = () => {
+const ProductList = ({ data,loader }) => {
+    // console.log("Products", data)
     return (
-        <View>
-            <Text>P</Text>
-        </View>
+        <View style={styles?.mainContainer}>
+
+            <View style={styles.filterBoxes_Cont}>
+                {/* Sort By */}
+                <TouchableOpacity style={styles.filterBox}>
+                    <Text style={styles?.filterBox_Text}>SORT BY</Text>
+                    <MaterialIcons size={25} name="keyboard-arrow-down" color="#020621" />
+                </TouchableOpacity>
+
+                {/* Filter */}
+                <TouchableOpacity style={styles.filterBox}>
+                    <Text style={styles?.filterBox_Text}>FILTER</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Products List */}
+
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                style={{ width: width }}
+            >
+                {loader == true &&
+                    <View style={[styles.productList_cont]}>
+
+                        <View style={styles.product_Cont}>
+
+                            <SkeletonPlaceholder  >
+                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+
+                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+
+                                    </SkeletonPlaceholder.Item>
+
+                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+
+                                </View>
+                            </SkeletonPlaceholder>
+                        </View>
+
+                        <View style={styles.product_Cont}>
+                            <SkeletonPlaceholder >
+                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+
+                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+
+                                </View>
+                            </SkeletonPlaceholder>
+                        </View>
+
+                        <View style={styles.product_Cont}>
+
+                            <SkeletonPlaceholder  >
+                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+
+                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+
+                                    </SkeletonPlaceholder.Item>
+
+                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+
+                                </View>
+                            </SkeletonPlaceholder>
+                        </View>
+
+                        <View style={styles.product_Cont}>
+
+                            <SkeletonPlaceholder  >
+                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+
+                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+
+                                    </SkeletonPlaceholder.Item>
+
+                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                    </SkeletonPlaceholder.Item>
+
+                                </View>
+                            </SkeletonPlaceholder>
+                        </View>
+
+                    </View>
+                }
+
+                {data.lenght != 0 && <View style={styles.productList_cont}>
+                    {
+                        data.map((products, index) => {
+                            console.log("products?.media_gallery_entries[0]?.file", products?.media_gallery_entries[0]?.file)
+                            return (
+                                <TouchableOpacity
+                                    key={String(products?.id)}
+                                    style={styles.product_Cont}
+                                >
+
+
+                                    <Image
+                                        resizeMode='stretch'
+                                        source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
+                                        style={{ width: "100%", height: 110, borderRadius: 10 }}
+                                    />
+                                    <Text numberOfLines={2} style={styles.product_Name}>{products?.name}</Text>
+                                    <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
+
+                                    <TouchableOpacity style={styles?.addToCart_Cont}>
+                                        <Text style={styles.addToCart}>Add to Cart</Text>
+                                    </TouchableOpacity>
+
+
+                                </TouchableOpacity>
+                            )
+                        })
+                    }
+                </View>}
+            </ScrollView >
+
+        </View >
     )
 }
 
 export default ProductList;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+
+    mainContainer: {
+        width: width,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 20
+    },
+
+    filterBoxes_Cont: {
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-around",
+        marginBottom: 10,
+    },
+
+    filterBox: {
+        width: width / 2 - 50,
+        height: 40,
+        backgroundColor: "#f0f0f0",
+        borderRadius: 5,
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+    },
+
+    filterBox_Text: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: "#020621",
+    },
+
+    productList_cont: {
+        width: "100%",
+        height: "90%",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        marginTop: 10,
+        marginBottom: 320,
+    },
+    product_Cont: {
+        marginVertical: 10,
+        marginHorizontal: 10,
+        width: width / 2 - 20,
+        height: 230,
+        backgroundColor: "#fffff",
+        borderRadius: 5,
+        alignItems: "center",
+        // elevation: 4,
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.4,
+        // shadowRadius: 1.5,
+        // borderTopWidth: 0.4,
+        borderColor: "#bbb"
+    },
+    product_Name: {
+        fontSize: 12,
+        fontWeight: "600",
+        color: "#020621",
+        marginTop: 10,
+        textAlign: "center",
+    },
+    addToCart: {
+        fontSize: 12,
+        fontWeight: "600",
+        color: "#020621",
+        textAlign: "center",
+    },
+    addToCart_Cont: {
+        width: 80,
+        height: 30,
+        marginTop: 10,
+        backgroundColor: "#f0f0f0",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 5
+    }
+
+
+})

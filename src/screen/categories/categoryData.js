@@ -18,7 +18,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 36,
-                "img": "/aljaber_newsite/pub/media/wysiwyg/smartwave/porto/theme_assets/images/prada.jpg",
+                "img": "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/prada.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -54,7 +54,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 2,
-                "img": "/aljaber_newsite/pub/media/wysiwyg/smartwave/porto/theme_assets/images/prada.jpg",
+                "img": "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/prada.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -66,7 +66,7 @@ export var ImageArray = [
                 "position": 5,
                 "level": 3,
                 "product_count": 22,
-                "img": "/aljaber_newsite/pub/media/wysiwyg/smartwave/porto/theme_assets/images/prada.jpg",
+                "img": "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/prada.jpg",
                 "placeHolder": "false",
                 "children_data": []
             }
@@ -80,7 +80,7 @@ export var ImageArray = [
         "position": 3,
         "level": 2,
         "product_count": 108,
-        "img": "/aljaber_newsite/pub/media/catalog/category/Contact-Lenses_5.jpg",
+        "img": "/pub/media/catalog/category/Contact-Lenses_5.jpg",
         "placeHolder": "false",
         "children_data": [
             {
@@ -91,7 +91,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 12,
-                "img": "/aljaber_newsite/pub/media/catalog/category/image_2021_04_13T14_10_50_074Z.png",
+                "img": "/pub/media/catalog/category/image_2021_04_13T14_10_50_074Z.png",
                 "placeHolder": "false",
                 "children_data": [
                     {
@@ -140,7 +140,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 73,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Color_3.jpg",
+                "img": "/pub/media/catalog/category/Color_3.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -152,7 +152,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 9,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Toric-for-Astigmatism_6.jpg",
+                "img": "/pub/media/catalog/category/Toric-for-Astigmatism_6.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -164,7 +164,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 4,
-                "img": "/aljaber_newsite/pub/media/catalog/category/image_2021_04_13T14_10_50_074Z.png",
+                "img": "/pub/media/catalog/category/image_2021_04_13T14_10_50_074Z.png",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -176,7 +176,7 @@ export var ImageArray = [
                 "position": 5,
                 "level": 3,
                 "product_count": 9,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Lens-Solution_4.jpg",
+                "img": "/pub/media/catalog/category/Lens-Solution_4.jpg",
                 "placeHolder": "false",
                 "children_data": []
             }
@@ -190,7 +190,7 @@ export var ImageArray = [
         "position": 4,
         "level": 2,
         "product_count": 87,
-        "img": '/aljaber_newsite/pub/media/catalog/category/Computer-Glasses_6.jpg',
+        "img": '/pub/media/catalog/category/Computer-Glasses_6.jpg',
         "placeHolder": "false",
         "children_data": [
             {
@@ -201,7 +201,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 34,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Unisex_19.jpg",
+                "img": "/pub/media/catalog/category/Unisex_19.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -213,7 +213,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 29,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Kids_20.jpg",
+                "img": "/pub/media/catalog/category/Kids_20.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -225,7 +225,7 @@ export var ImageArray = [
                 "level": 3,
                 "product_count": 13,
                 "name": "Accessories for Computer Glasses",
-                "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "/pub/media/catalog/category/banner2_1_.jpg",
                 "placeHolder": "false",
                 "children_data": [
                     {
@@ -236,7 +236,7 @@ export var ImageArray = [
                         "position": 1,
                         "level": 4,
                         "product_count": 13,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -248,7 +248,7 @@ export var ImageArray = [
                         "position": 2,
                         "level": 4,
                         "product_count": 0,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -260,7 +260,7 @@ export var ImageArray = [
                         "position": 3,
                         "level": 4,
                         "product_count": 0,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     }
@@ -276,7 +276,7 @@ export var ImageArray = [
         "position": 5,
         "level": 2,
         "product_count": 202,
-        "img": "/aljaber_newsite/pub/media/catalog/category/Reading-Glasses_5.jpg",
+        "img": "/pub/media/catalog/category/Reading-Glasses_5.jpg",
         "placeHolder": "false",
         "children_data": [
             {
@@ -287,7 +287,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 28,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Reading-Glasses_5.jpg",
+                "img": "/pub/media/catalog/category/Reading-Glasses_5.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -323,7 +323,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 23,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Frames_3.jpg",
+                "img": "/pub/media/catalog/category/Frames_3.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -347,7 +347,7 @@ export var ImageArray = [
                 "position": 6,
                 "level": 3,
                 "product_count": 33,
-                "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "/pub/media/catalog/category/banner2_1_.jpg",
                 "placeHolder": "false",
                 "children_data": [
                     {
@@ -358,7 +358,7 @@ export var ImageArray = [
                         "position": 1,
                         "level": 4,
                         "product_count": 27,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -370,7 +370,7 @@ export var ImageArray = [
                         "position": 2,
                         "level": 4,
                         "product_count": 2,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -382,7 +382,7 @@ export var ImageArray = [
                         "position": 3,
                         "level": 4,
                         "product_count": 4,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     }
@@ -398,7 +398,7 @@ export var ImageArray = [
         "position": 6,
         "level": 2,
         "product_count": 342,
-        "img": "/aljaber_newsite/pub/media/catalog/category/Sunglasses_6.jpg",
+        "img": "/pub/media/catalog/category/Sunglasses_6.jpg",
         "placeHolder": "false",
         "children_data": [
             {
@@ -409,7 +409,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 164,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Men_12.jpg",
+                "img": "/pub/media/catalog/category/Men_12.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -421,7 +421,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 220,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Women_20.jpg",
+                "img": "/pub/media/catalog/category/Women_20.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -433,7 +433,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 27,
-                "img": "/aljaber_newsite/pub/media/catalog/category/Kids_16_1.jpg",
+                "img": "/pub/media/catalog/category/Kids_16_1.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -457,7 +457,7 @@ export var ImageArray = [
                 "position": 5,
                 "level": 3,
                 "product_count": 23,
-                "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "/pub/media/catalog/category/banner2_1_.jpg",
                 "placeHolder": "false",
                 "children_data": [
                     {
@@ -468,7 +468,7 @@ export var ImageArray = [
                         "position": 1,
                         "level": 4,
                         "product_count": 1,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -480,7 +480,7 @@ export var ImageArray = [
                         "position": 2,
                         "level": 4,
                         "product_count": 0,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -492,7 +492,7 @@ export var ImageArray = [
                         "position": 3,
                         "level": 4,
                         "product_count": 12,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -504,7 +504,7 @@ export var ImageArray = [
                         "position": 4,
                         "level": 4,
                         "product_count": 1,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                        "img": "/pub/media/catalog/category/banner2_1_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -516,7 +516,7 @@ export var ImageArray = [
                         "position": 5,
                         "level": 4,
                         "product_count": 7,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/saftey_.jpg",
+                        "img": "/pub/media/catalog/category/saftey_.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     },
@@ -528,7 +528,7 @@ export var ImageArray = [
                         "position": 6,
                         "level": 4,
                         "product_count": 2,
-                        "img": "/aljaber_newsite/pub/media/catalog/category/swimming_banner.jpg",
+                        "img": "/pub/media/catalog/category/swimming_banner.jpg",
                         "placeHolder": "false",
                         "children_data": []
                     }
@@ -544,7 +544,7 @@ export var ImageArray = [
         "position": 7,
         "level": 2,
         "product_count": 6,
-        "img": "/aljaber_newsite/pub/media/catalog/category/OffersBanners_AJO-05.jpg",
+        "img": "/pub/media/catalog/category/OffersBanners_AJO-05.jpg",
         "placeHolder": "false",
         "children_data": []
     },
@@ -568,7 +568,7 @@ export var ImageArray = [
         "position": 9,
         "level": 2,
         "product_count": 47,
-        "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+        "img": "/pub/media/catalog/category/banner2_1_.jpg",
         "placeHolder": "false",
         "children_data": [
             {
@@ -579,7 +579,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 20,
-                "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "/pub/media/catalog/category/banner2_1_.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -591,7 +591,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 1,
-                "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "/pub/media/catalog/category/banner2_1_.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -603,7 +603,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 16,
-                "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "/pub/media/catalog/category/banner2_1_.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -615,7 +615,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 1,
-                "img": "/aljaber_newsite/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "/pub/media/catalog/category/banner2_1_.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -627,7 +627,7 @@ export var ImageArray = [
                 "position": 5,
                 "level": 3,
                 "product_count": 7,
-                "img": "/aljaber_newsite/pub/media/catalog/category/saftey_.jpg",
+                "img": "/pub/media/catalog/category/saftey_.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -639,7 +639,7 @@ export var ImageArray = [
                 "position": 6,
                 "level": 3,
                 "product_count": 2,
-                "img": "/aljaber_newsite/pub/media/catalog/category/swimming_banner.jpg",
+                "img": "/pub/media/catalog/category/swimming_banner.jpg",
                 "placeHolder": "false",
                 "children_data": []
             }

@@ -30,12 +30,12 @@ class App extends Component {
     };
   }
 
-  adminApi = () => {
+  adminApi = async () => {
 
     console.log(this.props)
     const { actions } = this.props
 
-    api.post('integration/admin/token', {
+   await api.post('integration/admin/token', {
       "username": "manager",
       "password": "Pakistan2023"
     }).then((res) => {
