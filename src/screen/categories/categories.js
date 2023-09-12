@@ -50,9 +50,6 @@ class Categories extends Component {
 
             for (let i = 0; i < children_data.length; i++) {
                 console.log(children_data[i]?.children_data.length)
-                // console.log("")
-                // console.log("children_data", ç[i]?.id, " ", children_data[i]?.children_data)
-
                 for (let j = 0; j < ImageArray.length; j++) {
 
                     if (ImageArray[j]?.id == children_data[i]?.id) {
@@ -74,7 +71,7 @@ class Categories extends Component {
 
                     }
                     if (ImageArray[i]?.id == undefined) {
-                           var obj = {
+                        var obj = {
                             "id": children_data[i]?.id,
                             "parent_id": children_data[i]?.parent_id,
                             "name": children_data[i]?.name,
@@ -100,31 +97,10 @@ class Categories extends Component {
                         }
 
                     }
-                    // else {
-                    //     var obj = {
-                    //         "id": children_data[i]?.id,
-                    //         "parent_id": children_data[i]?.parent_id,
-                    //         "name": children_data[i]?.name,
-                    //         "is_active": children_data[i]?.is_active,
-                    //         "position": children_data[i]?.position,
-                    //         "level": children_data[i]?.level,
-                    //         "product_count": children_data[i]?.product_count,
-                    //         "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-                    //         "placeHolder": true,
-                    //         "children_data": []
-                    //     };
-                    //     tempArray1.push(obj)
-                    //     break;
-                    // }
-
-
                 }
-
-
 
                 for (let j = 0; j < ImageArray.length; j++) {
                     // console.log(" ImageArray[j]?.children_data.length)", ImageArray[j]?.children_data.length)
-
                     //  Sub Cat
                     if (children_data[i]?.children_data.length !== 0) {
 
@@ -157,65 +133,8 @@ class Categories extends Component {
                                             break;
                                         }
                                     }
-                                    // 
-
-
-                                    // break;
-
-                                    // Sub Sub Cat
-
-
-                                    // if (children_data[i]?.children_data[ccl]?.children_data.length !== 0) {
-                                    //      console.log(children_data[i]?.children_data[ccl])
-
-                                    //     // for (let cccl = 0; children_data[i]?.children_data[ccl]?.children_data.length; cccl++) {
-
-                                    //     //     if (ImageArray[j]?.children_data[iA]?.children_data.length !== 0) {
-
-                                    //     //         console.log("Innner DATAAAAA",children_data[i]?.children_data[ccl])
-
-                                    //     //         // for (let iiA = 0; iiA < ImageArray[j]?.children_data[iA]?.children_data.length; iiA++) {
-                                    //     //         //     var obj2 = {}
-
-                                    //     //         //     if (ImageArray[j]?.children_data[iA]?.children_data[iiA]?.id == children_data[i]?.children_data[ccl]?.children_data[cccl]?.id) {
-
-
-                                    //     //         //         obj2 = {
-                                    //     //         //             "id": children_data[i]?.children_data[ccl]?.children_data[cccl]?.id,
-                                    //     //         //             "parent_id": children_data[i]?.children_data[ccl]?.children_data[cccl]?.parent_id,
-                                    //     //         //             "name": children_data[i]?.children_data[ccl]?.children_data[cccl]?.name,
-                                    //     //         //             "is_active": children_data[i]?.children_data[ccl]?.children_data[cccl]?.is_active,
-                                    //     //         //             "position": children_data[i]?.children_data[ccl]?.children_data[cccl]?.position,
-                                    //     //         //             "level": children_data[i]?.children_data[ccl]?.children_data[cccl]?.level,
-                                    //     //         //             "product_count": children_data[i]?.children_data[ccl]?.children_data[cccl]?.product_count,
-                                    //     //         //             "img": ImageArray[j]?.children_data[iA]?.children_data[iiA]?.img,
-                                    //     //         //             "placeHolder": ImageArray[j]?.children_data[iA]?.children_data[iiA]?.placeHolder,
-                                    //     //         //             "children_data": []
-                                    //     //         //         };
-
-                                    //     //         //         for (let tA = 0; tA < tempArray1.length; tA++) {
-                                    //     //         //             for (let ttA = 0; ttA < tempArray1[tA].children_data.length; ttA++) {
-                                    //     //         //                 if (children_data[i]?.children_data[ccl]?.id == tempArray1[tA]?.children_data[ttA].id) {
-                                    //     //         //                     tempArray1[tA]?.children_data[ttA]?.children_data.push(obj2)
-                                    //     //         //                     break;
-                                    //     //         //                 }
-                                    //     //         //             }
-                                    //     //         //         }
-                                    //     //         //         // 
-
-
-                                    //     //         //         break;
-                                    //     //         //     }
-                                    //     //         // }
-                                    //     //     }
-                                    //     // }
-                                    // }
-
-
-
                                 }
                             }
-
                             if (ImageArray[i]?.children_data[ccl]?.id == undefined) {
                                 var obj2 = {
                                     "id": children_data[i]?.children_data[ccl]?.id,
@@ -241,34 +160,15 @@ class Categories extends Component {
                                 }
 
                             }
-
-
-
-
-
                         }
                     }
-
                 }
-
-
             }
-
-
         }
-        console.log("tempArray1------------------", tempArray1)
+        // console.log("tempArray1------------------", tempArray1)
         this.setState({
             defaultCategories: tempArray1
         })
-        // for (let tA = 0; tA < tempArray1.length; tA++) {
-        //     console.log("tempArray1------------------", tempArray1[tA]?.children_data.length)
-
-        // }
-
-
-
-
-
     }
 
     selectedItems = (item, index, key) => {
@@ -281,11 +181,8 @@ class Categories extends Component {
                 break;
 
             case 'sub':
-                 console.log("Selected Item: ", this.state.selectedCat )
-               this.props.navigation.navigate("Products", { item, defaultCategories: this.state.defaultCategories,mainCat_selected:this.state.selectedCat?.position })
-            // setImmediate(() => {
-            //     this.setState({ selectedSubCat: item })
-            // })
+                console.log("Selected Item: ", this.state.selectedCat)
+                this.props.navigation.navigate("Products", { item, defaultCategories: this.state.defaultCategories, mainCat_selected: this.state.selectedCat?.position })
         }
     }
 
@@ -305,27 +202,31 @@ class Categories extends Component {
                                 {
                                     this.state.defaultCategories?.map((item, index) => {
                                         return (
+                                            <>
 
-                                            <TouchableOpacity
-                                                onPress={() => this.selectedItems(item, index, 'main')}
-                                                style={styles.flatList_Cont}>
+                                                {item?.is_active == true &&
+                                                    <TouchableOpacity
+                                                        key={String(item?.id)}
+                                                        onPress={() => this.selectedItems(item, index, 'main')}
+                                                        style={styles.flatList_Cont}>
 
-                                                <View style={{
-                                                    width: 70,
-                                                    height: 70,
-                                                    borderWidth: 1,
-                                                    borderRadius: 120,
-                                                    borderColor: "#020621",
-                                                    marginBottom: 10,
-                                                    overflow: "hidden",
-                                                    zIndex: 150,
-                                                }}>
-                                                    {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                                    {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                    {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                </View>
-                                                <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
-                                            </TouchableOpacity>
+                                                        <View style={{
+                                                            width: 70,
+                                                            height: 70,
+                                                            borderWidth: 1,
+                                                            borderRadius: 120,
+                                                            borderColor: "#020621",
+                                                            marginBottom: 10,
+                                                            overflow: "hidden",
+                                                            zIndex: 150,
+                                                        }}>
+                                                            {/* https://wpstaging51.a2zcreatorz.com/ */}
+                                                            {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                        </View>
+                                                        <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
+                                                    </TouchableOpacity>}
+                                            </>
                                         )
                                     })
                                 }
@@ -345,27 +246,30 @@ class Categories extends Component {
                                     this.state.selectedCat?.children_data.map((item, index) => {
                                         console.log(item)
                                         return (
+                                            <>
+                                                {item?.is_active == true &&
+                                                    <TouchableOpacity
+                                                        onPress={() => this.selectedItems(item, index, 'sub')}
+                                                        style={styles.flatList_Cont_sub}>
 
-                                            <TouchableOpacity
-                                                onPress={() => this.selectedItems(item, index, 'sub')}
-                                                style={styles.flatList_Cont_sub}>
+                                                        <View style={{
+                                                            width: 100,
+                                                            height: 90,
+                                                            borderWidth: 1,
+                                                            borderColor: "#020621",
+                                                            borderRadius: 10,
+                                                            marginBottom: 10,
+                                                            overflow: "hidden",
+                                                            zIndex: 150,
+                                                        }}>
 
-                                                <View style={{
-                                                    width: 100,
-                                                    height: 90,
-                                                    borderWidth: 1,
-                                                    borderColor: "#020621",
-                                                    borderRadius: 10,
-                                                    marginBottom: 10,
-                                                    overflow: "hidden",
-                                                    zIndex: 150,
-                                                }}>
-
-                                                    {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                    {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                </View>
-                                                <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
-                                            </TouchableOpacity>
+                                                            {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                        </View>
+                                                        <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
+                                                    </TouchableOpacity>
+                                                }
+                                            </>
                                         )
                                     })
                                 }

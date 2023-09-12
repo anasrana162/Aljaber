@@ -2,7 +2,7 @@ import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView
 import React, { Component } from 'react'
 const width = Dimensions.get("screen").width
 const CategoryList = ({ categories,selectedItem }) => {
-    console.log("CategoryList",categories)
+    // console.log("CategoryList",categories)
     return (
         <View style={styles.mainContainer}>
 
@@ -25,7 +25,7 @@ const CategoryList = ({ categories,selectedItem }) => {
                                         padding:10,
                                         borderWidth: 1,
                                         borderRadius: 5,
-                                        borderColor: "#0ec9a1",
+                                        borderColor: "#3f999e",
                                         overflow: "hidden",
                                         zIndex: 150,
                                         marginHorizontal:20

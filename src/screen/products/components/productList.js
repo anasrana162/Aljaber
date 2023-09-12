@@ -118,7 +118,7 @@ const ProductList = ({ data,loader }) => {
                 {data.lenght != 0 && <View style={styles.productList_cont}>
                     {
                         data.map((products, index) => {
-                            console.log("products?.media_gallery_entries[0]?.file", products?.media_gallery_entries[0]?.file)
+                            // console.log("products?.media_gallery_entries[0]?.file", products?.media_gallery_entries[0]?.file)
                             return (
                                 <TouchableOpacity
                                     key={String(products?.id)}

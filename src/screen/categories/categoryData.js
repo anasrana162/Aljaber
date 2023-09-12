@@ -299,8 +299,8 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 73,
-                "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-                "placeHolder": "true",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/man-cat.jpg",
+                "placeHolder": "false",
                 "children_data": []
             },
             {
@@ -311,8 +311,8 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 39,
-                "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-                "placeHolder": "true",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/women-cat.jpg",
+                "placeHolder": "false",
                 "children_data": []
             },
             {
@@ -323,7 +323,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 23,
-                "img": "/pub/media/catalog/category/Frames_3.jpg",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/kid-cat.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -347,7 +347,7 @@ export var ImageArray = [
                 "position": 6,
                 "level": 3,
                 "product_count": 33,
-                "img": "/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/sunglasses-cat.jpg",
                 "placeHolder": "false",
                 "children_data": [
                     {
