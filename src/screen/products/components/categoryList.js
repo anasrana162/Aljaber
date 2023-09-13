@@ -1,7 +1,7 @@
 import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView } from 'react-native'
 import React, { Component } from 'react'
 const width = Dimensions.get("screen").width
-const CategoryList = ({ categories,selectedItem }) => {
+const CategoryList = ({ categories, selectedItem }) => {
     // console.log("CategoryList",categories)
     return (
         <View style={styles.mainContainer}>
@@ -10,9 +10,9 @@ const CategoryList = ({ categories,selectedItem }) => {
                 showsVerticalScrollIndicator={false}
                 horizontal
             >
-                <View style={[styles.mainContainer,{
-                    width:null,
-                    flexDirection:"row"
+                <View style={[styles.mainContainer, {
+                    width: null,
+                    flexDirection: "row"
                 }]}>
 
                     {
@@ -22,13 +22,13 @@ const CategoryList = ({ categories,selectedItem }) => {
                                 <TouchableOpacity
                                     onPress={() => selectedItem(item, index)}
                                     style={{
-                                        padding:10,
+                                        padding: 10,
                                         borderWidth: 1,
                                         borderRadius: 5,
                                         borderColor: "#3f999e",
                                         overflow: "hidden",
                                         zIndex: 150,
-                                        marginHorizontal:20
+                                        marginHorizontal: 20
                                     }}>
 
 
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         height: 60,
-        marginTop:10,
-      //  backgroundColor: "#bbb"
+        marginTop: 10,
+        //  backgroundColor: "#bbb"
     },
 })

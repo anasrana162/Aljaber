@@ -7,12 +7,15 @@ import HomeCategories from './components/homeCategories';
 import api from '../../api/api';
 import RNRestart from 'react-native-restart';
 import NetInfo from "@react-native-community/netinfo";
+import DefaultCategories from './components/defaultCategories';
+import ProductList from '../products/components/productList';
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
 import Loading from '../../components_reusable/loading';
-
+import { ImageArray } from '../categories/categoryData';
+import { ProductData } from './productData';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -85,8 +88,22 @@ class HomeScreen extends Component {
             loader: false,
             categoryApiCounter: 0,
             network: true,
+            defaultCategories1: null,
+            selectedCat: null,
+            selectedSubCat: null,
+            tempArray: [],
+            firstSubItem: null,
+            randomProducts: null,
+            topCategoryData: null,
         };
     }
+
+    componentDidMount = () => {
+        this.getDefaultCategories()
+        this.unsubscribe()
+        this.randomProducts()
+    }
+
     adminApi = async () => {
 
         // console.log(this.props)
@@ -159,6 +176,11 @@ class HomeScreen extends Component {
                             defaultCategories: res?.data
                         })
                         actions.defaultCategories(res?.data)
+
+                        setTimeout(() => {
+                            this.defaultCategories()
+                        }, 500)
+
                     })
 
 
@@ -186,6 +208,141 @@ class HomeScreen extends Component {
         }
     }
 
+    defaultCategories = () => {
+        const { actions, userData: { defaultcategory, admintoken } } = this.props
+        if (Object.keys(defaultcategory).length !== 0) {
+            //console.log("working")
+            var { children_data } = defaultcategory
+            var obj = {}
+            var tempArray1 = [];
+
+            for (let i = 0; i < children_data.length; i++) {
+                console.log(children_data[i]?.children_data.length)
+                for (let j = 0; j < ImageArray.length; j++) {
+
+                    if (ImageArray[j]?.id == children_data[i]?.id) {
+                        var obj = {
+                            "id": children_data[i]?.id,
+                            "parent_id": children_data[i]?.parent_id,
+                            "name": children_data[i]?.name,
+                            "is_active": ImageArray[j]?.is_active,
+                            "position": children_data[i]?.position,
+                            "level": children_data[i]?.level,
+                            "product_count": children_data[i]?.product_count,
+                            "img": ImageArray[j]?.img,
+                            "placeHolder": ImageArray[j]?.placeHolder,
+                            "children_data": []
+                        };
+                        tempArray1.push(obj)
+
+                        break;
+
+                    }
+                    if (ImageArray[i]?.id == undefined) {
+                        var obj = {
+                            "id": children_data[i]?.id,
+                            "parent_id": children_data[i]?.parent_id,
+                            "name": children_data[i]?.name,
+                            "is_active": children_data[i]?.is_active,
+                            "position": children_data[i]?.position,
+                            "level": children_data[i]?.level,
+                            "product_count": children_data[i]?.product_count,
+                            "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
+                            "placeHolder": true,
+                            "children_data": []
+                        };
+                        // tempArray1.push(obj)
+                        // break;
+
+                        for (let tA = 0; tA < tempArray1.length; tA++) {
+                            if (tempArray1[tA]?.length == children_data[i]?.length) {
+                                break;
+                            } else {
+
+                                tempArray1[tA]?.push(obj)
+                            }
+
+                        }
+
+                    }
+                }
+
+                for (let j = 0; j < ImageArray.length; j++) {
+                    // console.log(" ImageArray[j]?.children_data.length)", ImageArray[j]?.children_data.length)
+                    //  Sub Cat
+                    if (children_data[i]?.children_data.length !== 0) {
+
+                        for (let ccl = 0; ccl < children_data[i]?.children_data.length; ccl++) {
+
+
+                            for (let iA = 0; iA < ImageArray[j]?.children_data?.length; iA++) {
+
+                                // console.log(ImageArray[j]?.children_data[iA])
+                                var obj2 = {}
+                                if (ImageArray[j]?.children_data[iA]?.id == children_data[i]?.children_data[ccl]?.id) {
+
+
+                                    obj2 = {
+                                        "id": children_data[i]?.children_data[ccl]?.id,
+                                        "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
+                                        "name": children_data[i]?.children_data[ccl]?.name,
+                                        "is_active": children_data[i]?.children_data[ccl]?.is_active,
+                                        "position": children_data[i]?.children_data[ccl]?.position,
+                                        "level": children_data[i]?.children_data[ccl]?.level,
+                                        "product_count": children_data[i]?.children_data[ccl]?.product_count,
+                                        "img": ImageArray[j]?.children_data[iA]?.img,
+                                        "placeHolder": ImageArray[j]?.children_data[iA]?.placeHolder,
+                                        "children_data": []
+                                    };
+
+                                    for (let tA = 0; tA < tempArray1.length; tA++) {
+                                        if (children_data[i]?.id == tempArray1[tA]?.id) {
+                                            tempArray1[tA]?.children_data.push(obj2)
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (ImageArray[i]?.children_data[ccl]?.id == undefined) {
+                                var obj2 = {
+                                    "id": children_data[i]?.children_data[ccl]?.id,
+                                    "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
+                                    "name": children_data[i]?.children_data[ccl]?.name,
+                                    "is_active": children_data[i]?.children_data[ccl]?.is_active,
+                                    "position": children_data[i]?.children_data[ccl]?.position,
+                                    "level": children_data[i]?.level,
+                                    "product_count": children_data[i]?.children_data[ccl]?.product_count,
+                                    "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
+                                    "placeHolder": true,
+                                    "children_data": []
+                                };
+
+                                for (let tA = 0; tA < tempArray1.length; tA++) {
+                                    if (tempArray1[tA]?.children_data.length == children_data[i]?.children_data.length) {
+                                        break;
+                                    } else {
+
+                                        tempArray1[tA]?.children_data.push(obj2)
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        console.log("tempArray1", tempArray1[1])
+        actions?.createdDefaultCategories(tempArray1)
+        this.setState({
+
+            defaultCategories1: tempArray1,
+            firstSubItem: tempArray1[1]
+        });
+        this.topCatData(tempArray1)
+    }
+
     unsubscribe = NetInfo.addEventListener(state => {
         console.log("Connection type", state.type);
         console.log("Is connected?", state.isConnected);
@@ -206,12 +363,64 @@ class HomeScreen extends Component {
         }
     });
 
+    topCatData = (array) => {
+        let arr = []
+        for (let ar = 0; ar < array.length; ar++) {
+            if (array[ar]?.id == 26) {
+                arr.push(array[ar])
+            }
+        }
+        console.log("Top Categories:", arr)
+        setImmediate(() => {
+            this.setState({
+                topCategoryData: arr
+            })
+        })
 
-
-    componentDidMount = () => {
-        this.getDefaultCategories()
-        this.unsubscribe()
     }
+
+    randomProducts = () => {
+
+        let randomProducts = []
+        let RPID = []
+        for (let p = 0; p < 6; p++) {
+
+            if (RPID.length == 0) {
+                const randomIndex = Math.floor(Math.random() * ProductData.length);
+                console.log("randomIndex RPID LENGTH COND", randomIndex)
+                randomProducts[p] = ProductData[randomIndex]
+                RPID.push(randomIndex)
+            } else {
+                for (let t = 0; t < RPID.length; t++) {
+                    const randomIndex = Math.floor(Math.random() * ProductData.length);
+                    if (RPID[t] !== randomIndex) {
+                        // const randomIndex = Math.floor(Math.random() * ProductData.length);
+                        console.log("randomIndex RPID LENGTH COND", randomIndex)
+                        randomProducts[p] = ProductData[randomIndex]
+                    } else {
+                        const randomIndex = Math.floor(Math.random() * ProductData.length);
+                        console.log("randomIndex RPID LENGTH COND", randomIndex)
+                        randomProducts[p] = ProductData[randomIndex]
+                    }
+                }
+            }
+
+
+
+
+
+        }
+        console.log("randomProducts Array", randomProducts)
+
+        setImmediate(() => {
+            this.setState({
+                randomProducts: randomProducts,
+            })
+        })
+
+    }
+
+
 
     render() {
 
@@ -225,18 +434,37 @@ class HomeScreen extends Component {
                     {/** Swiper below header */}
                     <Swiper data={sliderImages} />
 
-                    {/** Default Categories */}
-                    {/* <DefaultCategories data={[this.state.defaultCategories]}/> */}
+                    {/* * Default Categories */}
+                    <DefaultCategories
+                        data={this.state.defaultCategories1}
+                        navProps={this.props.navigation}
+                        firstSubItem={this.state.firstSubItem}
+                    />
+
+                    <ProductList
+                        screenName="Home"
+                        data={this.state.randomProducts == null ? [] : this.state.randomProducts}
+                        loader={this.state.loader}
+                    />
+
 
                     {/** Categories like men, women etc */}
-                    <HomeCategories data={category} navProps={this.props.navigation} />
+                    <HomeCategories
+                        data={this.state.topCategoryData == null ? [] : this.state.topCategoryData[0]?.children_data}
+                        mainCatPos={this.state.topCategoryData == null ? null : this.state.topCategoryData[0]?.position}
+                        navProps={this.props.navigation}
+                    />
+
 
 
 
                 </ScrollView>
 
                 {/** Tab Navigator */}
-                <TabNavigator screenName={"home"} navProps={this.props.navigation} />
+                <TabNavigator
+                    screenName={"home"}
+                    navProps={this.props.navigation}
+                />
 
                 {/* Loader */}
                 {this.state.loader &&

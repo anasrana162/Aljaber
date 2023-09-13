@@ -1,8 +1,9 @@
 export const TOKEN = 'TOKEN';
 export const LANGUAGE = 'LANGUAGE';
 export const USER = 'USER_DATA';
-export const ADMINTOKEN ='ADMINTOKEN';
-export const DEFAULTCAT ='DEFAULTCAT';
+export const ADMINTOKEN = 'ADMINTOKEN';
+export const DEFAULTCAT = 'DEFAULTCAT';
+export const CREATEDDEFAULTCAT = 'CREATEDDEFAULTCAT';
 // export const MISSING_DATA = 'MISSING_DATA';
 // export const SELECTED_PROGRAM = 'SELECTED_PROGRAM';
 // export const SHOPS = 'SHOPS';

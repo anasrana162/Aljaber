@@ -3,7 +3,7 @@ export var ImageArray = [
         "id": 50,
         "parent_id": 2,
         "name": "Shop By Brand",
-        "is_active": "true",
+        "is_active": "false",
         "position": 1,
         "level": 2,
         "product_count": 46,
@@ -409,7 +409,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 164,
-                "img": "/pub/media/catalog/category/Men_12.jpg",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/man-cat.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -421,7 +421,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 220,
-                "img": "/pub/media/catalog/category/Women_20.jpg",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/women-cat.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -433,7 +433,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 27,
-                "img": "/pub/media/catalog/category/Kids_16_1.jpg",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/kid-cat.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -457,7 +457,7 @@ export var ImageArray = [
                 "position": 5,
                 "level": 3,
                 "product_count": 23,
-                "img": "/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/sunglasses-cat.jpg",
                 "placeHolder": "false",
                 "children_data": [
                     {
@@ -539,8 +539,8 @@ export var ImageArray = [
     {
         "id": 72,
         "parent_id": 2,
-        "name": "Offers",
-        "is_active": "true",
+        "name": "false",
+        "is_active": "false",
         "position": 7,
         "level": 2,
         "product_count": 6,
@@ -552,7 +552,7 @@ export var ImageArray = [
         "id": 89,
         "parent_id": 2,
         "name": "Others",
-        "is_active": "true",
+        "is_active": "false",
         "position": 8,
         "level": 2,
         "product_count": 81,

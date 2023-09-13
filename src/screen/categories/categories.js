@@ -1,16 +1,11 @@
 import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, TouchableOpacity } from 'react-native'
 import React, { Component } from 'react'
-import HomeHeader from '../home/components/homeHeader';
 import TabNavigator from '../../components_reusable/TabNavigator';
-import HomeCategories from '../home/components/homeCategories';
-import api from '../../api/api';
-import { ImageArray } from './categoryData';
-
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
-import DefaultCategories from './components/defaultCategories';
+
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -33,142 +28,15 @@ class Categories extends Component {
     }
 
     defaultCategories = () => {
-        const { action, userData: { defaultcategory, admintoken } } = this.props
-        var { tempArray } = this.state
-        // console.log("defaultcategory in categories", defaultcategory)
-        // setImmediate(() => {
-        //     this.setState({ defaultCategories: defaultcategory })
-        // })
+        const { userData: { createddefaultcategory } } = this.props
+        
+         console.log("userData",createddefaultcategory)
+         setImmediate(()=>{
 
-        if (Object.keys(defaultcategory).length !== 0) {
-            //console.log("working")
-            var { children_data } = defaultcategory
-            var obj = {}
-            var tempArray1 = [];
-
-
-
-            for (let i = 0; i < children_data.length; i++) {
-                console.log(children_data[i]?.children_data.length)
-                for (let j = 0; j < ImageArray.length; j++) {
-
-                    if (ImageArray[j]?.id == children_data[i]?.id) {
-                        var obj = {
-                            "id": children_data[i]?.id,
-                            "parent_id": children_data[i]?.parent_id,
-                            "name": children_data[i]?.name,
-                            "is_active": children_data[i]?.is_active,
-                            "position": children_data[i]?.position,
-                            "level": children_data[i]?.level,
-                            "product_count": children_data[i]?.product_count,
-                            "img": ImageArray[j]?.img,
-                            "placeHolder": ImageArray[j]?.placeHolder,
-                            "children_data": []
-                        };
-                        tempArray1.push(obj)
-
-                        break;
-
-                    }
-                    if (ImageArray[i]?.id == undefined) {
-                        var obj = {
-                            "id": children_data[i]?.id,
-                            "parent_id": children_data[i]?.parent_id,
-                            "name": children_data[i]?.name,
-                            "is_active": children_data[i]?.is_active,
-                            "position": children_data[i]?.position,
-                            "level": children_data[i]?.level,
-                            "product_count": children_data[i]?.product_count,
-                            "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-                            "placeHolder": true,
-                            "children_data": []
-                        };
-                        // tempArray1.push(obj)
-                        // break;
-
-                        for (let tA = 0; tA < tempArray1.length; tA++) {
-                            if (tempArray1[tA]?.length == children_data[i]?.length) {
-                                break;
-                            } else {
-
-                                tempArray1[tA]?.push(obj)
-                            }
-
-                        }
-
-                    }
-                }
-
-                for (let j = 0; j < ImageArray.length; j++) {
-                    // console.log(" ImageArray[j]?.children_data.length)", ImageArray[j]?.children_data.length)
-                    //  Sub Cat
-                    if (children_data[i]?.children_data.length !== 0) {
-
-                        for (let ccl = 0; ccl < children_data[i]?.children_data.length; ccl++) {
-
-
-                            for (let iA = 0; iA < ImageArray[j]?.children_data?.length; iA++) {
-
-                                // console.log(ImageArray[j]?.children_data[iA])
-                                var obj2 = {}
-                                if (ImageArray[j]?.children_data[iA]?.id == children_data[i]?.children_data[ccl]?.id) {
-
-
-                                    obj2 = {
-                                        "id": children_data[i]?.children_data[ccl]?.id,
-                                        "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
-                                        "name": children_data[i]?.children_data[ccl]?.name,
-                                        "is_active": children_data[i]?.children_data[ccl]?.is_active,
-                                        "position": children_data[i]?.children_data[ccl]?.position,
-                                        "level": children_data[i]?.children_data[ccl]?.level,
-                                        "product_count": children_data[i]?.children_data[ccl]?.product_count,
-                                        "img": ImageArray[j]?.children_data[iA]?.img,
-                                        "placeHolder": ImageArray[j]?.children_data[iA]?.placeHolder,
-                                        "children_data": []
-                                    };
-
-                                    for (let tA = 0; tA < tempArray1.length; tA++) {
-                                        if (children_data[i]?.id == tempArray1[tA]?.id) {
-                                            tempArray1[tA]?.children_data.push(obj2)
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            if (ImageArray[i]?.children_data[ccl]?.id == undefined) {
-                                var obj2 = {
-                                    "id": children_data[i]?.children_data[ccl]?.id,
-                                    "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
-                                    "name": children_data[i]?.children_data[ccl]?.name,
-                                    "is_active": children_data[i]?.children_data[ccl]?.is_active,
-                                    "position": children_data[i]?.children_data[ccl]?.position,
-                                    "level": children_data[i]?.level,
-                                    "product_count": children_data[i]?.children_data[ccl]?.product_count,
-                                    "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-                                    "placeHolder": true,
-                                    "children_data": []
-                                };
-
-                                for (let tA = 0; tA < tempArray1.length; tA++) {
-                                    if (tempArray1[tA]?.children_data.length == children_data[i]?.children_data.length) {
-                                        break;
-                                    } else {
-
-                                        tempArray1[tA]?.children_data.push(obj2)
-                                    }
-
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        // console.log("tempArray1------------------", tempArray1)
-        this.setState({
-            defaultCategories: tempArray1
-        })
+             this.setState({
+                 defaultCategories: createddefaultcategory
+             })
+         })
     }
 
     selectedItems = (item, index, key) => {
@@ -204,7 +72,7 @@ class Categories extends Component {
                                         return (
                                             <>
 
-                                                {item?.is_active == true &&
+                                                {item?.is_active == "true" &&
                                                     <TouchableOpacity
                                                         key={String(item?.id)}
                                                         onPress={() => this.selectedItems(item, index, 'main')}

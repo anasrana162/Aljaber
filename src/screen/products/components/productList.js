@@ -5,32 +5,67 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = ({ data,loader }) => {
-    // console.log("Products", data)
+const ProductList = ({ data, loader, screenName }) => {
+    //  console.log("Products", data)
     return (
         <View style={styles?.mainContainer}>
 
-            <View style={styles.filterBoxes_Cont}>
-                {/* Sort By */}
-                <TouchableOpacity style={styles.filterBox}>
-                    <Text style={styles?.filterBox_Text}>SORT BY</Text>
-                    <MaterialIcons size={25} name="keyboard-arrow-down" color="#020621" />
-                </TouchableOpacity>
+            {screenName == undefined &&
+                <View style={styles.filterBoxes_Cont}>
+                    {/* Sort By */}
+                    <TouchableOpacity style={styles.filterBox}>
+                        <Text style={styles?.filterBox_Text}>SORT BY</Text>
+                        <MaterialIcons size={25} name="keyboard-arrow-down" color="#020621" />
+                    </TouchableOpacity>
 
-                {/* Filter */}
-                <TouchableOpacity style={styles.filterBox}>
-                    <Text style={styles?.filterBox_Text}>FILTER</Text>
-                </TouchableOpacity>
-            </View>
+                    {/* Filter */}
+                    <TouchableOpacity style={styles.filterBox}>
+                        <Text style={styles?.filterBox_Text}>FILTER</Text>
+                    </TouchableOpacity>
+                </View>}
+            {screenName == "Home" &&
+                <View style={{
+                    width: width - 15,
+                    height: 120,
+                    borderRadius: 5,
+                    overflow: "hidden"
+                }}>
+
+                    <Image
+                        source={{ uri: "https://aljaberoptical.com/media/magestore/bannerslider/images/c/o/color_contact_lenses_web_banner_copy_3.jpg" }}
+                        style={{ width: "100%", height: "100%", }}
+                        resizeMode='stretch'
+                    />
+
+
+                    <View style={{
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "black",
+                        opacity: 0.7,
+                        position: "absolute",
+                        zIndex: 250,
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                        <Text style={{ fontSize: 22, fontWeight: "700", color: "white" }}>Products</Text>
+                    </View>
+
+                </View>}
 
             {/* Products List */}
 
             <ScrollView
+                horizontal={screenName == "Home" ? true : false}
+                showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 style={{ width: width }}
             >
                 {loader == true &&
-                    <View style={[styles.productList_cont]}>
+                    <View style={[styles.productList_cont, {
+                        flexWrap: screenName == "Home" ? null : "wrap",
+                        marginBottom: screenName == "Home" ? 20 : 320,
+                    }]}>
 
                         <View style={styles.product_Cont}>
 
@@ -115,7 +150,10 @@ const ProductList = ({ data,loader }) => {
                     </View>
                 }
 
-                {data.lenght != 0 && <View style={styles.productList_cont}>
+                {data != null && <View style={[styles.productList_cont, {
+                    flexWrap: screenName == "Home" ? null : "wrap",
+                    marginBottom: screenName == "Home" ? 20 : 320,
+                }]}>
                     {
                         data.map((products, index) => {
                             // console.log("products?.media_gallery_entries[0]?.file", products?.media_gallery_entries[0]?.file)
@@ -145,6 +183,8 @@ const ProductList = ({ data,loader }) => {
                     }
                 </View>}
             </ScrollView >
+
+            {screenName == "Home" &&<Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30,marginTop:-20 }} />}
 
         </View >
     )

@@ -26,6 +26,7 @@ class Products extends Component {
             item: this.props?.route?.params?.item,
             original: null,
             loader: false,
+            productApiCounter: 0,
         };
     }
 
@@ -34,9 +35,9 @@ class Products extends Component {
     // then add that data to an array
 
     createData = async () => {
-        var { item } = this.state;
+        var { item, productApiCounter } = this.state;
         const { userData: { admintoken }, actions, userData } = this.props
-        console.log("item Products Screen", item)
+        console.log("item Products Screen]]]]]]]]]]]]]]]]",)
 
         setImmediate(() => {
             this.setState({
@@ -51,7 +52,7 @@ class Products extends Component {
                 Authorization: `Bearer ${admintoken}`,
             },
         }).then(async (res) => {
-             console.log("Product Api:", res?.data)
+            //console.log("Product Api:", res?.data)
             var temp = res?.data
             // console.log("Products Index:", temp?.length)
             for (let p = 0; p < temp.length; p++) {
@@ -62,25 +63,25 @@ class Products extends Component {
                         Authorization: `Bearer ${admintoken}`,
                     },
                 }).then((prod) => {
-                    //  console.log("Product Details Api:", res?.data)
+                    //   console.log("Product Details Api:", prod?.data)
 
                     products.push(prod?.data)
                     // console.log("Api Array index current", p)
                     if (p == temp.length - 1) {
 
-                        setImmediate(() => {
-                            this.setState({
-                                loader: false,
+                        for (let p = 0; p < products.length; p++) {
+                            console.log(products[p])
+                        }
+                        // console.log("Products State", this.state.products)
 
-                            })
-                            // console.log("Products State", this.state.products)
-                        })
                     }
                     setImmediate(() => {
                         this.setState({
 
                             products: products,
                             original: products,
+                            loader: false,
+
                         })
                         // console.log("Products State", this.state.products)
                     })
@@ -88,28 +89,40 @@ class Products extends Component {
 
                 }).catch((err) => {
                     //alert("Network Error Code: (CAT#1)")
+
                     console.log("Product Detail Api error: ", err.response)
-                    setImmediate(() => {
+                    return setImmediate(() => {
                         this.setState({
                             loader: false
                         })
+
                     })
-                    this.createData()
+
                 })
             }
         }).catch((err) => {
             //alert("Network Error Code: (CAT#1)")
-            console.log("Product Api error: ", err)
-            setImmediate(() => {
-                this.setState({
-                    loader: false
+            if (productApiCounter == 3) {
+
+                productApiCounter = productApiCounter + 1
+                console.log("Product Api error: ", err)
+                setImmediate(() => {
+                    this.setState({
+                        loader: false
+                    })
                 })
-            })
-            this.createData()
+                this.createData()
+            }
+            else {
+                alert("Network Error")
+                // this.props.navigation.goBack();
+
+
+            }
         })
     }
     inner_Categories = () => {
-        var { item, defaultCategories, mainCat_selected } = this.props?.route?.params;
+        var { item, mainCat_selected } = this.props?.route?.params;
         var { userData: { defaultcategory, admintoken } } = this.props
         // console.log("children_data", item)
         var mainIndex = mainCat_selected - 1
@@ -133,9 +146,7 @@ class Products extends Component {
     selectedItems = (selecteditem, index) => {
 
 
-        var { item, defaultCategories, mainCat_selected } = this.props?.route?.params;
-        //var { userData: { defaultcategory, admintoken } } = this.props
-        // console.log("defaultCategories", defaultCategories)
+        var { item, mainCat_selected } = this.props?.route?.params;
         // because position is giving 1 which index of array in first value while array starts with 0
         var mainIndex = mainCat_selected - 1
         if (mainIndex == 0) {
@@ -145,16 +156,8 @@ class Products extends Component {
             // see in defaultCategories console.log or  ImageArray file while matching parent ids
             mainIndex = mainIndex - 1
         }
-
-        // var inner_cats = defaultcategory?.children_data[mainIndex]?.children_data[item.position - 1]?.children_data
-        //  var sub_cats=defaultCategories[mainIndex]?.children_data[item.position - 1]
-
         var sub_index = selecteditem?.position - 1
-
         var sub_cats = ImageArray[mainIndex]?.children_data[item.position - 1].children_data[sub_index]
-        // console.log("mainIndex", mainIndex)
-         console.log("inner_cats", sub_cats)
-        // console.log("Selected Item: ", selecteditem)
         if (sub_cats.children_data.length !== 0) {
 
             setImmediate(() => {
@@ -177,7 +180,6 @@ class Products extends Component {
 
     render() {
         var { item } = this.props?.route?.params;
-        // console.log("Products State", this.state.products)
         return (
             <View style={styles.mainContainer}>
                 {/** Screen Header */}
@@ -201,7 +203,7 @@ class Products extends Component {
                 {/* Product List */}
 
 
-                {this.state.products != null && < ProductList data={this.state.products} loader={this.state.loader} />}
+                < ProductList data={this.state.products} loader={this.state.loader} />
 
 
             </View>
