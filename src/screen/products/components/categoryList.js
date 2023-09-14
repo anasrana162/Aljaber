@@ -21,6 +21,7 @@ const CategoryList = ({ categories, selectedItem }) => {
 
                                 <TouchableOpacity
                                     onPress={() => selectedItem(item, index)}
+                                    key={String(index)}
                                     style={{
                                         padding: 10,
                                         borderWidth: 1,

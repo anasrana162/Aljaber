@@ -37,7 +37,7 @@ class Products extends Component {
     createData = async () => {
         var { item, productApiCounter } = this.state;
         const { userData: { admintoken }, actions, userData } = this.props
-        console.log("item Products Screen]]]]]]]]]]]]]]]]",)
+       // console.log("item Products Screen]]]]]]]]]]]]]]]]",)
 
         setImmediate(() => {
             this.setState({
@@ -69,9 +69,9 @@ class Products extends Component {
                     // console.log("Api Array index current", p)
                     if (p == temp.length - 1) {
 
-                        for (let p = 0; p < products.length; p++) {
-                            console.log(products[p])
-                        }
+                        // for (let p = 0; p < products.length; p++) {
+                        //     console.log(products[p])
+                        // }
                         // console.log("Products State", this.state.products)
 
                     }
@@ -203,7 +203,7 @@ class Products extends Component {
                 {/* Product List */}
 
 
-                < ProductList data={this.state.products} loader={this.state.loader} />
+                < ProductList data={this.state.products} loader={this.state.loader} navProps={this.props.navigation} />
 
 
             </View>

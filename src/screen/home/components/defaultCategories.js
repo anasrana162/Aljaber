@@ -42,12 +42,15 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
                 {
                     data?.map((item, index) => {
                         return (
-                            <>
+                            <View
+                            key={String(index)}
+                            >
 
                                 {item.is_active == "true" && 
                                 <TouchableOpacity
                                     onPress={() => selectedItems(item, index)}
                                     activeOpacity={0.9}
+                                   
                                     style={styles.flatList_Cont}>
 
                                     <View style={{
@@ -75,7 +78,7 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
                                         marginTop: 2
                                     }} />
                                 </TouchableOpacity>}
-                            </>
+                            </View>
                         )
                     })
                 }

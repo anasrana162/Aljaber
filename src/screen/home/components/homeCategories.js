@@ -9,9 +9,9 @@ const height = Dimensions.get("screen").height
 const HomeCategories = ({ data, navProps, mainCatPos }) => {
 
 
-    console.log("DefaultCategoryItems:;;;;; ", data)
+    // console.log("DefaultCategoryItems:;;;;; ", data)
 
-   const selectedItems = (item, index,) => {
+    const selectedItems = (item, index,) => {
 
         // console.log("Selected Item: ", this.state.selectedCat)
         navProps.navigate("Products", { item, mainCat_selected: mainCatPos })
@@ -81,11 +81,14 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
                     data.map((item, index) => {
                         return (
 
-                            <>
+                            <View
+                                key={String(index)}
+                            >
                                 {item?.is_active == true &&
                                     <TouchableOpacity
-                                    onPress={()=> selectedItems(item,index)}
-                                    style={styles.flatList_Cont}>
+
+                                        onPress={() => selectedItems(item, index)}
+                                        style={styles.flatList_Cont}>
 
 
                                         <View style={{
@@ -109,7 +112,7 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
                                             //alignSelf: "center"
                                         }]}>{item?.name}</Text>
                                     </TouchableOpacity>}
-                            </>
+                            </View>
                         )
                     })
                 }

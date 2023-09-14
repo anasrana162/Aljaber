@@ -4,7 +4,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 const width = Dimensions.get("screen").width
 
 const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
-    console.log("DefaultCategoryItems:;;;;; ", data?.children_data)
+    // console.log("DefaultCategoryItems:;;;;; ", data?.children_data)
 
     selectedItems = (item, index, key) => {
 
@@ -36,7 +36,7 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
                     justifyContent: "center",
                     alignItems: "center",
                 }}>
-                    <Text style={{fontSize:22, fontWeight:"700", color:"white"}}>{data?.name}</Text>
+                    <Text style={{ fontSize: 22, fontWeight: "700", color: "white" }}>{data?.name}</Text>
                 </View>
 
             </View>
@@ -45,8 +45,8 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
 
             <View style={styles.flatList_outerCont}>
                 <TouchableOpacity
-                onPress={onNextPress}
-                style={styles.next_Arrow}>
+                    onPress={onNextPress}
+                    style={styles.next_Arrow}>
                     <AntDesign name="arrowright" size={27} color="white" />
                 </TouchableOpacity>
                 <ScrollView
@@ -58,33 +58,37 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
                 >
                     {
                         data?.children_data.map((item, index) => {
-                            console.log(item)
+                            //console.log(item)
                             return (
-                                <>
-{/* index <= 2 */}
-                                    {item?.is_active == true && 
-                                    <TouchableOpacity
-                                        onPress={() => selectedItems(item, index)}
-                                        style={styles.flatList_Cont}>
+                                <View
+                                    key={String(index)}
+                                >
+                                    {/* index <= 2 */}
+                                    {item?.is_active == true &&
+                                        <TouchableOpacity
+                                            onPress={() => selectedItems(item, index)}
 
-                                        <View style={{
-                                            width: 130,
-                                            height: 160,
-                                            // borderWidth: 1,
-                                            borderRadius: 5,
-                                            marginBottom: 10,
-                                            overflow: "hidden",
-                                            zIndex: 150,
-                                        }}>
+                                            // key={String(item?.name)}
+                                            style={styles.flatList_Cont}>
 
-                                            {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                            {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} resizeMode='cover' style={{ width: "100%", height: "100%" }} />}
-                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                        </View>
-                                        <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
-                                    </TouchableOpacity>
-                                    } 
-                                </>
+                                            <View style={{
+                                                width: 130,
+                                                height: 160,
+                                                // borderWidth: 1,
+                                                borderRadius: 5,
+                                                marginBottom: 10,
+                                                overflow: "hidden",
+                                                zIndex: 150,
+                                            }}>
+
+                                                {/* https://wpstaging51.a2zcreatorz.com/ */}
+                                                {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} resizeMode='cover' style={{ width: "100%", height: "100%" }} />}
+                                                {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                            </View>
+                                            <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
+                                        </TouchableOpacity>
+                                    }
+                                </View>
                             )
                         })
                     }

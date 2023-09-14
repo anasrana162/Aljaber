@@ -101,7 +101,7 @@ class HomeScreen extends Component {
     componentDidMount = () => {
         this.getDefaultCategories()
         this.unsubscribe()
-        this.randomProducts()
+        // this.randomProducts()
     }
 
     adminApi = async () => {
@@ -217,7 +217,7 @@ class HomeScreen extends Component {
             var tempArray1 = [];
 
             for (let i = 0; i < children_data.length; i++) {
-                console.log(children_data[i]?.children_data.length)
+                // console.log(children_data[i]?.children_data.length)
                 for (let j = 0; j < ImageArray.length; j++) {
 
                     if (ImageArray[j]?.id == children_data[i]?.id) {
@@ -333,7 +333,7 @@ class HomeScreen extends Component {
                 }
             }
         }
-        console.log("tempArray1", tempArray1[1])
+        // console.log("tempArray1", tempArray1[1])
         actions?.createdDefaultCategories(tempArray1)
         this.setState({
 
@@ -370,7 +370,7 @@ class HomeScreen extends Component {
                 arr.push(array[ar])
             }
         }
-        console.log("Top Categories:", arr)
+        // console.log("Top Categories:", arr)
         setImmediate(() => {
             this.setState({
                 topCategoryData: arr
@@ -387,7 +387,7 @@ class HomeScreen extends Component {
 
             if (RPID.length == 0) {
                 const randomIndex = Math.floor(Math.random() * ProductData.length);
-                console.log("randomIndex RPID LENGTH COND", randomIndex)
+                // console.log("randomIndex RPID LENGTH COND", randomIndex)
                 randomProducts[p] = ProductData[randomIndex]
                 RPID.push(randomIndex)
             } else {
@@ -395,11 +395,11 @@ class HomeScreen extends Component {
                     const randomIndex = Math.floor(Math.random() * ProductData.length);
                     if (RPID[t] !== randomIndex) {
                         // const randomIndex = Math.floor(Math.random() * ProductData.length);
-                        console.log("randomIndex RPID LENGTH COND", randomIndex)
+                        // console.log("randomIndex RPID LENGTH COND", randomIndex)
                         randomProducts[p] = ProductData[randomIndex]
                     } else {
                         const randomIndex = Math.floor(Math.random() * ProductData.length);
-                        console.log("randomIndex RPID LENGTH COND", randomIndex)
+                        // console.log("randomIndex RPID LENGTH COND", randomIndex)
                         randomProducts[p] = ProductData[randomIndex]
                     }
                 }
@@ -410,7 +410,7 @@ class HomeScreen extends Component {
 
 
         }
-        console.log("randomProducts Array", randomProducts)
+        // console.log("randomProducts Array", randomProducts)
 
         setImmediate(() => {
             this.setState({
@@ -443,7 +443,7 @@ class HomeScreen extends Component {
 
                     <ProductList
                         screenName="Home"
-                        data={this.state.randomProducts == null ? [] : this.state.randomProducts}
+                        data={ProductData == null ? [] : ProductData}
                         loader={this.state.loader}
                     />
 

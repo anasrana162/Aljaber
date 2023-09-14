@@ -15,6 +15,7 @@ import {
   View,
   NativeModules,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 const { StatusBarManager } = NativeModules;
@@ -38,7 +39,7 @@ class App extends Component {
     console.log("Is connected?", state.isConnected);
     console.log("isInternetReachable", state.isInternetReachable)
     console.log("details", state.details)
-    if (state.isConnected == false || state.isInternetReachable == false) {
+    if (state.isConnected == false || state.isInternetReachable == false || state.isInternetReachable == null) {
       setImmediate(() => {
         this.setState({
           network: false,
@@ -133,6 +134,9 @@ class App extends Component {
             backgroundColor={"#020621"}
             translucent
           />}
+
+
+
           <Navigation />
 
         </View>
@@ -143,7 +147,17 @@ class App extends Component {
 
 }
 
+const styles = StyleSheet.create({
 
+  image: {
+      width: 330,
+      height: 150,
+     // marginTop: 60,
+     marginBottom:60,
+      marginLeft: 20
+  },
+  
+})
 
 {/* {---------------redux State ------------} */ }
 const mapStateToProps = state => ({

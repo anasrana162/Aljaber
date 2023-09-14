@@ -29,14 +29,14 @@ class Categories extends Component {
 
     defaultCategories = () => {
         const { userData: { createddefaultcategory } } = this.props
-        
-         console.log("userData",createddefaultcategory)
-         setImmediate(()=>{
 
-             this.setState({
-                 defaultCategories: createddefaultcategory
-             })
-         })
+        // console.log("userData", createddefaultcategory)
+        setImmediate(() => {
+
+            this.setState({
+                defaultCategories: createddefaultcategory
+            })
+        })
     }
 
     selectedItems = (item, index, key) => {
@@ -49,7 +49,7 @@ class Categories extends Component {
                 break;
 
             case 'sub':
-                console.log("Selected Item: ", this.state.selectedCat)
+                // console.log("Selected Item: ", this.state.selectedCat)
                 this.props.navigation.navigate("Products", { item, defaultCategories: this.state.defaultCategories, mainCat_selected: this.state.selectedCat?.position })
         }
     }
@@ -70,11 +70,11 @@ class Categories extends Component {
                                 {
                                     this.state.defaultCategories?.map((item, index) => {
                                         return (
-                                            <>
-
+                                            <View
+                                                key={String(index)}>
                                                 {item?.is_active == "true" &&
                                                     <TouchableOpacity
-                                                        key={String(item?.id)}
+
                                                         onPress={() => this.selectedItems(item, index, 'main')}
                                                         style={styles.flatList_Cont}>
 
@@ -94,7 +94,7 @@ class Categories extends Component {
                                                         </View>
                                                         <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
                                                     </TouchableOpacity>}
-                                            </>
+                                            </View>
                                         )
                                     })
                                 }
@@ -112,12 +112,15 @@ class Categories extends Component {
                             <View style={styles.flatList_outerCont_sub}>
                                 {
                                     this.state.selectedCat?.children_data.map((item, index) => {
-                                        console.log(item)
+                                        // console.log(item)
                                         return (
-                                            <>
+                                            <View
+                                                key={String(index)}
+                                            >
                                                 {item?.is_active == true &&
                                                     <TouchableOpacity
                                                         onPress={() => this.selectedItems(item, index, 'sub')}
+
                                                         style={styles.flatList_Cont_sub}>
 
                                                         <View style={{
@@ -137,7 +140,7 @@ class Categories extends Component {
                                                         <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
                                                     </TouchableOpacity>
                                                 }
-                                            </>
+                                            </View>
                                         )
                                     })
                                 }

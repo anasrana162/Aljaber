@@ -7,6 +7,7 @@ import GetStarted from '../screen/getstarted/getStarted';
 import Account from '../screen/account/account';
 import Categories from '../screen/categories/categories';
 import Products from '../screen/products/products';
+import ProductDetails from '../screen/products/productDetails';
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -25,6 +26,7 @@ export default class Navigation extends Component {
                     <Stack.Screen name="Account" component={Account} />
                     <Stack.Screen name="Categories" component={Categories} />
                     <Stack.Screen name="Products" component={Products} />
+                    <Stack.Screen name="ProductDetails" component={ProductDetails} />
                 </Stack.Navigator>
             </NavigationContainer>
         )

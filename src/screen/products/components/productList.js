@@ -5,8 +5,15 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = ({ data, loader, screenName }) => {
+const ProductList = ({ data, loader, screenName, navProps }) => {
     //  console.log("Products", data)
+
+
+    const selectedItem = (item, index) => {
+        console.log("Item Product Slected:", item)
+        navProps.navigate("ProductDetails",{product_details:item,product_index:index})
+    }
+
     return (
         <View style={styles?.mainContainer}>
 
@@ -159,7 +166,8 @@ const ProductList = ({ data, loader, screenName }) => {
                             // console.log("products?.media_gallery_entries[0]?.file", products?.media_gallery_entries[0]?.file)
                             return (
                                 <TouchableOpacity
-                                    key={String(products?.id)}
+                                    key={String(index)}
+                                    onPress={() => selectedItem(products, index)}
                                     style={styles.product_Cont}
                                 >
 
@@ -184,7 +192,7 @@ const ProductList = ({ data, loader, screenName }) => {
                 </View>}
             </ScrollView >
 
-            {screenName == "Home" &&<Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30,marginTop:-20 }} />}
+            {screenName == "Home" && <Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30, marginTop: -20 }} />}
 
         </View >
     )
