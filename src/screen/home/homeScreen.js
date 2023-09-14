@@ -445,6 +445,7 @@ class HomeScreen extends Component {
                         screenName="Home"
                         data={ProductData == null ? [] : ProductData}
                         loader={this.state.loader}
+                        navProps={this.props.navigation}
                     />
 
 

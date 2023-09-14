@@ -11,7 +11,7 @@ const ProductList = ({ data, loader, screenName, navProps }) => {
 
     const selectedItem = (item, index) => {
         console.log("Item Product Slected:", item)
-        navProps.navigate("ProductDetails",{product_details:item,product_index:index})
+        navProps.navigate("ProductDetails", { product_details: item, product_index: index })
     }
 
     return (
