@@ -111,8 +111,8 @@ class HomeScreen extends Component {
         var { adminTokenCounter } = this.state
 
         await api.post('integration/admin/token', {
-            "username": "manager",
-            "password": "Pakistan2023"
+            "username": "apiuser",
+            "password": "Pakistani2023"
         }).then((res) => {
             console.log("Admin Api res: ||||| ", res?.data)
             if (res?.data) {

@@ -62,8 +62,8 @@ class App extends Component {
     var { adminTokenCounter } = this.state
 
     await api.post('integration/admin/token', {
-      "username": "manager",
-      "password": "Pakistan2023"
+      "username": "apiuser",
+      "password": "Pakistani2023"
     }).then((res) => {
       console.log("Admin Api res: ||||| ", res?.data)
       if (res?.data) {
@@ -150,13 +150,13 @@ class App extends Component {
 const styles = StyleSheet.create({
 
   image: {
-      width: 330,
-      height: 150,
-     // marginTop: 60,
-     marginBottom:60,
-      marginLeft: 20
+    width: 330,
+    height: 150,
+    // marginTop: 60,
+    marginBottom: 60,
+    marginLeft: 20
   },
-  
+
 })
 
 {/* {---------------redux State ------------} */ }

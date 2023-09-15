@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, TouchableOpacity } from 'react-native'
+import { Text, StyleSheet, Image, View, Dimensions, Modal, NativeModules, ScrollView, TouchableOpacity } from 'react-native'
 import React, { Component } from 'react'
 import RenderHtml from 'react-native-render-html';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -11,6 +11,7 @@ import EvilIcons from 'react-native-vector-icons/EvilIcons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 //card
 
+import Fontisto from 'react-native-vector-icons/Fontisto'
 
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
@@ -18,6 +19,7 @@ import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
 import HomeHeader from '../home/components/homeHeader';
 import ImageCarousel from './components/imageCarousel';
+import Options from './components/options';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -31,11 +33,65 @@ class ProductDetails extends Component {
             images: [],
             description: '',
             quantity: 1,
+            option_package_size: null,
+            option_power: null,
+            selectedItemLeftPower: {
+                "title": "Select",
+                "sort_order": 0,
+                "price": 0,
+                "price_type": "",
+                "option_type_id": null,
+
+            },
+            selectedItemLeftPackage: {
+                "title": "Select",
+                "sort_order": 0,
+                "price": 0,
+                "price_type": "",
+                "option_type_id": null,
+
+            },
+            selectedItemRightPower: {
+                "title": "Select",
+                "sort_order": 0,
+                "price": 0,
+                "price_type": "",
+                "option_type_id": null,
+
+            },
+            selectedItemRightPackage: {
+                "title": "Select",
+                "sort_order": 0,
+                "price": 0,
+                "price_type": "",
+                "option_type_id": null,
+
+            },
+            eyedir: '',
+            dropdown: false,
+            optionSelected: [],
         };
     }
 
     componentDidMount = () => {
         this.getDescription()
+        this.checkOptions()
+    }
+
+    checkOptions = () => {
+        var { product_details: { options } } = this.props.route.params
+        console.log("OPtions For Product", options)
+
+        for (let i = 0; i < options.length; i++) {
+
+            if (options[i]?.title == "PACKAGE SIZE") {
+                this.setState({ option_package_size: options[i] })
+            }
+            if (options[i]?.title == "POWER") {
+                this.setState({ option_power: options[i] })
+            }
+
+        }
     }
 
     getDescription = () => {
@@ -86,6 +142,47 @@ class ProductDetails extends Component {
         }
     }
 
+    selectItem = (item, index, title) => {
+        console.log(this.state.eyedir)
+        switch (this.state.eyedir) {
+            case "leftPA":
+                setImmediate(() => {
+                    this.setState({ selectedItemLeftPackage: item, dropdown: false, })
+                })
+                break;
+
+            case "leftPO":
+                setImmediate(() => {
+                    this.setState({ selectedItemLeftPower: item, dropdown: false, })
+                })
+                break;
+
+            case "rightPA":
+                setImmediate(() => {
+                    this.setState({ selectedItemRightPackage: item, dropdown: false, })
+                })
+                break;
+            case "rightPO":
+                setImmediate(() => {
+                    this.setState({ selectedItemRightPower: item, dropdown: false, })
+                })
+                break;
+
+        }
+    }
+
+    openDropDown = (val, eyedir) => {
+        console.log(eyedir)
+        setImmediate(() => {
+            this.setState({ dropdown: !this.state.dropdown, optionSelected: val, eyedir: eyedir })
+        })
+    }
+    dismissModal = () => {
+        setImmediate(() => {
+            this.setState({ dropdown: false, })
+        })
+    }
+
     render() {
         var {
             product_details,
@@ -97,7 +194,9 @@ class ProductDetails extends Component {
                 {/* Header */}
                 <HomeHeader />
 
-                <ScrollView style={{ width: width - 20 }}>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={{ width: width - 20, }}>
                     <ImageCarousel
                         data={product_details?.media_gallery_entries}
                         fisrtImage={{
@@ -159,22 +258,123 @@ class ProductDetails extends Component {
 
                     {/* Availabilty */}
                     <Text style={[styles.product_name, {
-                        marginTop:10,
-                        fontSize:12,
+                        marginTop: 10,
+                        fontSize: 12,
                         fontWeight: "400"
                     }]}>
                         AVAILABILTY:
                         <Text style={[styles.product_name, {
-                             fontSize:12,
+                            fontSize: 12,
                             color: stock_item?.is_in_stock == true ? "#020621" : "red"
                         }]}>
                             {stock_item?.is_in_stock == true ? " IN STOCK" : " OUT OF STOCK"}
                         </Text>
                     </Text>
 
+                    {/* Options */}
+                    <Options
+                        option_package_size={this.state.option_package_size}
+                        option_power={this.state.option_power}
+                        dropdown={this.state.dropdown}
+                        selectedItemLeftPower={this.state.selectedItemLeftPower}
+                        selectedItemLeftPackage={this.state.selectedItemLeftPackage}
+                        selectedItemRightPower={this.state.selectedItemRightPower}
+                        selectedItemRightPackage={this.state.selectedItemRightPackage}
+                        openDropDown={(val, eyedir) => this.openDropDown(val, eyedir)}
+                    />
+
 
 
                 </ScrollView>
+                {this.state.optionSelected.length !== 0 && <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.dropdown}
+                    onDismiss={() => this.dismissModal()}
+                >
+                    <TouchableOpacity
+                        onPress={() => this.dismissModal()}
+                        style={{
+                            width: width,
+                            height: height,
+                            backgroundColor: "rgba(52,52,52,0.8)",
+                            justifyContent: "center",
+                            alignItems: "center"
+
+                        }}>
+
+                        <View style={[styles?.dropDown_style, {
+                            zIndex: 300,
+                            height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
+                        }]}>
+                            <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
+                                {
+
+                                    this.state.optionSelected?.values?.map((item, index) => {
+                                        return (
+                                            <TouchableOpacity
+                                                key={String(index)}
+                                                onPress={() => this.selectItem(item, index, item?.title)}
+                                                style={styles?.dropDown_item_style}>
+                                                {/* {this.state.eyedir == 'leftPA' ?
+                                                    (this.state.selectedItemLeftPackage?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
+                                                    :
+                                                    (this.state.selectedItemLeftPackage?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
+                                                }
+                                                {this.state.eyedir == 'leftPO' ?
+                                                    (this.state.selectedItemLeftPower?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
+                                                    :
+                                                    (this.state.selectedItemRightPower?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
+                                                }
+                                                {this.state.eyedir == 'rightPA' ?
+                                                    (this.state.selectedItemLeft?.title == item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
+                                                    :
+                                                    (this.state.selectedItemRight?.title == item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
+                                                } */}
+                                                {/* {this.state.selectedItem?.title == item?.title && <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />} */}
+
+
+{/* new ones */}
+
+                                                {/* {this.state.eyedir == "leftPA" &&
+                                                    this.state.selectedItemLeftPackage?.title !== item?.title ?
+                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
+                                                    :
+                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
+                                                }
+
+
+                                                {this.state.eyedir == "leftPO" &&
+                                                    this.state.selectedItemLeftPower?.title !== item?.title ?
+                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
+                                                    :
+                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
+                                                }
+
+                                                {this.state.eyedir == "rightPA" &&
+                                                    this.state.selectedItemRightPackage?.title !== item?.title ?
+                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
+                                                    :
+                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
+                                                }
+
+
+                                                {this.state.eyedir == "rightPO" &&
+                                                    this.state.selectedItemRightPower?.title !== item?.title ?
+                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
+                                                    :
+                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
+                                                } */}
+
+                                                < Text style={styles.dropDown_item_text}>{item?.title}</Text>
+                                            </TouchableOpacity>
+                                        )
+                                    })
+                                }
+                            </ScrollView>
+                        </View>
+                    </TouchableOpacity>
+                </Modal>}
             </View>
         )
     }
@@ -187,7 +387,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: width,
         height: height,
-        backgroundColor: "white"
+        backgroundColor: "white",
     },
     product_name: {
         fontSize: 18,
@@ -234,6 +434,54 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "600",
         color: 'white',
+    },
+    option_cont: {
+        width: width - 20,
+        alignItems: "flex-start",
+        marginTop: 20
+
+    },
+    dropdown_cont: {
+        width: "100%",
+        height: 45,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#020621",
+        marginTop: 10
+    },
+    selectedItem_text: {
+        marginLeft: 10,
+        fontSize: 14,
+        fontWeight: "500",
+        color: "#020621",
+    },
+
+    dropDown_style: {
+        width: "100%",
+        // height: 200,
+        backgroundColor: "#fff",
+        borderWidth: 1,
+        borderColor: "#020621",
+        borderRadius: 10,
+        overflow: "hidden",
+        justifyContent: "flex-start",
+        alignItems: "flex-start",
+    },
+    dropDown_item_style: {
+        width: "95%",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        flexDirection: "row",
+        marginVertical: 5,
+
+    },
+    dropDown_item_text: {
+        fontSize: 14,
+        fontWeight: "500",
+        color: "#020621",
+        marginHorizontal: 10
     }
 })
 
