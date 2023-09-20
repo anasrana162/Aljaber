@@ -10,7 +10,7 @@ const ImageView = ({ source, textEN, textAR }) => {
                     <Text style={styles.category_text}>{textEN}</Text>
                 </View>
             </View>
-            <Image source={source} style={{ width: "100%", height: "100%" }} resizeMode='stretch' />
+            <Image source={source} style={{ width: "100%", height: "100%" }} resizeMode='cover' />
 
         </View>
     )

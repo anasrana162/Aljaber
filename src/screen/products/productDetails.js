@@ -17,9 +17,14 @@ import Fontisto from 'react-native-vector-icons/Fontisto'
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
+
+{/* {---------------Components Imports------------} */ }
 import HomeHeader from '../home/components/homeHeader';
 import ImageCarousel from './components/imageCarousel';
 import Options from './components/options';
+import StoreFeatures from './components/storeFeatures';
+import DetailsTabNav from './detailsTabNav';
+
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -67,9 +72,12 @@ class ProductDetails extends Component {
                 "option_type_id": null,
 
             },
+            leftEyeQuantity: 1,
+            rigthEyeQuantity: 1,
             eyedir: '',
             dropdown: false,
             optionSelected: [],
+            checked: false,
         };
     }
 
@@ -142,6 +150,35 @@ class ProductDetails extends Component {
         }
     }
 
+    onQuantityChange = (val, key) => {
+        switch (key) {
+            case 'left':
+                setImmediate(() => {
+                    this.setState({
+                        leftEyeQuantity: val,
+                    })
+                })
+                break;
+
+            case 'right':
+                setImmediate(() => {
+                    this.setState({
+                        rightEyeQuantity: val,
+                    })
+                })
+                break;
+
+        }
+    }
+
+    checkMarked = (val) => {
+        setImmediate(() => {
+            this.setState({
+                checked: val
+            })
+        })
+    }
+
     selectItem = (item, index, title) => {
         console.log(this.state.eyedir)
         switch (this.state.eyedir) {
@@ -188,6 +225,17 @@ class ProductDetails extends Component {
             product_details,
             product_details: { extension_attributes: { stock_item } },
         } = this.props.route.params
+        const tagsStyles = {
+            body: {
+                color: "black",
+                alignItems: "center",
+                width: "90%",
+                fontFamily: "Careem-Bold",
+            },
+            a: {
+                color: "green",
+            },
+        };
         return (
             <View style={styles.mainContainer}>
 
@@ -210,6 +258,7 @@ class ProductDetails extends Component {
                     {/* Product Description */}
                     {this.state.description !== '' &&
                         <RenderHtml
+                            tagsStyles={tagsStyles}
                             contentWidth={width}
                             source={{
                                 html: `${this.state.description}`,
@@ -219,32 +268,37 @@ class ProductDetails extends Component {
                     {/* Price , quantity, add to cart */}
                     <View style={styles.row_cont}>
                         {/* Price */}
-                        <Text style={styles.product_name}>AED {product_details?.price}</Text>
+                        <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_details?.price}</Text>
 
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
 
                             {/* Quantity */}
-                            <View style={styles?.row_quantity}>
-                                {/* Plus Button */}
-                                <TouchableOpacity
-                                    onPress={() => this.plusOne()}
-                                    style={styles.quantityBox}>
-                                    <AntDesign name="plus" size={18} color="#020621" />
-                                </TouchableOpacity>
+                            {this.state.checked == false &&
+                                <>
+                                    <View style={styles?.row_quantity}>
 
-                                {/* Quantity Number */}
-                                <View
-                                    style={styles.quantityBox}>
-                                    <Text style={styles.product_name}>{this.state.quantity}</Text>
-                                </View>
+                                        {/* Plus Button */}
+                                        <TouchableOpacity
+                                            onPress={() => this.plusOne()}
+                                            style={styles.quantityBox}>
+                                            <AntDesign name="plus" size={18} color="#020621" />
+                                        </TouchableOpacity>
 
-                                {/* Minus Button */}
-                                <TouchableOpacity
-                                    onPress={() => this.minusOne()}
-                                    style={styles.quantityBox}>
-                                    <AntDesign name="minus" size={18} color="#020621" />
-                                </TouchableOpacity>
-                            </View>
+                                        {/* Quantity Number */}
+                                        <View
+                                            style={styles.quantityBox}>
+                                            <Text style={styles.product_name}>{this.state.quantity}</Text>
+                                        </View>
+
+                                        {/* Minus Button */}
+                                        <TouchableOpacity
+                                            onPress={() => this.minusOne()}
+                                            style={styles.quantityBox}>
+                                            <AntDesign name="minus" size={18} color="#020621" />
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            }
 
                             {/* Add to Cart */}
                             <TouchableOpacity
@@ -252,6 +306,7 @@ class ProductDetails extends Component {
                             >
                                 <Text style={styles.add_to_cart_text}>AddToCart</Text>
                             </TouchableOpacity>
+
                         </View>
 
                     </View>
@@ -276,47 +331,57 @@ class ProductDetails extends Component {
                         option_package_size={this.state.option_package_size}
                         option_power={this.state.option_power}
                         dropdown={this.state.dropdown}
+                        checkMarked={(val) => this.checkMarked(val)}
                         selectedItemLeftPower={this.state.selectedItemLeftPower}
                         selectedItemLeftPackage={this.state.selectedItemLeftPackage}
                         selectedItemRightPower={this.state.selectedItemRightPower}
                         selectedItemRightPackage={this.state.selectedItemRightPackage}
                         openDropDown={(val, eyedir) => this.openDropDown(val, eyedir)}
+                        onChangeText={(val, key) => this.onQuantityChange(val, key)}
+                        leftEyeQuantity={this.state.leftEyeQuantity}
+                        rigthEyeQuantity={this.state.rigthEyeQuantity}
                     />
 
+                    {/* Store Features */}
+                    <StoreFeatures />
 
+                    {/* DetailsNav */}
+                    <DetailsTabNav navProps={this.props.navigation} details_tab={this.state.description} />
 
                 </ScrollView>
-                {this.state.optionSelected.length !== 0 && <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.dropdown}
-                    onDismiss={() => this.dismissModal()}
-                >
-                    <TouchableOpacity
-                        onPress={() => this.dismissModal()}
-                        style={{
-                            width: width,
-                            height: height,
-                            backgroundColor: "rgba(52,52,52,0.8)",
-                            justifyContent: "center",
-                            alignItems: "center"
+                {this.state.optionSelected.length !== 0 &&
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={this.state.dropdown}
+                        onDismiss={() => this.dismissModal()}
+                    >
+                        <TouchableOpacity
+                            onPress={() => this.dismissModal()}
+                            style={{
+                                width: width,
+                                height: Dimensions.get("screen").height,
+                                backgroundColor: "rgba(52,52,52,0.8)",
+                                justifyContent: "center",
+                                alignItems: "center"
 
-                        }}>
+                            }}>
 
-                        <View style={[styles?.dropDown_style, {
-                            zIndex: 300,
-                            height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
-                        }]}>
-                            <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
-                                {
+                            <View style={[styles?.dropDown_style, {
+                                zIndex: 300,
+                                width: width - 30,
+                                height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
+                            }]}>
+                                <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
+                                    {
 
-                                    this.state.optionSelected?.values?.map((item, index) => {
-                                        return (
-                                            <TouchableOpacity
-                                                key={String(index)}
-                                                onPress={() => this.selectItem(item, index, item?.title)}
-                                                style={styles?.dropDown_item_style}>
-                                                {/* {this.state.eyedir == 'leftPA' ?
+                                        this.state.optionSelected?.values?.map((item, index) => {
+                                            return (
+                                                <TouchableOpacity
+                                                    key={String(index)}
+                                                    onPress={() => this.selectItem(item, index, item?.title)}
+                                                    style={styles?.dropDown_item_style}>
+                                                    {/* {this.state.eyedir == 'leftPA' ?
                                                     (this.state.selectedItemLeftPackage?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
                                                     :
                                                     (this.state.selectedItemLeftPackage?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
@@ -331,12 +396,12 @@ class ProductDetails extends Component {
                                                     :
                                                     (this.state.selectedItemRight?.title == item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
                                                 } */}
-                                                {/* {this.state.selectedItem?.title == item?.title && <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />} */}
+                                                    {/* {this.state.selectedItem?.title == item?.title && <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />} */}
 
 
-{/* new ones */}
+                                                    {/* new ones */}
 
-                                                {/* {this.state.eyedir == "leftPA" &&
+                                                    {/* {this.state.eyedir == "leftPA" &&
                                                     this.state.selectedItemLeftPackage?.title !== item?.title ?
                                                     <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
                                                     :
@@ -366,15 +431,15 @@ class ProductDetails extends Component {
                                                     <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
                                                 } */}
 
-                                                < Text style={styles.dropDown_item_text}>{item?.title}</Text>
-                                            </TouchableOpacity>
-                                        )
-                                    })
-                                }
-                            </ScrollView>
-                        </View>
-                    </TouchableOpacity>
-                </Modal>}
+                                                    < Text style={styles.dropDown_item_text}>{item?.title}</Text>
+                                                </TouchableOpacity>
+                                            )
+                                        })
+                                    }
+                                </ScrollView>
+                            </View>
+                        </TouchableOpacity>
+                    </Modal>}
             </View>
         )
     }

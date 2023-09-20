@@ -18,8 +18,8 @@ export default class Navigation extends Component {
                 <Stack.Navigator
                     screenOptions={{
                         headerShown: false,
-                        animation:
-                            language == 'AR' ? 'slide_from_left' : 'slide_from_right',
+                        animation:'fade'
+                           // language == 'AR' ? 'slide_from_left' : 'slide_from_right',
                     }}>
                     <Stack.Screen name="GetStarted" component={GetStarted} />
                     <Stack.Screen name="HomeScreen" component={HomeScreen} />
