@@ -2,16 +2,6 @@ import { Text, StyleSheet, Image, View, Dimensions, Modal, NativeModules, Scroll
 import React, { Component } from 'react'
 import RenderHtml from 'react-native-render-html';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-//24-hour
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-//local-shipping
-import EvilIcons from 'react-native-vector-icons/EvilIcons'
-//undo
-import Ionicons from 'react-native-vector-icons/Ionicons'
-//card
-
-import Fontisto from 'react-native-vector-icons/Fontisto'
 
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
@@ -24,7 +14,7 @@ import ImageCarousel from './components/imageCarousel';
 import Options from './components/options';
 import StoreFeatures from './components/storeFeatures';
 import DetailsTabNav from './detailsTabNav';
-
+import api from '../../api/api';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -37,6 +27,7 @@ class ProductDetails extends Component {
         this.state = {
             images: [],
             description: '',
+            main_info_temp: null,
             quantity: 1,
             option_package_size: null,
             option_power: null,
@@ -84,6 +75,7 @@ class ProductDetails extends Component {
     componentDidMount = () => {
         this.getDescription()
         this.checkOptions()
+        this.getMain_Info()
     }
 
     checkOptions = () => {
@@ -103,7 +95,7 @@ class ProductDetails extends Component {
     }
 
     getDescription = () => {
-        var { product_details: { custom_attributes } } = this.props.route.params
+        var { product_details: { custom_attributes } } = this.props?.route?.params
         // console.log("product_details Images Length", media_gallery_entries.length)
         // console.log("product_details Images", custom_attributes)
 
@@ -116,6 +108,209 @@ class ProductDetails extends Component {
                 break;
             }
         }
+    }
+
+    getMain_Info = async () => {
+        var { product_details: { custom_attributes } } = this.props?.route?.params
+        const { userData: { admintoken }, actions, userData } = this.props
+
+        var { main_info_temp } = this.state
+
+        let temp = []
+        for (let i = 0; i < custom_attributes.length; i++) {
+            if (custom_attributes[i]?.attribute_code == "brands") {
+
+                temp.push(custom_attributes[i])
+
+              //  console.log("brands", custom_attributes[i])
+                // break;
+            }
+            if (custom_attributes[i]?.attribute_code == "color") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("color", custom_attributes[i])
+                // break;
+            }
+            if (custom_attributes[i]?.attribute_code == "size") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (custom_attributes[i]?.attribute_code == "contact_lenses") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("brands", custom_attributes[i])
+                // break;
+            }
+            if (custom_attributes[i]?.attribute_code == "contact_lens_diameter") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("contact_lens_diameter", custom_attributes[i])
+                // break;
+            }
+            if (custom_attributes[i]?.attribute_code == "contact_lens_base_curve") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("contact_lens_base_curve", custom_attributes[i])
+                // break;
+            }
+
+            if (custom_attributes[i]?.attribute_code == "water_container_content") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("water_container_content", custom_attributes[i])
+                // break;
+            }
+            if (custom_attributes[i]?.attribute_code == "contact_lens_usage") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("contact_lens_usage", custom_attributes[i])
+                // break;
+            }
+            if (custom_attributes[i]?.attribute_code == "box_content_pcs") {
+
+                temp.push(custom_attributes[i])
+
+               // console.log("box_content_pcs", custom_attributes[i])
+                // break;
+            }
+        }
+
+        //console.log("temp:", temp)
+
+
+        let items = []
+        let obj = {}
+        for (let j = 0; j < temp.length; j++) {
+            // console.log("temp Array elements", temp[j])
+            await api.get('/products/attributes/' + temp[j]?.attribute_code + '/options', {
+                headers: {
+                    Authorization: `Bearer ${admintoken}`,
+                },
+            })
+                .then((res) => {
+                    // console.log("")
+                    // console.log("----------------------------")
+                    // console.log("Item DEtails Api:", res?.data)
+                    // console.log("----------------------------")
+                    // console.log('')
+
+                    for (let k = 0; k < res?.data?.length; k++) {
+                        if (res?.data[k]?.value == temp[j]?.value) {
+
+                            if (temp[j]?.attribute_code == "brands") {
+
+                                obj = {
+                                    "id": 1,
+                                    "brands": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                // break;
+                            }
+                            if (temp[j]?.attribute_code == "color") {
+
+                                obj = {
+                                    "id": 2,
+                                    "color": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                // break;
+                            }
+                            if (temp[j]?.attribute_codee == "size") {
+
+                                obj = {
+                                    "id": 3,
+                                    "color": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+
+                                // break;
+                            }
+                            if (temp[j]?.attribute_code == "contact_lenses") {
+
+                                obj = {
+                                    "id": 4,
+                                    "contact_lenses": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                            }
+                            if (temp[j]?.attribute_code == "contact_lens_diameter") {
+
+                                obj = {
+                                    "id": 5,
+                                    "contact_lens_diameter": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                            }
+                            if (temp[j]?.attribute_code == "contact_lens_base_curve") {
+
+                                obj = {
+                                    "id": 6,
+                                    "contact_lens_base_curve": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                            }
+
+                            if (temp[j]?.attribute_code == "water_container_content") {
+
+                                obj = {
+                                    "id": 7,
+                                    "water_container_content": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                            }
+                            if (temp[j]?.attribute_code == "contact_lens_usage") {
+
+                                obj = {
+                                    "id": 8,
+                                    "contact_lens_usage": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                            }
+                            if (temp[j]?.attribute_code == "box_content_pcs") {
+
+                                obj = {
+                                    "id": 9,
+                                    "box_content_pcs": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+
+
+
+                        }
+                    }
+
+                })
+                .catch((err) => {
+                    console.log("More_info Api Error", err?.response)
+                    alert("Cant fetch More Information Data, Please Try again!")
+                })
+        }
+
+       // console.log("Items Array:", items)
+
+        setImmediate(() => {
+            this.setState({ main_info_temp: items })
+        })
     }
 
     plusOne = () => {
@@ -346,7 +541,12 @@ class ProductDetails extends Component {
                     <StoreFeatures />
 
                     {/* DetailsNav */}
-                    <DetailsTabNav navProps={this.props.navigation} details_tab={this.state.description} />
+                    <DetailsTabNav
+                        navProps={this.props.navigation}
+                        details_tab={this.state.description}
+                        ProductName={product_details?.name}
+                        main_infor={this.state.main_info_temp}
+                    />
 
                 </ScrollView>
                 {this.state.optionSelected.length !== 0 &&

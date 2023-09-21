@@ -2,8 +2,9 @@ import { Text, StyleSheet, Image, View, Dimensions, Modal, NativeModules, Scroll
 import React, { useState } from 'react'
 const width = Dimensions.get("screen").width
 import RenderHtml from 'react-native-render-html';
-
-const DetailsTabNav = ({ navProps, details_tab }) => {
+import Review from './components/review';
+import Main_Info from './components/main_info';
+const DetailsTabNav = ({ navProps, details_tab, ProductName, main_infor }) => {
 
     const [details, setDetails] = useState(false)
     const [main_info, setMain_info] = useState(true)
@@ -48,24 +49,25 @@ const DetailsTabNav = ({ navProps, details_tab }) => {
         <View style={styles.mainContainer}>
             <View style={styles.tabCont}>
 
-                <TouchableOpacity
+                {details_tab !== '' && <TouchableOpacity
                     onPress={() => TabPress("details")}
                     style={[styles.btn, { width: "30%" }]}>
-                    <Text>Details</Text>
+                    <Text style={styles.btnText}>Details</Text>
                     {details && <View style={styles.btnLine}></View>}
-                </TouchableOpacity>
+                </TouchableOpacity>}
 
-                <TouchableOpacity
-                    onPress={() => TabPress("main_info")}
-                    style={[styles.btn, { width: "40%" }]}>
-                    <Text>Main Information</Text>
-                    {main_info && <View style={styles.btnLine}></View>}
-                </TouchableOpacity>
+                {main_infor !== null &&
+                    <TouchableOpacity
+                        onPress={() => TabPress("main_info")}
+                        style={[styles.btn, { width: "40%" }]}>
+                        <Text style={styles.btnText}>Main Information</Text>
+                        {main_info && <View style={styles.btnLine}></View>}
+                    </TouchableOpacity>}
 
                 <TouchableOpacity
                     onPress={() => TabPress("review")}
                     style={[styles.btn, { width: "30%" }]}>
-                    <Text>Review</Text>
+                    <Text style={styles.btnText}>Review</Text>
                     {review && <View style={styles.btnLine}></View>}
                 </TouchableOpacity>
 
@@ -83,6 +85,10 @@ const DetailsTabNav = ({ navProps, details_tab }) => {
                         }}
                     />}
             </View>}
+
+            {review && <Review ProductName={ProductName} />}
+
+            {main_info && <Main_Info data={main_infor == null ? [] : main_infor} />}
 
         </View>
     )
@@ -138,5 +144,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
 
+    },
+    btnText: {
+        fontWeight: "700",
+        fontSize: 16,
+        color: "#020621",
     }
 })
