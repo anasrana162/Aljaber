@@ -13,6 +13,7 @@ import ImageView from './components/ImageView';
 import CategoryList from './components/categoryList';
 import ProductList from './components/productList';
 import { ImageArray } from '../categories/categoryData';
+import axios from 'axios';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -26,6 +27,7 @@ class Products extends Component {
             item: this.props?.route?.params?.item,
             original: null,
             loader: false,
+            loaderFilter: false,
             productApiCounter: 0,
         };
     }
@@ -37,11 +39,12 @@ class Products extends Component {
     createData = async () => {
         var { item, productApiCounter } = this.state;
         const { userData: { admintoken }, actions, userData } = this.props
-       // console.log("item Products Screen]]]]]]]]]]]]]]]]",)
+        // console.log("item Products Screen]]]]]]]]]]]]]]]]",)
 
         setImmediate(() => {
             this.setState({
                 loader: true,
+                loaderFilter: true
 
             })
         })
@@ -62,35 +65,97 @@ class Products extends Component {
                     headers: {
                         Authorization: `Bearer ${admintoken}`,
                     },
-                }).then((prod) => {
+                }).then(async (prod) => {
                     //   console.log("Product Details Api:", prod?.data)
 
                     products.push(prod?.data)
-                    // console.log("Api Array index current", p)
+
+                    // console.log("Api Array index current", products)
                     if (p == temp.length - 1) {
 
-                        // for (let p = 0; p < products.length; p++) {
-                        //     console.log(products[p])
-                        // }
-                        // console.log("Products State", this.state.products)
-
+                        setImmediate(() => {
+                            this.setState({
+                                loaderFilter: false,
+                            })
+                        })
                     }
+
+                    for (let p = 0; p < products.length; p++) {
+
+                        for (let i = 0; i < products[p].custom_attributes.length; i++) {
+                            if (products[p].custom_attributes[i].attribute_code == 'brands') {
+                                await api.get('/products/attributes/' + products[p].custom_attributes[i].attribute_code + '/options', {
+                                    headers: {
+                                        Authorization: `Bearer ${admintoken}`,
+                                    },
+                                })
+                                    .then(async (res) => {
+                                        // console.log("")
+                                        // console.log("----------------------------")
+                                        // console.log("Item DEtails Api:", res?.data)
+                                        // console.log("----------------------------")
+                                        // console.log('')
+
+                                        // console.log("products[p].custom_attributes[i].attribute_code", products[p].custom_attributes[i].value)
+
+                                        await axios.get('https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/script/custom_api.php?func=option_label&id=' + products[p].custom_attributes[i].value,).then((data) => {
+
+                                            // console.log("Data coming for brands:", data?.data)
+                                            products[p].brand = data?.data
+                                            // let obj = {
+                                            //     "attribute_code": "temp_brands",
+                                            //     "value": data?.data,
+                                            // }
+                                            //prod?.data.custom_attributes.push(obj)
+                                            //products.push(prod?.data)
+                                            // products[p].custom_attributes.push(obj)
+                                        }).catch((err) => {
+                                            console.log("DAta for Brands Api errr", err)
+                                        })
+                                        // for (let k = 0; k < res?.data?.length; k++) {
+                                        //     if (res?.data[k]?.value == products[p].custom_attributes[i].value) {
+
+                                        //         // console.log("working")
+
+                                        //         let obj = {
+                                        //             "attribute_code": "temp_brands",
+                                        //             "value": res?.data[k]?.label,
+                                        //         }
+                                        //         //prod?.data.custom_attributes.push(obj)
+                                        //         //products.push(prod?.data)
+                                        //         products[p].custom_attributes.push(obj)
+
+                                        //         break;
+
+
+                                        //     }
+                                        // }
+
+                                    })
+                                    .catch((err) => {
+                                        console.log("More_info Api Error", err?.response)
+                                        //alert("Cant fetch More Information Data, Please Try again!")
+                                    })
+
+                                break;
+                            }
+                        }
+                    }
+
                     setImmediate(() => {
                         this.setState({
-
                             products: products,
                             original: products,
                             loader: false,
-
                         })
-                        // console.log("Products State", this.state.products)
+                        //s console.log("Products State", this.state.products[0].custom_attributes)
                     })
 
 
                 }).catch((err) => {
                     //alert("Network Error Code: (CAT#1)")
 
-                    console.log("Product Detail Api error: ", err.response)
+                    console.log("Product Detail Api error on:  ", temp[p]?.sku)
                     return setImmediate(() => {
                         this.setState({
                             loader: false
@@ -121,6 +186,7 @@ class Products extends Component {
             }
         })
     }
+
     inner_Categories = () => {
         var { item, mainCat_selected } = this.props?.route?.params;
         var { userData: { defaultcategory, admintoken } } = this.props
@@ -173,6 +239,61 @@ class Products extends Component {
 
     }
 
+    sortBy = async (key) => {
+        var { products, products: { custom_attributes } } = this.state
+        const { userData: { admintoken }, actions, userData } = this.props
+        switch (key) {
+            case "position":
+                // console.log("position Working")
+                this.state.products.sort(function (a, b) {
+                    if (a.name < b.name) {
+                        return 1;
+                    }
+                    if (a.name > b.name) {
+                        return -1;
+                    }
+                    return 0;
+                });
+                setImmediate(() => {
+
+                    this.setState({ products })
+                })
+                break;
+
+            case "product_name":
+                this.state.products.sort(function (a, b) {
+                    if (a.name < b.name) {
+                        return -1;
+                    }
+                    if (a.name > b.name) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                setImmediate(() => {
+                    this.setState({ products })
+                })
+
+                //console.log(users);
+                break;
+
+            case "price":
+                // console.log("price Working")
+                this.state.products.sort(function (a, b) { return a.price - b.price });
+                setImmediate(() => {
+                    this.setState({ products })
+                })
+                break;
+
+            case "brands":
+
+                break;
+
+
+        }
+    }
+
     componentDidMount = () => {
         this.createData()
         this.inner_Categories()
@@ -203,7 +324,13 @@ class Products extends Component {
                 {/* Product List */}
 
 
-                < ProductList data={this.state.products} loader={this.state.loader} navProps={this.props.navigation} />
+                < ProductList
+                    data={this.state.products}
+                    loader={this.state.loader}
+                    navProps={this.props.navigation}
+                    sortBY={(key) => this.sortBy(key)}
+                    loaderFilter={this.state.loaderFilter}
+                />
 
 
             </View>

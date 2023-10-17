@@ -91,7 +91,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 12,
-                "img": "/pub/media/catalog/category/image_2021_04_13T14_10_50_074Z.png",
+                "img": "/media/catalog/category/prescription_1_1_1.jpg",
                 "placeHolder": "false",
                 "children_data": [
                     {
@@ -140,7 +140,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 73,
-                "img": "/pub/media/catalog/category/Color_3.jpg",
+                "img": "/media/catalog/category/color-lens_2.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -152,7 +152,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 9,
-                "img": "/pub/media/catalog/category/Toric-for-Astigmatism_6.jpg",
+                "img": "/media/catalog/category/prescription_1_1_1.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -164,7 +164,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 4,
-                "img": "/pub/media/catalog/category/image_2021_04_13T14_10_50_074Z.png",
+                "img": "/media/catalog/category/multifocal.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -176,7 +176,7 @@ export var ImageArray = [
                 "position": 5,
                 "level": 3,
                 "product_count": 9,
-                "img": "/pub/media/catalog/category/Lens-Solution_4.jpg",
+                "img": "/media/catalog/category/lens-solution.jpg",
                 "placeHolder": "false",
                 "children_data": []
             }
@@ -201,7 +201,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 34,
-                "img": "/pub/media/catalog/category/Unisex_19.jpg",
+                "img": "/media/catalog/category/Untitled-1_1.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -213,7 +213,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 29,
-                "img": "/pub/media/catalog/category/Kids_20.jpg",
+                "img": "/media/catalog/category/kids_1_3.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -299,7 +299,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 73,
-                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/man-cat.jpg",
+                "img": "/media/catalog/category/aa1_4.png",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -311,7 +311,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 39,
-                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/women-cat.jpg",
+                "img": "/media/catalog/category/aabb_1_4.png",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -323,7 +323,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 23,
-                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/kid-cat.jpg",
+                "img": "/media/catalog/category/aabbc_1_3_3.png",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -409,7 +409,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 164,
-                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/man-cat.jpg",
+                "img": "/media/catalog/category/men-sunglasses_1.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -421,7 +421,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 220,
-                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/women-cat.jpg",
+                "img": "/media/catalog/category/women-sunglasses_1.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -433,7 +433,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 27,
-                "img": "media/wysiwyg/smartwave/porto/theme_assets/images/resource/kid-cat.jpg",
+                "img": "/media/catalog/category/kids-sunglasses_1_3.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -579,7 +579,7 @@ export var ImageArray = [
                 "position": 1,
                 "level": 3,
                 "product_count": 20,
-                "img": "/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -591,7 +591,7 @@ export var ImageArray = [
                 "position": 2,
                 "level": 3,
                 "product_count": 1,
-                "img": "/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -603,7 +603,7 @@ export var ImageArray = [
                 "position": 3,
                 "level": 3,
                 "product_count": 16,
-                "img": "/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -615,7 +615,7 @@ export var ImageArray = [
                 "position": 4,
                 "level": 3,
                 "product_count": 1,
-                "img": "/pub/media/catalog/category/banner2_1_.jpg",
+                "img": "pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -627,7 +627,7 @@ export var ImageArray = [
                 "position": 5,
                 "level": 3,
                 "product_count": 7,
-                "img": "/pub/media/catalog/category/saftey_.jpg",
+                "img": "pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
                 "placeHolder": "false",
                 "children_data": []
             },
@@ -639,7 +639,7 @@ export var ImageArray = [
                 "position": 6,
                 "level": 3,
                 "product_count": 2,
-                "img": "/pub/media/catalog/category/swimming_banner.jpg",
+                "img": "pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
                 "placeHolder": "false",
                 "children_data": []
             }

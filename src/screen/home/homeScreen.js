@@ -21,29 +21,29 @@ const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
 
 var sliderImages = [
-    {
-        id: 1,
-        source: "https://aljaberoptical.com/media/magestore/bannerslider/images/3/0/30-50_-02.jpg"
-    }, {
-        id: 2,
-        source: "https://aljaberoptical.com/media/magestore/bannerslider/images/w/e/web_banner_back_b.jpg"
-    },
-    {
-        id: 3,
-        source: "https://aljaberoptical.com/media/magestore/bannerslider/images/w/e/web_banner_t.jpg"
-    },
-    {
-        id: 4,
-        source: "https://aljaberoptical.com/media/magestore/bannerslider/images/e/a/ea_kids.jpg"
-    },
-    {
-        id: 5,
-        source: "https://aljaberoptical.com/media/magestore/bannerslider/images/e/a/ea_web_banner_1.jpg"
-    },
-    {
-        id: 6,
-        source: "https://aljaberoptical.com/media/magestore/bannerslider/images/o/l/oliver_peoples_web_banner.jpg"
-    },
+    // {
+    //     id: 1,
+    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/3/0/30-50_-02.jpg"
+    // }, {
+    //     id: 2,
+    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/w/e/web_banner_back_b.jpg"
+    // },
+    // {
+    //     id: 3,
+    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/w/e/web_banner_t.jpg"
+    // },
+    // {
+    //     id: 4,
+    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/e/a/ea_kids.jpg"
+    // },
+    // {
+    //     id: 5,
+    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/e/a/ea_web_banner_1.jpg"
+    // },
+    // {
+    //     id: 6,
+    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/o/l/oliver_peoples_web_banner.jpg"
+    // },
     {
         id: 7,
         source: "https://aljaberoptical.com/media/magestore/bannerslider/images/c/o/contact_lenses_web_banner_final.jpg"
@@ -172,7 +172,7 @@ class HomeScreen extends Component {
 
                     setImmediate(() => {
                         this.setState({
-                            loader: false,
+
                             defaultCategories: res?.data
                         })
                         actions.defaultCategories(res?.data)
@@ -370,9 +370,10 @@ class HomeScreen extends Component {
                 arr.push(array[ar])
             }
         }
-        // console.log("Top Categories:", arr)
+        console.log("Top Categories:", arr[0]?.children_data)
         setImmediate(() => {
             this.setState({
+                loader: false,
                 topCategoryData: arr
             })
         })
@@ -435,11 +436,11 @@ class HomeScreen extends Component {
                     <Swiper data={sliderImages} />
 
                     {/* * Default Categories */}
-                    <DefaultCategories
+                    {this.state.loader == false && <DefaultCategories
                         data={this.state.defaultCategories1}
                         navProps={this.props.navigation}
                         firstSubItem={this.state.firstSubItem}
-                    />
+                    />}
 
                     <ProductList
                         screenName="Home"

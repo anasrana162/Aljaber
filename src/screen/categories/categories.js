@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, TouchableOpacity } from 'react-native'
+import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, TouchableOpacity, FlatList } from 'react-native'
 import React, { Component } from 'react'
 import TabNavigator from '../../components_reusable/TabNavigator';
 {/* {---------------Redux Imports------------} */ }
@@ -17,7 +17,7 @@ class Categories extends Component {
         this.state = {
             defaultCategories: null,
             loader: false,
-            selectedCat: null,
+            selectedCat: this.props?.userData?.createddefaultcategory[1],
             selectedSubCat: null,
             tempArray: [],
         };
@@ -30,7 +30,7 @@ class Categories extends Component {
     defaultCategories = () => {
         const { userData: { createddefaultcategory } } = this.props
 
-        // console.log("userData", createddefaultcategory)
+        console.log("userData", createddefaultcategory)
         setImmediate(() => {
 
             this.setState({
@@ -60,94 +60,94 @@ class Categories extends Component {
         return (
             <View style={styles.mainContainer}>
                 {/* <HomeHeader /> */}
+
+                <Text style={styles.title}>Categories</Text>
+
+
+
                 <View style={styles.inner_main}>
-                    <View style={styles.default_category_cont}>
-                        <ScrollView
-                            showsVerticalScrollIndicator={false}
-                        >
-                            <View style={styles.flatList_outerCont}>
+                    <FlatList
+                        horizontal
+                        data={this.state.defaultCategories}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={(item, index) => {
 
-                                {
-                                    this.state.defaultCategories?.map((item, index) => {
-                                        return (
-                                            <View
-                                                key={String(index)}>
-                                                {item?.is_active == "true" &&
-                                                    <TouchableOpacity
+                            return (
+                                <>
+                                    {item?.item?.is_active == "true" &&
+                                        <TouchableOpacity
 
-                                                        onPress={() => this.selectedItems(item, index, 'main')}
-                                                        style={styles.flatList_Cont}>
+                                            onPress={() => this.selectedItems(item?.item, index, 'main')}
+                                            style={styles.flatList_Cont}>
 
-                                                        <View style={{
-                                                            width: 70,
-                                                            height: 70,
-                                                            borderWidth: 1,
-                                                            borderRadius: 120,
-                                                            borderColor: "#020621",
-                                                            marginBottom: 10,
-                                                            overflow: "hidden",
-                                                            zIndex: 150,
-                                                        }}>
-                                                            {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                                            {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                        </View>
-                                                        <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
-                                                    </TouchableOpacity>}
-                                            </View>
-                                        )
-                                    })
-                                }
-                            </View>
-                        </ScrollView>
-                    </View>
-                    <View style={styles.sub_category}>
-                        <ScrollView
-                            //pagingEnabled 
-                            // horizontal
-                            showsVerticalScrollIndicator={false}
-                        // showsHorizontalScrollIndicator={false}
-                        //contentOffset={{ x: 6 }}
-                        >
-                            <View style={styles.flatList_outerCont_sub}>
-                                {
-                                    this.state.selectedCat?.children_data.map((item, index) => {
-                                        // console.log(item)
-                                        return (
-                                            <View
-                                                key={String(index)}
-                                            >
-                                                {item?.is_active == true &&
-                                                    <TouchableOpacity
-                                                        onPress={() => this.selectedItems(item, index, 'sub')}
+                                            {/* <View style={{
+                                            width: 165,
+                                            height: 180,
+                                            borderWidth: 1,
+                                            borderRadius: 20,
+                                            borderColor: "#020621",
+                                            marginBottom: 10,
+                                            overflow: "hidden",
+                                            zIndex: 150,
+                                        }}> */}
+                                            {/* https://wpstaging51.a2zcreatorz.com/ */}
+                                            {/* {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />} */}
+                                            {/* </View> */}
+                                            <Text numberOfLines={2} style={styles.text_item}>{item?.item?.name}</Text>
+                                        </TouchableOpacity>}
+                                </>
+                            )
+                        }}
+                    />
 
-                                                        style={styles.flatList_Cont_sub}>
 
-                                                        <View style={{
-                                                            width: 100,
-                                                            height: 90,
-                                                            borderWidth: 1,
-                                                            borderColor: "#020621",
-                                                            borderRadius: 10,
-                                                            marginBottom: 10,
-                                                            overflow: "hidden",
-                                                            zIndex: 150,
-                                                        }}>
-
-                                                            {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                                        </View>
-                                                        <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
-                                                    </TouchableOpacity>
-                                                }
-                                            </View>
-                                        )
-                                    })
-                                }
-                            </View>
-                        </ScrollView>
-                    </View>
+                    {/* {
+                            this.state.defaultCategories?.map((item, index) => {
+                                return (
+                                   
+                                )
+                            })
+                        } */}
                 </View>
+                <ScrollView style={{ width: width }}>
+
+                    <View style={styles.flatList_outerCont_sub}>
+                        {
+                            this.state.selectedCat?.children_data.map((item, index) => {
+                                // console.log(item)
+                                return (
+                                    <View
+                                        key={String(index)}
+                                    >
+                                        {item?.is_active == true &&
+                                            <TouchableOpacity
+                                                onPress={() => this.selectedItems(item, index, 'sub')}
+
+                                                style={{
+                                                    width: 160,
+                                                    height: 190,
+                                                    borderColor: "#020621",
+                                                    marginBottom: 10,
+                                                    overflow: "hidden",
+                                                    marginHorizontal: 10,
+                                                    zIndex: 150,
+                                                }}>
+
+                                                {/* <View style={}> */}
+
+                                                {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={styles.image_Cont} />}
+                                                {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={styles.image_Cont}  />}
+                                                {/* </View> */}
+                                                <Text numberOfLines={1} style={[styles.text_item, { color: "black",marginTop:5 }]}>{item?.name}</Text>
+                                            </TouchableOpacity>
+                                        }
+                                    </View>
+                                )
+                            })
+                        }
+                    </View>
+                </ScrollView>
                 {/** Tab Navigator */}
                 <TabNavigator screenName={"category"} navProps={this.props.navigation} />
             </View>
@@ -164,12 +164,20 @@ const styles = StyleSheet.create({
         height: height,
         backgroundColor: "white"
     },
+    title: {
+        fontSize: 32,
+        fontWeight: "600",
+        color: "#020621",
+        marginTop: 20,
+        marginLeft: 20,
+        alignSelf: "flex-start"
+    },
     inner_main: {
         width: width,
         alignSelf: "center",
-        height: "100%",
-        flexDirection: "row",
-        justifyContent: "flex-start",
+        marginTop: 20,
+        // marginRight: 200,
+        // flexDirection: "row",
         alignItems: "center"
     },
     default_category_cont: {
@@ -190,21 +198,33 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     flatList_outerCont_sub: {
-        width: width - 110,
+        width: width - 30,
         alignSelf: "center",
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: "center",
         marginBottom: 200,
         marginTop: 20
         //backgroundColor:"red",
     },
+    image_Cont: {
+        width: 160,
+        height: 170,
+        borderWidth: 1,
+        borderRadius: 20,
+        borderColor: "#020621",
+    },
     flatList_Cont: {
+        padding: 5,
+        backgroundColor: "#020621",
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 20,
-        marginHorizontal: 10
+        borderRadius: 15,
+        // marginRight: 10,
+        marginHorizontal: 5,
+        // width: "100%",
+        // backgroundColor:"red"
 
     },
     flatList_Cont_sub: {
@@ -218,9 +238,9 @@ const styles = StyleSheet.create({
 
     },
     text_item: {
-        fontSize: 11,
-        fontWeight: "600",
-        color: "#020621",
+        fontSize: 14,
+        fontWeight: "700",
+        color: "white",
         textAlign: "center"
     }
 })

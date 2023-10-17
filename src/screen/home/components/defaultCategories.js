@@ -5,14 +5,14 @@ import DefaultCategoryItems from './defaultCategoryItems'
 const width = Dimensions.get("screen").width
 
 const DefaultCategories = ({ data, navProps, firstSubItem }) => {
-    console.log("")
+    // console.log("")
     // console.log("Default CAtegories:::::; ", firstSubItem)
 
-    var [selectedItem, setSelectedItem] = React.useState(null)
+    var [selectedItem, setSelectedItem] = React.useState(firstSubItem)
     const [selectedItemIndex, setSelectedItemIndex] = React.useState(null)
 
     const selectedItems = (item, index) => {
-       // console.log("Selected Item: ", item)
+        // console.log("Selected Item: ", item)
         setImmediate(() => {
             setSelectedItem(item)
             setSelectedItemIndex(index)
@@ -21,15 +21,15 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
 
     const onNextPress = () => {
         //console.log("DATA ON NEXT PRESS", data?.length - 1)
-        
-            if (data[selectedItemIndex + 1]?.is_active == "true") {
 
-                setSelectedItem(data[selectedItemIndex + 1])
-                setSelectedItemIndex(selectedItemIndex + 1)
-            } else {
-                setSelectedItem(data[selectedItemIndex + 3])
-                setSelectedItemIndex(selectedItemIndex + 3)
-            }
+        if (data[selectedItemIndex + 1]?.is_active == "true") {
+
+            setSelectedItem(data[selectedItemIndex + 1])
+            setSelectedItemIndex(selectedItemIndex + 1)
+        } else {
+            setSelectedItem(data[selectedItemIndex + 3])
+            setSelectedItemIndex(selectedItemIndex + 3)
+        }
     }
 
     return (
@@ -41,43 +41,39 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
 
                 {
                     data?.map((item, index) => {
+                        // console.log("firstSubItem:::::; ", firstSubItem?.id)
+                        // console.log("selectedItem:::::; ", selectedItem)
+                        // console.log("item:::::;111", item?.id)
                         return (
                             <View
-                            key={String(index)}
+                                key={String(index)}
                             >
 
-                                {item.is_active == "true" && 
-                                <TouchableOpacity
-                                    onPress={() => selectedItems(item, index)}
-                                    activeOpacity={0.9}
-                                   
-                                    style={styles.flatList_Cont}>
+                                {item.is_active == "true" &&
+                                    <TouchableOpacity
+                                        onPress={() => selectedItems(item, index)}
+                                        activeOpacity={0.9}
 
-                                    <View style={{
-                                        width: 90,
-                                        height: 90,
-                                        borderWidth: item?.id == selectedItem?.id ? 3 : 0,
-                                        borderColor: "#233468",
-                                        borderRadius: 120,
-                                        marginBottom: 10,
-                                        overflow: "hidden",
-                                        zIndex: 150,
-                                    }}>
+                                        style={styles.flatList_Cont}>
 
-                                        {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                        {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                        {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
-                                    </View>
-                                    <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
-                                    <View style={{
-                                        width: "100%",
-                                        height: 2,
-                                        backgroundColor: item?.id == selectedItem?.id ? "#233468" : "transparent",
-                                        borderRadius: 10,
-                                        marginBottom: 10,
-                                        marginTop: 2
-                                    }} />
-                                </TouchableOpacity>}
+                                        {/* <View style={{
+
+                                        }}> */}
+
+                                            {/* https://wpstaging51.a2zcreatorz.com/ */}
+                                            {item?.placeHolder == "false" && <Image  source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />}
+                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />}
+                                        {/* </View> */}
+                                        <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
+                                        <View style={{
+                                            width: "100%",
+                                            height: 2,
+                                            backgroundColor: item?.id == selectedItem?.id ? "#233468" : "transparent",
+                                            borderRadius: 10,
+                                            marginBottom: 10,
+                                            marginTop: 2
+                                        }} />
+                                    </TouchableOpacity>}
                             </View>
                         )
                     })
@@ -127,5 +123,15 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         color: "#020621",
 
-    }
+    },
+    image_cont: {
+        width: 90,
+        height: 90,
+      
+        borderColor: "#233468",
+        borderRadius: 120,
+        marginBottom: 10,
+        overflow: "hidden",
+        zIndex: 150,
+    },
 })

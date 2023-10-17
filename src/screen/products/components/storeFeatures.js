@@ -12,7 +12,7 @@ const StoreFeatures = () => {
         <View style={styles.mainContainer}>
 
             {/* First Column */}
-            <View style={styles.inner_mains}>
+            {/* <View style={styles.inner_mains}> */}
 
                 {/* First Row */}
                 <View
@@ -35,12 +35,12 @@ const StoreFeatures = () => {
                         <Text style={styles.item_text}>Contact us 24 hours a day and 7 days a week</Text>
                     </View>
                 </View>
-            </View>
+            {/* </View> */}
 
             {/* Second Column */}
-            <View style={styles.inner_mains}>
+            {/* <View style={styles.inner_mains}> */}
 
-                {/* First Row */}
+                {/* Third Row */}
                 <View
                     style={styles.item_cont}
                 >
@@ -51,18 +51,18 @@ const StoreFeatures = () => {
                     </View>
                 </View>
 
-                {/* Second Row */}
+                {/* Fourth Row */}
                 <View
                     style={styles.item_cont}
                 >
-                    <FontAwesome5 name="undo" size={27} color="#020621" />
+                    <FontAwesome5 name="undo" size={30} color="#020621" />
                     <View style={{ width: "75%", marginLeft: 10 }} >
                         <Text style={styles.item_title}>30 Days Exchange</Text>
                         <Text style={styles.item_text}>Simply return it within 30 days for exchange</Text>
                     </View>
                 </View>
 
-            </View>
+            {/* </View> */}
 
         </View>
     )
@@ -73,15 +73,14 @@ export default StoreFeatures
 const styles = StyleSheet.create({
     mainContainer: {
         width: width,
-        // height:200,
-        flexDirection: "row",
-        justifyContent: "space-around",
+        // height:200, 
+        justifyContent: "flex-start",
         alignItems: "center",
         marginTop: 20,
     },
     inner_mains: {
-        width: "48%",
-        height: "100%",
+        width: "100%",
+       // height: "100%",
         alignItems: "center",
         //  backgroundColor: 'red'
     },
@@ -96,12 +95,12 @@ const styles = StyleSheet.create({
 
     item_title: {
         fontWeight: "500",
-        fontSize: 14,
+        fontSize: 15,
         color: "#020621"
     },
     item_text: {
-        fontWeight: "400",
-        fontSize: 11,
-        color: "#020621"
+        fontWeight: "500",
+        fontSize: 13,
+        color: "#222468"
     }
 })

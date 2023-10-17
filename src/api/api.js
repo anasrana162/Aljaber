@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Platform } from "react-native";
 export default axios.create({
-
-  baseURL: "https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/rest/V1/",
+  // https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/rest/V1/
+  baseURL: "https://aljaberoptical.com/pub/rest/V1/",
   headers: {
     "Accept": "application/json",
     "Content-Type": 'application/json; charset=utf-8; ',

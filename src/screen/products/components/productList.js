@@ -1,11 +1,12 @@
-import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView } from 'react-native'
-import React, { Component } from 'react'
+import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+import LottieView from 'lottie-react-native';
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = ({ data, loader, screenName, navProps }) => {
+const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter }) => {
     //  console.log("Products", data)
 
 
@@ -14,22 +15,81 @@ const ProductList = ({ data, loader, screenName, navProps }) => {
         navProps.navigate("ProductDetails", { product_details: item, product_index: index })
     }
 
+    const [openSort, setOpenSort] = useState(false)
+
+    const sort = [
+        {
+            id: 1,
+            name: "Position",
+            key: "position",
+        },
+        {
+            id: 2,
+            name: "Product Name",
+            key: "product_name",
+        },
+        {
+            id: 3,
+            name: "Price",
+            key: "price",
+        },
+        {
+            id: 4,
+            name: "Brands",
+            key: "brands",
+        },
+
+
+    ]
+
     return (
         <View style={styles?.mainContainer}>
 
             {screenName == undefined &&
                 <View style={styles.filterBoxes_Cont}>
                     {/* Sort By */}
-                    <TouchableOpacity style={styles.filterBox}>
-                        <Text style={styles?.filterBox_Text}>SORT BY</Text>
-                        <MaterialIcons size={25} name="keyboard-arrow-down" color="#020621" />
-                    </TouchableOpacity>
+                    <View style={{
+                        width: width / 2 - 50,
+                        justifyContent: "center",
+                        alignItems: "center"
+                    }}>
+                        <TouchableOpacity
+                            // disabled={loaderFilter}
+                            onPress={() => setOpenSort(!openSort)}
+                            style={[styles.filterBox, { width: "100%", position: "absolute", zIndex: 200 }]}>
+                            <Text style={styles?.filterBox_Text}>SORT BY</Text>
+                            <MaterialIcons size={25} name="keyboard-arrow-down" color="#020621" />
+
+                        </TouchableOpacity>
+                        {openSort &&
+                            <View style={styles.sort_dropdown_main_cont}>
+                                {sort.map((data, index) => {
+                                    return (
+                                        <TouchableOpacity
+                                            key={String(data?.id)}
+                                            style={styles.sort_dropdown_main_inner_cont}
+                                            onPress={() => {
+                                                setOpenSort(false)
+                                                sortBY(data?.key)
+                                            }}
+                                        >
+                                            <Text>{data.name}</Text>
+                                        </TouchableOpacity>
+                                    )
+                                })}
+                            </View>
+                        }
+
+                    </View>
 
                     {/* Filter */}
-                    <TouchableOpacity style={styles.filterBox}>
+                    <TouchableOpacity
+                        disabled={loaderFilter}
+                        style={styles.filterBox}>
                         <Text style={styles?.filterBox_Text}>FILTER</Text>
                     </TouchableOpacity>
                 </View>}
+
             {screenName == "Home" &&
                 <View style={{
                     width: width - 15,
@@ -59,6 +119,17 @@ const ProductList = ({ data, loader, screenName, navProps }) => {
                     </View>
 
                 </View>}
+
+            {loaderFilter &&
+                <LottieView source={require('../../../animations/tab_loader.json')}
+                    autoPlay={true}
+                    loop
+                    style={{
+                        width: "70%",
+                        height: 2,
+                        marginTop: 5
+                    }} />
+            }
 
             {/* Products List */}
 
@@ -163,29 +234,36 @@ const ProductList = ({ data, loader, screenName, navProps }) => {
                 }]}>
                     {
                         data.map((products, index) => {
-                            // console.log("products?.media_gallery_entries[0]?.file", products?.media_gallery_entries[0]?.file)
+
+                            //  console.log("products?.media_gallery_entries[0]?.file", products.brand)
                             return (
-                                <TouchableOpacity
+                                <View
                                     key={String(index)}
-                                    onPress={() => selectedItem(products, index)}
-                                    style={styles.product_Cont}
                                 >
+                                    <>
+                                       {products?.price !== 0 && <TouchableOpacity
+                                            onPress={() => selectedItem(products, index)}
+                                            style={styles.product_Cont}
+                                        >
 
 
-                                    <Image
-                                        resizeMode='stretch'
-                                        source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
-                                        style={{ width: "100%", height: 110, borderRadius: 10 }}
-                                    />
-                                    <Text numberOfLines={2} style={styles.product_Name}>{products?.name}</Text>
-                                    <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
+                                            <Image
+                                                resizeMode='stretch'
+                                                source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
+                                                style={{ width: "100%", height: 110, borderRadius: 10 }}
+                                            />
+                                            <Text numberOfLines={2} style={styles.product_Name}>{products?.brand}</Text>
+                                            <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 0 }]}>{products?.name}</Text>
+                                            <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
 
-                                    <TouchableOpacity style={styles?.addToCart_Cont}>
-                                        <Text style={styles.addToCart}>Add to Cart</Text>
-                                    </TouchableOpacity>
+                                            <TouchableOpacity style={styles?.addToCart_Cont}>
+                                                <Text style={styles.addToCart}>Add to Cart</Text>
+                                            </TouchableOpacity>
 
 
-                                </TouchableOpacity>
+                                        </TouchableOpacity>}
+                                    </>
+                                </View>
                             )
                         })
                     }
@@ -215,6 +293,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-around",
         marginBottom: 10,
+        zIndex: 200
     },
 
     filterBox: {
@@ -231,6 +310,26 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '700',
         color: "#020621",
+    },
+
+    sort_dropdown_main_cont: {
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "absolute",
+        borderWidth: 1,
+        top: 20,
+        backgroundColor: "white",
+        borderBottomLeftRadius: 5,
+        borderBottomRightRadius: 5,
+    },
+    sort_dropdown_main_inner_cont: {
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        borderBottomWidth: 1,
+        padding: 5,
+        // marginVertical: 5
     },
 
     productList_cont: {

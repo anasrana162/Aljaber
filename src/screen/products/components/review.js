@@ -6,7 +6,7 @@ const Review = ({ ProductName }) => {
     return (
         <View style={styles.mainContainer}>
             <Text style={styles.title}>YOUR REVIEWING</Text>
-            <Text style={[styles.title, { fontSize: 16, marginTop: 20,marginBottom:10 }]}>{ProductName?.toUpperCase()}</Text>
+            <Text style={[styles.title, { fontSize: 15, marginTop: 10,marginBottom:0 }]}>{ProductName?.toUpperCase()}</Text>
 
             <Text style={styles.textInp_title}>NICKNAME*</Text>
             <TextInput
@@ -43,13 +43,13 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
     },
     title: {
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: "600",
         color: "#233468",
         marginTop: 40
     },
     textInp_title: {
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: "500",
         color: "#233468",
         marginTop: 20,
