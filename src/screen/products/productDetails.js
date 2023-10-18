@@ -31,6 +31,8 @@ class ProductDetails extends Component {
             quantity: 1,
             option_package_size: null,
             option_power: null,
+            bigImage: "",
+            openBigImageModal: false,
             selectedItemLeftPower: {
                 "title": "Select",
                 "sort_order": 0,
@@ -80,7 +82,7 @@ class ProductDetails extends Component {
 
     checkOptions = () => {
         var { product_details: { options } } = this.props.route.params
-        console.log("OPtions For Product", options)
+        // console.log("OPtions For Product", options)
 
         for (let i = 0; i < options.length; i++) {
 
@@ -122,42 +124,42 @@ class ProductDetails extends Component {
 
                 temp.push(custom_attributes[i])
 
-              //  console.log("brands", custom_attributes[i])
+                //  console.log("brands", custom_attributes[i])
                 // break;
             }
             if (custom_attributes[i]?.attribute_code == "color") {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("color", custom_attributes[i])
+                // console.log("color", custom_attributes[i])
                 // break;
             }
             if (custom_attributes[i]?.attribute_code == "size") {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("size", custom_attributes[i])
+                // console.log("size", custom_attributes[i])
                 // break;
             }
             if (custom_attributes[i]?.attribute_code == "contact_lenses") {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("brands", custom_attributes[i])
+                // console.log("brands", custom_attributes[i])
                 // break;
             }
             if (custom_attributes[i]?.attribute_code == "contact_lens_diameter") {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("contact_lens_diameter", custom_attributes[i])
+                // console.log("contact_lens_diameter", custom_attributes[i])
                 // break;
             }
             if (custom_attributes[i]?.attribute_code == "contact_lens_base_curve") {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("contact_lens_base_curve", custom_attributes[i])
+                // console.log("contact_lens_base_curve", custom_attributes[i])
                 // break;
             }
 
@@ -165,21 +167,21 @@ class ProductDetails extends Component {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("water_container_content", custom_attributes[i])
+                // console.log("water_container_content", custom_attributes[i])
                 // break;
             }
             if (custom_attributes[i]?.attribute_code == "contact_lens_usage") {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("contact_lens_usage", custom_attributes[i])
+                // console.log("contact_lens_usage", custom_attributes[i])
                 // break;
             }
             if (custom_attributes[i]?.attribute_code == "box_content_pcs") {
 
                 temp.push(custom_attributes[i])
 
-               // console.log("box_content_pcs", custom_attributes[i])
+                // console.log("box_content_pcs", custom_attributes[i])
                 // break;
             }
         }
@@ -306,7 +308,7 @@ class ProductDetails extends Component {
                 })
         }
 
-       // console.log("Items Array:", items)
+        // console.log("Items Array:", items)
 
         setImmediate(() => {
             this.setState({ main_info_temp: items })
@@ -409,9 +411,25 @@ class ProductDetails extends Component {
             this.setState({ dropdown: !this.state.dropdown, optionSelected: val, eyedir: eyedir })
         })
     }
-    dismissModal = () => {
+    dismissModal = (key) => {
+        switch (key) {
+            case "eye":
+                setImmediate(() => {
+                    this.setState({ dropdown: false, })
+                })
+                break;
+            case "image":
+                setImmediate(() => {
+                    this.setState({ openBigImageModal: false, })
+                })
+                break;
+        }
+    }
+
+    onImagePress = (selected) => {
+        console.log("Selected Outside", selected)
         setImmediate(() => {
-            this.setState({ dropdown: false, })
+            this.setState({ bigImage: selected, openBigImageModal: true })
         })
     }
 
@@ -419,7 +437,7 @@ class ProductDetails extends Component {
         var {
             product_details,
             product_details: { extension_attributes: { stock_item } },
-        } = this.props.route.params
+        } = this.props?.route?.params
         const tagsStyles = {
             body: {
                 color: "black",
@@ -441,10 +459,13 @@ class ProductDetails extends Component {
                     showsVerticalScrollIndicator={false}
                     style={{ width: width - 20, }}>
                     <ImageCarousel
+                        usage="openModal"
                         data={product_details?.media_gallery_entries}
+                        onImagePress={(selected) => this.onImagePress(selected)}
                         fisrtImage={{
                             id: product_details?.media_gallery_entries[0]?.id,
-                            url: product_details?.media_gallery_entries[0]?.file
+                            url: product_details?.media_gallery_entries[0]?.file,
+                            index: 0,
                         }} />
 
                     {/* Product Name */}
@@ -549,15 +570,42 @@ class ProductDetails extends Component {
                     />
 
                 </ScrollView>
+
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.openBigImageModal}
+                    onDismiss={() => this.dismissModal("image")}
+                >
+                    <TouchableOpacity
+                        onPress={() => this.dismissModal("image")}
+                        style={{
+                            width: width,
+                            height: Dimensions.get("screen").height,
+                            backgroundColor: "rgba(52,52,52,0.8)",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+
+                    </TouchableOpacity>
+                    <ImageCarousel
+                        usage="open"
+                        data={product_details?.media_gallery_entries}
+                        onImagePress={(selected) => this.onImagePress(selected)}
+                        fisrtImage={this.state.bigImage}
+                        style={{ position: "absolute", zIndex: 400, marginTop: height / 4.2, marginLeft: 5 }}
+                    />
+                </Modal>
+
                 {this.state.optionSelected.length !== 0 &&
                     <Modal
                         animationType="slide"
                         transparent={true}
                         visible={this.state.dropdown}
-                        onDismiss={() => this.dismissModal()}
+                        onDismiss={() => this.dismissModal("eye")}
                     >
                         <TouchableOpacity
-                            onPress={() => this.dismissModal()}
+                            onPress={() => this.dismissModal("eye")}
                             style={{
                                 width: width,
                                 height: Dimensions.get("screen").height,
@@ -581,55 +629,6 @@ class ProductDetails extends Component {
                                                     key={String(index)}
                                                     onPress={() => this.selectItem(item, index, item?.title)}
                                                     style={styles?.dropDown_item_style}>
-                                                    {/* {this.state.eyedir == 'leftPA' ?
-                                                    (this.state.selectedItemLeftPackage?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
-                                                    :
-                                                    (this.state.selectedItemLeftPackage?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
-                                                }
-                                                {this.state.eyedir == 'leftPO' ?
-                                                    (this.state.selectedItemLeftPower?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
-                                                    :
-                                                    (this.state.selectedItemRightPower?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
-                                                }
-                                                {this.state.eyedir == 'rightPA' ?
-                                                    (this.state.selectedItemLeft?.title == item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
-                                                    :
-                                                    (this.state.selectedItemRight?.title == item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />)
-                                                } */}
-                                                    {/* {this.state.selectedItem?.title == item?.title && <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />} */}
-
-
-                                                    {/* new ones */}
-
-                                                    {/* {this.state.eyedir == "leftPA" &&
-                                                    this.state.selectedItemLeftPackage?.title !== item?.title ?
-                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
-                                                    :
-                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
-                                                }
-
-
-                                                {this.state.eyedir == "leftPO" &&
-                                                    this.state.selectedItemLeftPower?.title !== item?.title ?
-                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
-                                                    :
-                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
-                                                }
-
-                                                {this.state.eyedir == "rightPA" &&
-                                                    this.state.selectedItemRightPackage?.title !== item?.title ?
-                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
-                                                    :
-                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
-                                                }
-
-
-                                                {this.state.eyedir == "rightPO" &&
-                                                    this.state.selectedItemRightPower?.title !== item?.title ?
-                                                    <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />
-                                                    :
-                                                    <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />
-                                                } */}
 
                                                     < Text style={styles.dropDown_item_text}>{item?.title}</Text>
                                                 </TouchableOpacity>

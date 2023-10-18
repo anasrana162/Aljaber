@@ -44,6 +44,7 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
                         // console.log("firstSubItem:::::; ", firstSubItem?.id)
                         // console.log("selectedItem:::::; ", selectedItem)
                         // console.log("item:::::;111", item?.id)
+                        var imageURI =`../../../../assets/Category_Images/${item.id}.jpeg`
                         return (
                             <View
                                 key={String(index)}
@@ -60,10 +61,14 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
 
                                         }}> */}
 
-                                            {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                            {item?.placeHolder == "false" && <Image  source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />}
-                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />}
+                                        {/* https://wpstaging51.a2zcreatorz.com/ */}
+                                        {/* <Image
+                                            resizeMode='cover'
+                                            source={require(`../../../../assets/Category_Images/102.jpg`)} style={[styles.image_cont, { borderWidth: item?.id == selectedItem?.id ? 3 : 0, }]} /> */}
+                                        {/* {item?.placeHolder == "false" && <Image  source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />}
+                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />} */}
                                         {/* </View> */}
+                                        <Image  source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/"+item?.id+".jpg" }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />
                                         <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
                                         <View style={{
                                             width: "100%",
@@ -127,7 +132,7 @@ const styles = StyleSheet.create({
     image_cont: {
         width: 90,
         height: 90,
-      
+
         borderColor: "#233468",
         borderRadius: 120,
         marginBottom: 10,

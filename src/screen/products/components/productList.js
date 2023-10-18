@@ -235,13 +235,13 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
                     {
                         data.map((products, index) => {
 
-                            //  console.log("products?.media_gallery_entries[0]?.file", products.brand)
+                             console.log("products?.media_gallery_entries[0]?.file", products.price ,"  ",products.visibility)
                             return (
                                 <View
                                     key={String(index)}
                                 >
                                     <>
-                                       {products?.price !== 0 && <TouchableOpacity
+                                        {(products?.price > 0 && products?.visibility == 4 ) && <TouchableOpacity
                                             onPress={() => selectedItem(products, index)}
                                             style={styles.product_Cont}
                                         >

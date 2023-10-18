@@ -68,7 +68,7 @@ class Products extends Component {
                 }).then(async (prod) => {
                     //   console.log("Product Details Api:", prod?.data)
 
-                    products.push(prod?.data)
+                    //products.push(prod?.data)
 
                     // console.log("Api Array index current", products)
                     if (p == temp.length - 1) {
@@ -80,56 +80,35 @@ class Products extends Component {
                         })
                     }
 
-                    for (let p = 0; p < products.length; p++) {
+                    // for (let p = 0; p < products.length; p++) {
 
-                        for (let i = 0; i < products[p].custom_attributes.length; i++) {
-                            if (products[p].custom_attributes[i].attribute_code == 'brands') {
-                                await api.get('/products/attributes/' + products[p].custom_attributes[i].attribute_code + '/options', {
+                        for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
+                            if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
+                                await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
                                     headers: {
                                         Authorization: `Bearer ${admintoken}`,
                                     },
                                 })
                                     .then(async (res) => {
-                                        // console.log("")
-                                        // console.log("----------------------------")
-                                        // console.log("Item DEtails Api:", res?.data)
-                                        // console.log("----------------------------")
-                                        // console.log('')
+                                        console.log("")
+                                        console.log("----------------------------")
+                                        console.log("Item DEtails Api:", res?.data)
+                                        console.log("----------------------------")
+                                        console.log('')
 
                                         // console.log("products[p].custom_attributes[i].attribute_code", products[p].custom_attributes[i].value)
 
-                                        await axios.get('https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/script/custom_api.php?func=option_label&id=' + products[p].custom_attributes[i].value,).then((data) => {
+                                        await axios.get('https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then((data) => {
 
-                                            // console.log("Data coming for brands:", data?.data)
-                                            products[p].brand = data?.data
-                                            // let obj = {
-                                            //     "attribute_code": "temp_brands",
-                                            //     "value": data?.data,
-                                            // }
-                                            //prod?.data.custom_attributes.push(obj)
-                                            //products.push(prod?.data)
-                                            // products[p].custom_attributes.push(obj)
+                                            console.log("Data coming for brands:", data?.data)
+                                            prod.data.brand = data?.data
+                                            products.push(prod?.data)
+
+                                          
                                         }).catch((err) => {
                                             console.log("DAta for Brands Api errr", err)
                                         })
-                                        // for (let k = 0; k < res?.data?.length; k++) {
-                                        //     if (res?.data[k]?.value == products[p].custom_attributes[i].value) {
-
-                                        //         // console.log("working")
-
-                                        //         let obj = {
-                                        //             "attribute_code": "temp_brands",
-                                        //             "value": res?.data[k]?.label,
-                                        //         }
-                                        //         //prod?.data.custom_attributes.push(obj)
-                                        //         //products.push(prod?.data)
-                                        //         products[p].custom_attributes.push(obj)
-
-                                        //         break;
-
-
-                                        //     }
-                                        // }
+                              
 
                                     })
                                     .catch((err) => {
@@ -140,7 +119,7 @@ class Products extends Component {
                                 break;
                             }
                         }
-                    }
+                    // }
 
                     setImmediate(() => {
                         this.setState({

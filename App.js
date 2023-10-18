@@ -22,6 +22,7 @@ const { StatusBarManager } = NativeModules;
 import Navigation from './src/navigation/navigation';
 import api from './src/api/api';
 import NetInfo from "@react-native-community/netinfo";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 class App extends Component {
 
@@ -121,7 +122,7 @@ class App extends Component {
 
   render() {
     return (
-      <View style={{ flex: 1, backgroundColor: "#020621", }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#020621", }}>
 
         <View style={{ marginTop: StatusBarManager?.HEIGHT, flex: 1 }} >
           {Platform.OS == "ios" && <StatusBar
@@ -140,7 +141,7 @@ class App extends Component {
           <Navigation />
 
         </View>
-      </View>
+      </GestureHandlerRootView>
     );
 
   }
