@@ -1,5 +1,5 @@
 import { Text, StyleSheet, View, Dimensions, FlatList, NativeModules, TouchableOpacity, Platform, Image } from 'react-native'
-import React, { Component, PureComponent, memo } from 'react'
+import React, { Component, PureComponent, memo, useEffect } from 'react'
 import DefaultCategoryItems from './defaultCategoryItems'
 
 const width = Dimensions.get("screen").width
@@ -9,8 +9,9 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
     // console.log("Default CAtegories:::::; ", firstSubItem)
 
     var [selectedItem, setSelectedItem] = React.useState(firstSubItem)
-    const [selectedItemIndex, setSelectedItemIndex] = React.useState(null)
-
+    const [selectedItemIndex, setSelectedItemIndex] = React.useState(0)
+    var [categories, setCategories] = React.useState([])
+    const [showItem, setShowItem] = React.useState(true)
     const selectedItems = (item, index) => {
         // console.log("Selected Item: ", item)
         setImmediate(() => {
@@ -19,23 +20,34 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
         })
     }
 
+
+
     const onNextPress = () => {
-        //console.log("DATA ON NEXT PRESS", data?.length - 1)
+        // console.log("DATA ON NEXT PRESS", data?.length - 1)
 
-        if (data[selectedItemIndex + 1]?.is_active == "true") {
+        // if (data[selectedItemIndex + 1]?.is_active == "true") {
 
+        //     setSelectedItem(data[selectedItemIndex + 1])
+        //     setSelectedItemIndex(selectedItemIndex + 1)
+        // } else {
+        //     setSelectedItem(data[selectedItemIndex + 3])
+        //     setSelectedItemIndex(selectedItemIndex + 3)
+        // }
+        // console.log("selectedItemIndex", selectedItemIndex + 1)
+        // console.log("Next Data", data[selectedItemIndex + 1])
+        if (data[selectedItemIndex + 1] == undefined) {
+            setSelectedItem(firstSubItem)
+            setSelectedItemIndex(0)
+        } else {
             setSelectedItem(data[selectedItemIndex + 1])
             setSelectedItemIndex(selectedItemIndex + 1)
-        } else {
-            setSelectedItem(data[selectedItemIndex + 3])
-            setSelectedItemIndex(selectedItemIndex + 3)
+
         }
+
     }
 
     return (
         <View style={styles.mainContainer}>
-
-
 
             <View style={styles.flatList_outerCont}>
 
@@ -43,14 +55,15 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
                     data?.map((item, index) => {
                         // console.log("firstSubItem:::::; ", firstSubItem?.id)
                         // console.log("selectedItem:::::; ", selectedItem)
-                        // console.log("item:::::;111", item?.id)
-                        var imageURI =`../../../../assets/Category_Images/${item.id}.jpeg`
+                        // console.log("item:::::;111", item?.id, " ", item?.name, " ", item?.is_active)
+
+
                         return (
                             <View
                                 key={String(index)}
                             >
 
-                                {item.is_active == "true" &&
+                                {item?.is_active == true &&
                                     <TouchableOpacity
                                         onPress={() => selectedItems(item, index)}
                                         activeOpacity={0.9}
@@ -68,7 +81,7 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
                                         {/* {item?.placeHolder == "false" && <Image  source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />}
                                             {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />} */}
                                         {/* </View> */}
-                                        <Image  source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/"+item?.id+".jpg" }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />
+                                        <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={[styles.image_cont, { borderWidth: item?.id == selectedItem?.id ? 3 : 0, }]} />
                                         <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
                                         <View style={{
                                             width: "100%",

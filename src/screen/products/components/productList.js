@@ -11,7 +11,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
 
 
     const selectedItem = (item, index) => {
-        console.log("Item Product Slected:", item)
+        // console.log("Item Product Slected:", item)
         navProps.navigate("ProductDetails", { product_details: item, product_index: index })
     }
 
@@ -120,7 +120,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
 
                 </View>}
 
-            {loaderFilter &&
+            {/* {loaderFilter &&
                 <LottieView source={require('../../../animations/tab_loader.json')}
                     autoPlay={true}
                     loop
@@ -129,7 +129,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
                         height: 2,
                         marginTop: 5
                     }} />
-            }
+            } */}
 
             {/* Products List */}
 
@@ -235,17 +235,16 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
                     {
                         data.map((products, index) => {
 
-                             console.log("products?.media_gallery_entries[0]?.file", products.price ,"  ",products.visibility)
+                            //  console.log("products?.media_gallery_entries[0]?.file", products.price ,"  ",products.visibility)
                             return (
                                 <View
                                     key={String(index)}
                                 >
                                     <>
-                                        {(products?.price > 0 && products?.visibility == 4 ) && <TouchableOpacity
+                                        {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true ) && <TouchableOpacity
                                             onPress={() => selectedItem(products, index)}
                                             style={styles.product_Cont}
                                         >
-
 
                                             <Image
                                                 resizeMode='stretch'

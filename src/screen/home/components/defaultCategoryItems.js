@@ -22,9 +22,9 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
                 borderRadius: 5,
                 overflow: "hidden"
             }}>
-
-                {data?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + data?.img }} style={{ width: "100%", height: "100%", }} />}
-                {data?.placeHolder == "true" && <Image source={{ uri: data?.img }} style={{ width: "100%", height: "100%", }} />}
+                <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + data?.id + ".jpg" }} style={{ width: "100%", height: "100%", }} />
+                {/* {data?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + data?.img }} style={{ width: "100%", height: "100%", }} />}
+                {data?.placeHolder == "true" && <Image source={{ uri: data?.img }} style={{ width: "100%", height: "100%", }} />} */}
 
                 <View style={{
                     width: "100%",
@@ -59,6 +59,20 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
                     {
                         data?.children_data.map((item, index) => {
                             //console.log(item)
+                            switch (item?.id) {
+                                case 81:
+                                    item.is_active = false
+                                    break;
+                                case 74:
+                                    item.is_active = false
+                                    break;
+                                case 45:
+                                    item.is_active = false
+                                    break;
+                                // case 81:
+                                //     item.is_active = false
+                                //     break;
+                            }
                             return (
                                 <View
                                     key={String(index)}
@@ -78,14 +92,18 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
                                                 borderRadius: 5,
                                                 marginBottom: 10,
                                                 overflow: "hidden",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                borderWidth: item?.parent_id == 102 ? 1 : 0,
                                                 zIndex: 150,
                                             }}>
-
+                                                {item?.parent_id == 102 && <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>}
                                                 {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                                {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} resizeMode='cover' style={{ width: "100%", height: "100%" }} />}
-                                                {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />}
+                                                {item?.parent_id !== 102 && <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={{ width: "100%", height: "100%", }} />}
+                                                {/* {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} resizeMode='cover' style={{ width: "100%", height: "100%" }} />}
+                                                {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />} */}
                                             </View>
-                                            <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
+                                            {item?.parent_id !== 102 && <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>}
                                         </TouchableOpacity>
                                     }
                                 </View>

@@ -210,137 +210,161 @@ class HomeScreen extends Component {
 
     defaultCategories = () => {
         const { actions, userData: { defaultcategory, admintoken } } = this.props
-        if (Object.keys(defaultcategory).length !== 0) {
-            //console.log("working")
-            var { children_data } = defaultcategory
-            var obj = {}
-            var tempArray1 = [];
+        // if (Object.keys(defaultcategory).length !== 0) {
+        //     //console.log("working")
+        //     var { children_data } = defaultcategory
+        //     var obj = {}
+        //     var tempArray1 = [];
 
-            for (let i = 0; i < children_data.length; i++) {
-                // console.log(children_data[i]?.children_data.length)
-                for (let j = 0; j < ImageArray.length; j++) {
+        //     for (let i = 0; i < children_data.length; i++) {
+        //         // console.log(children_data[i]?.children_data.length)
+        //         for (let j = 0; j < ImageArray.length; j++) {
 
-                    if (ImageArray[j]?.id == children_data[i]?.id) {
-                        var obj = {
-                            "id": children_data[i]?.id,
-                            "parent_id": children_data[i]?.parent_id,
-                            "name": children_data[i]?.name,
-                            "is_active": ImageArray[j]?.is_active,
-                            "position": children_data[i]?.position,
-                            "level": children_data[i]?.level,
-                            "product_count": children_data[i]?.product_count,
-                            "img": ImageArray[j]?.img,
-                            "placeHolder": ImageArray[j]?.placeHolder,
-                            "children_data": []
-                        };
-                        tempArray1.push(obj)
+        //             if (ImageArray[j]?.id == children_data[i]?.id) {
+        //                 var obj = {
+        //                     "id": children_data[i]?.id,
+        //                     "parent_id": children_data[i]?.parent_id,
+        //                     "name": children_data[i]?.name,
+        //                     "is_active": ImageArray[j]?.is_active,
+        //                     "position": children_data[i]?.position,
+        //                     "level": children_data[i]?.level,
+        //                     "product_count": children_data[i]?.product_count,
+        //                     "img": ImageArray[j]?.img,
+        //                     "placeHolder": ImageArray[j]?.placeHolder,
+        //                     "children_data": []
+        //                 };
+        //                 tempArray1.push(obj)
 
-                        break;
+        //                 break;
 
-                    }
-                    if (ImageArray[i]?.id == undefined) {
-                        var obj = {
-                            "id": children_data[i]?.id,
-                            "parent_id": children_data[i]?.parent_id,
-                            "name": children_data[i]?.name,
-                            "is_active": children_data[i]?.is_active,
-                            "position": children_data[i]?.position,
-                            "level": children_data[i]?.level,
-                            "product_count": children_data[i]?.product_count,
-                            "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-                            "placeHolder": true,
-                            "children_data": []
-                        };
-                        // tempArray1.push(obj)
-                        // break;
+        //             }
+        //             if (ImageArray[i]?.id == undefined) {
+        //                 var obj = {
+        //                     "id": children_data[i]?.id,
+        //                     "parent_id": children_data[i]?.parent_id,
+        //                     "name": children_data[i]?.name,
+        //                     "is_active": children_data[i]?.is_active,
+        //                     "position": children_data[i]?.position,
+        //                     "level": children_data[i]?.level,
+        //                     "product_count": children_data[i]?.product_count,
+        //                     "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
+        //                     "placeHolder": true,
+        //                     "children_data": []
+        //                 };
+        //                 // tempArray1.push(obj)
+        //                 // break;
 
-                        for (let tA = 0; tA < tempArray1.length; tA++) {
-                            if (tempArray1[tA]?.length == children_data[i]?.length) {
-                                break;
-                            } else {
+        //                 for (let tA = 0; tA < tempArray1.length; tA++) {
+        //                     if (tempArray1[tA]?.length == children_data[i]?.length) {
+        //                         break;
+        //                     } else {
 
-                                tempArray1[tA]?.push(obj)
-                            }
+        //                         tempArray1[tA]?.push(obj)
+        //                     }
 
-                        }
+        //                 }
 
-                    }
-                }
+        //             }
+        //         }
 
-                for (let j = 0; j < ImageArray.length; j++) {
-                    // console.log(" ImageArray[j]?.children_data.length)", ImageArray[j]?.children_data.length)
-                    //  Sub Cat
-                    if (children_data[i]?.children_data.length !== 0) {
+        //         for (let j = 0; j < ImageArray.length; j++) {
+        //             // console.log(" ImageArray[j]?.children_data.length)", ImageArray[j]?.children_data.length)
+        //             //  Sub Cat
+        //             if (children_data[i]?.children_data.length !== 0) {
 
-                        for (let ccl = 0; ccl < children_data[i]?.children_data.length; ccl++) {
-
-
-                            for (let iA = 0; iA < ImageArray[j]?.children_data?.length; iA++) {
-
-                                // console.log(ImageArray[j]?.children_data[iA])
-                                var obj2 = {}
-                                if (ImageArray[j]?.children_data[iA]?.id == children_data[i]?.children_data[ccl]?.id) {
+        //                 for (let ccl = 0; ccl < children_data[i]?.children_data.length; ccl++) {
 
 
-                                    obj2 = {
-                                        "id": children_data[i]?.children_data[ccl]?.id,
-                                        "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
-                                        "name": children_data[i]?.children_data[ccl]?.name,
-                                        "is_active": children_data[i]?.children_data[ccl]?.is_active,
-                                        "position": children_data[i]?.children_data[ccl]?.position,
-                                        "level": children_data[i]?.children_data[ccl]?.level,
-                                        "product_count": children_data[i]?.children_data[ccl]?.product_count,
-                                        "img": ImageArray[j]?.children_data[iA]?.img,
-                                        "placeHolder": ImageArray[j]?.children_data[iA]?.placeHolder,
-                                        "children_data": []
-                                    };
+        //                     for (let iA = 0; iA < ImageArray[j]?.children_data?.length; iA++) {
 
-                                    for (let tA = 0; tA < tempArray1.length; tA++) {
-                                        if (children_data[i]?.id == tempArray1[tA]?.id) {
-                                            tempArray1[tA]?.children_data.push(obj2)
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            if (ImageArray[i]?.children_data[ccl]?.id == undefined) {
-                                var obj2 = {
-                                    "id": children_data[i]?.children_data[ccl]?.id,
-                                    "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
-                                    "name": children_data[i]?.children_data[ccl]?.name,
-                                    "is_active": children_data[i]?.children_data[ccl]?.is_active,
-                                    "position": children_data[i]?.children_data[ccl]?.position,
-                                    "level": children_data[i]?.level,
-                                    "product_count": children_data[i]?.children_data[ccl]?.product_count,
-                                    "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-                                    "placeHolder": true,
-                                    "children_data": []
-                                };
+        //                         // console.log(ImageArray[j]?.children_data[iA])
+        //                         var obj2 = {}
+        //                         if (ImageArray[j]?.children_data[iA]?.id == children_data[i]?.children_data[ccl]?.id) {
 
-                                for (let tA = 0; tA < tempArray1.length; tA++) {
-                                    if (tempArray1[tA]?.children_data.length == children_data[i]?.children_data.length) {
-                                        break;
-                                    } else {
 
-                                        tempArray1[tA]?.children_data.push(obj2)
-                                    }
+        //                             obj2 = {
+        //                                 "id": children_data[i]?.children_data[ccl]?.id,
+        //                                 "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
+        //                                 "name": children_data[i]?.children_data[ccl]?.name,
+        //                                 "is_active": children_data[i]?.children_data[ccl]?.is_active,
+        //                                 "position": children_data[i]?.children_data[ccl]?.position,
+        //                                 "level": children_data[i]?.children_data[ccl]?.level,
+        //                                 "product_count": children_data[i]?.children_data[ccl]?.product_count,
+        //                                 "img": ImageArray[j]?.children_data[iA]?.img,
+        //                                 "placeHolder": ImageArray[j]?.children_data[iA]?.placeHolder,
+        //                                 "children_data": []
+        //                             };
 
-                                }
+        //                             for (let tA = 0; tA < tempArray1.length; tA++) {
+        //                                 if (children_data[i]?.id == tempArray1[tA]?.id) {
+        //                                     tempArray1[tA]?.children_data.push(obj2)
+        //                                     break;
+        //                                 }
+        //                             }
+        //                         }
+        //                     }
+        //                     if (ImageArray[i]?.children_data[ccl]?.id == undefined) {
+        //                         var obj2 = {
+        //                             "id": children_data[i]?.children_data[ccl]?.id,
+        //                             "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
+        //                             "name": children_data[i]?.children_data[ccl]?.name,
+        //                             "is_active": children_data[i]?.children_data[ccl]?.is_active,
+        //                             "position": children_data[i]?.children_data[ccl]?.position,
+        //                             "level": children_data[i]?.level,
+        //                             "product_count": children_data[i]?.children_data[ccl]?.product_count,
+        //                             "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
+        //                             "placeHolder": true,
+        //                             "children_data": []
+        //                         };
 
-                            }
-                        }
-                    }
-                }
+        //                         for (let tA = 0; tA < tempArray1.length; tA++) {
+        //                             if (tempArray1[tA]?.children_data.length == children_data[i]?.children_data.length) {
+        //                                 break;
+        //                             } else {
+
+        //                                 tempArray1[tA]?.children_data.push(obj2)
+        //                             }
+
+        //                         }
+
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        var { children_data } = defaultcategory
+        // console.log("tempArray1", children_data)
+        actions?.createdDefaultCategories(children_data)
+
+        // this to to hide some categories ID's are specified in switch
+        var tempArr = []
+        for (let i = 0; i < children_data?.length; i++) {
+            switch (children_data[i].id) {
+                case 50:
+                    children_data[i].is_active = false
+                    break;
+                case 72:
+                    children_data[i].is_active = false
+                    break;
+                case 89:
+                    children_data[i].is_active = false
+                    break;
+                case 128:
+                    children_data[i].is_active = false
+                    break;
+
+                default:
+                    // /children_data[i].is_active = true
+                    tempArr.push(children_data[i])
+                    break;
             }
         }
-        // console.log("tempArray1", tempArray1[1])
-        actions?.createdDefaultCategories(tempArray1)
         this.setState({
-
-            defaultCategories1: tempArray1,
-            firstSubItem: tempArray1[1]
+            defaultCategories1: tempArr,
+            firstSubItem: tempArr[0]
         });
-        this.topCatData(tempArray1)
+        this.topCatData(tempArr)
     }
 
     unsubscribe = NetInfo.addEventListener(state => {
@@ -370,7 +394,7 @@ class HomeScreen extends Component {
                 arr.push(array[ar])
             }
         }
-        console.log("Top Categories:", arr[0]?.children_data)
+        // console.log("Top Categories:", arr[0]?.children_data)
         setImmediate(() => {
             this.setState({
                 loader: false,

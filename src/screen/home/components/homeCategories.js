@@ -102,9 +102,9 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
 
                                             //   backgroundColor: "red"
                                         }}>
- {/* <Image  source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/"+item?.id+".jpg" }} style={{ width: "100%", height: "100%", }} /> */}
-                                            {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%", }} />}
-                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%", }} />}
+ <Image  source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/"+item?.id+".jpg" }} style={{ width: "100%", height: "100%", }} />
+                                            {/* {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%", }} />}
+                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%", }} />} */}
                                         </View>
                                         <Text numberOfLines={1} style={[styles.text_item, {
                                             fontSize: 15,

@@ -71,10 +71,10 @@ class Categories extends Component {
                         data={this.state.defaultCategories}
                         showsHorizontalScrollIndicator={false}
                         renderItem={(item, index) => {
-
+                            // console.log("Item",item?.item?.name)
                             return (
                                 <>
-                                    {item?.item?.is_active == "true" &&
+                                    {item?.item?.is_active == true &&
                                         <TouchableOpacity
 
                                             onPress={() => this.selectedItems(item?.item, index, 'main')}
@@ -115,7 +115,21 @@ class Categories extends Component {
                     <View style={styles.flatList_outerCont_sub}>
                         {
                             this.state.selectedCat?.children_data.map((item, index) => {
-                                // console.log(item)
+                                console.log(item)
+                                switch (item?.id) {
+                                    case 81:
+                                        item.is_active = false
+                                        break;
+                                    case 74:
+                                        item.is_active = false
+                                        break;
+                                    case 45:
+                                        item.is_active = false
+                                        break;
+                                    // case 81:
+                                    //     item.is_active = false
+                                    //     break;
+                                }
                                 return (
                                     <View
                                         key={String(index)}
@@ -126,7 +140,7 @@ class Categories extends Component {
 
                                                 style={{
                                                     width: 160,
-                                                    height: 190,
+                                                    height: 170,
                                                     borderColor: "#020621",
                                                     marginBottom: 10,
                                                     overflow: "hidden",
@@ -134,12 +148,15 @@ class Categories extends Component {
                                                     zIndex: 150,
                                                 }}>
 
-                                                {/* <View style={}> */}
+                                                {item?.parent_id == 102 && <View style={[styles.image_Cont, {
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                }]}>
+                                                    <Text numberOfLines={1} style={[styles.text_item, { color: "black", marginTop: 5, }]}>{item?.name}</Text>
+                                                </View>}
+                                                {item?.parent_id !== 102 && <Image resizeMode='stretch' source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={styles.image_Cont} />}
+                                                {item?.parent_id !== 102 && <Text numberOfLines={1} style={[styles.text_item, { color: "black", marginTop: 5 }]}>{item?.name}</Text>}
 
-                                                {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={styles.image_Cont} />}
-                                                {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={styles.image_Cont}  />}
-                                                {/* </View> */}
-                                                <Text numberOfLines={1} style={[styles.text_item, { color: "black",marginTop:5 }]}>{item?.name}</Text>
                                             </TouchableOpacity>
                                         }
                                     </View>
@@ -198,11 +215,11 @@ const styles = StyleSheet.create({
         marginTop: 20
     },
     flatList_outerCont_sub: {
-        width: width - 30,
+        width: width,
         alignSelf: "center",
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         alignItems: "center",
         marginBottom: 200,
         marginTop: 20
@@ -210,7 +227,7 @@ const styles = StyleSheet.create({
     },
     image_Cont: {
         width: 160,
-        height: 170,
+        height: 150,
         borderWidth: 1,
         borderRadius: 20,
         borderColor: "#020621",

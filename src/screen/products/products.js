@@ -50,6 +50,7 @@ class Products extends Component {
         })
 
         let products = []
+        let tempProducts = []
         await api.get('/categories/' + item.id + '/products', {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
@@ -66,66 +67,83 @@ class Products extends Component {
                         Authorization: `Bearer ${admintoken}`,
                     },
                 }).then(async (prod) => {
-                    //   console.log("Product Details Api:", prod?.data)
+                    // console.log("Product Details Api:", prod?.data?.visibility, "  ", prod?.data?.price)
 
-                    //products.push(prod?.data)
+
+                    //    products.push(prod?.data)
 
                     // console.log("Api Array index current", products)
                     if (p == temp.length - 1) {
-
+                        console.log("Products List", products)
                         setImmediate(() => {
                             this.setState({
                                 loaderFilter: false,
+
                             })
                         })
                     }
 
                     // for (let p = 0; p < products.length; p++) {
 
-                        for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
-                            if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-                                await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
-                                    headers: {
-                                        Authorization: `Bearer ${admintoken}`,
-                                    },
-                                })
-                                    .then(async (res) => {
-                                        console.log("")
-                                        console.log("----------------------------")
-                                        console.log("Item DEtails Api:", res?.data)
-                                        console.log("----------------------------")
-                                        console.log('')
+                    for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
+                        if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
+                            await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
+                                headers: {
+                                    Authorization: `Bearer ${admintoken}`,
+                                },
+                            })
+                                .then(async (res) => {
+                                    // console.log("")
+                                    // console.log("----------------------------")
+                                    // console.log("Item DEtails Api:", res?.data)
+                                    // console.log("----------------------------")
+                                    // console.log('')
 
-                                        // console.log("products[p].custom_attributes[i].attribute_code", products[p].custom_attributes[i].value)
+                                    // console.log("products[p].custom_attributes[i].attribute_code", products[p].custom_attributes[i].value)
 
-                                        await axios.get('https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then((data) => {
+                                    await axios.get('https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then((data) => {
 
-                                            console.log("Data coming for brands:", data?.data)
-                                            prod.data.brand = data?.data
+                                        // console.log("Data coming for brands:", data?.data)
+                                        prod.data.brand = data?.data
+                                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true) {
                                             products.push(prod?.data)
+                                        } else {
+                                            tempProducts.push(prod?.data)
+                                        }
 
-                                          
-                                        }).catch((err) => {
-                                            console.log("DAta for Brands Api errr", err)
-                                        })
-                              
 
-                                    })
-                                    .catch((err) => {
-                                        console.log("More_info Api Error", err?.response)
-                                        //alert("Cant fetch More Information Data, Please Try again!")
+
+                                    }).catch((err) => {
+                                        console.log("DAta for Brands Api errr", err)
                                     })
 
-                                break;
-                            }
+
+                                })
+                                .catch((err) => {
+                                    console.log("More_info Api Error", err?.response)
+                                    //alert("Cant fetch More Information Data, Please Try again!")
+                                })
+
+                            break;
                         }
+                    }
                     // }
+
+                    // this is for loader skeleton 
+                    // console.log("Products Lenght", products?.length)
+                    if (products?.length >= 1) {
+                        setImmediate(() => {
+                            this.setState({
+                                loader: false,
+                            })
+                        })
+                    }
 
                     setImmediate(() => {
                         this.setState({
                             products: products,
                             original: products,
-                            loader: false,
+                            // loader: false,
                         })
                         //s console.log("Products State", this.state.products[0].custom_attributes)
                     })
@@ -266,6 +284,20 @@ class Products extends Component {
                 break;
 
             case "brands":
+                // console.log("Brands of products", this.state.products[0].brand)
+                this.state.products.sort(function (a, b) {
+                    if (a.brand < b.brand) {
+                        return 1;
+                    }
+                    if (a.brand > b.brand) {
+                        return -1;
+                    }
+                    return 0;
+                });
+                setImmediate(() => {
+
+                    this.setState({ products })
+                })
 
                 break;
 
@@ -287,7 +319,10 @@ class Products extends Component {
 
                 {/** Top Image & Category Name */}
                 <ImageView
-                    source={{ uri: "https://aljaberoptical.com/" + item?.img }}
+                    source={item?.parent_id == 102 ?
+                        { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.parent_id + ".jpg" }
+                        :
+                        { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }}
                     textEN={item?.name}
                     textAR={""}
                 />
