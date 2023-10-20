@@ -35,89 +35,89 @@ class App extends Component {
     };
   }
 
-  unsubscribe = NetInfo.addEventListener(state => {
-    console.log("Connection type", state.type);
-    console.log("Is connected?", state.isConnected);
-    console.log("isInternetReachable", state.isInternetReachable)
-    console.log("details", state.details)
-    if (state.isConnected == false || state.isInternetReachable == false || state.isInternetReachable == null) {
-      setImmediate(() => {
-        this.setState({
-          network: false,
-        })
-      })
-    } else {
-      setImmediate(() => {
-        this.setState({
-          network: true,
-        })
-      })
-    }
-  });
+  // unsubscribe = NetInfo.addEventListener(state => {
+  //   console.log("Connection type", state.type);
+  //   console.log("Is connected?", state.isConnected);
+  //   console.log("isInternetReachable", state.isInternetReachable)
+  //   console.log("details", state.details)
+  //   if (state.isConnected == false || state.isInternetReachable == false || state.isInternetReachable == null) {
+  //     setImmediate(() => {
+  //       this.setState({
+  //         network: false,
+  //       })
+  //     })
+  //   } else {
+  //     setImmediate(() => {
+  //       this.setState({
+  //         network: true,
+  //       })
+  //     })
+  //   }
+  // });
 
 
-  adminApi = async () => {
+  // adminApi = async () => {
 
-    // console.log(this.props)
-    const { actions } = this.props
-    var { adminTokenCounter } = this.state
+  //   // console.log(this.props)
+  //   const { actions } = this.props
+  //   var { adminTokenCounter } = this.state
 
-    await api.post('integration/admin/token', {
-      "username": "apiuser",
-      "password": "Pakistani2023"
-    }).then((res) => {
-      console.log("Admin Api res: ||||| ", res?.data)
-      if (res?.data) {
-        setImmediate(() => {
-          actions.adminToken(res?.data)
-          this.setState({
-            adminToken: res?.data
-          })
-        })
-      }
-    })
-      .catch((err) => {
-        console.log("Admin Api Error", err)
-        console.log("Admin Api Error", err?.response)
+  //   await api.post('integration/admin/token', {
+  //     "username": "apiuser",
+  //     "password": "Pakistani2023"
+  //   }).then((res) => {
+  //     console.log("Admin Api res: ||||| ", res?.data)
+  //     if (res?.data) {
+  //       setImmediate(() => {
+  //         actions.adminToken(res?.data)
+  //         this.setState({
+  //           adminToken: res?.data
+  //         })
+  //       })
+  //     }
+  //   })
+  //     .catch((err) => {
+  //       console.log("Admin Api Error", err)
+  //       console.log("Admin Api Error", err?.response)
 
-        if (adminTokenCounter == 3) {
-          RNRestart.restart()
-        } else {
-          setTimeout(() => {
-            adminTokenCounter = adminTokenCounter + 1
-            this.setState({ adminTokenCounter })
-            this.checkAdminToken()
-          }, 5000);
+  //       if (adminTokenCounter == 3) {
+  //         RNRestart.restart()
+  //       } else {
+  //         setTimeout(() => {
+  //           adminTokenCounter = adminTokenCounter + 1
+  //           this.setState({ adminTokenCounter })
+  //           this.checkAdminToken()
+  //         }, 5000);
 
-        }
-        // this.checkAdminToken()
-      })
-  }
+  //       }
+  //       // this.checkAdminToken()
+  //     })
+  // }
 
-  checkAdminToken = () => {
-    const { userData } = this.props
-    console.log('')
-    console.log("userData?.admintoken", userData?.admintoken)
-    console.log('')
-    if (this.state.network == true) {
+  // checkAdminToken = () => {
+  //   const { userData } = this.props
+  //   console.log('')
+  //   console.log("userData?.admintoken", userData?.admintoken)
+  //   console.log('')
+  //   if (this.state.network == true) {
 
-      if (userData?.admintoken == null) {
-        this.adminApi()
-      } else {
-        console.log("")
-        console.log("/-----------------------------------/")
-        console.log("        Admin Token Generated")
-        console.log("/-----------------------------------/")
-      }
-    } else {
-      alert("Network error check your connection")
-    }
-  }
+  //     if (userData?.admintoken == null) {
+  //       this.adminApi()
+  //     } else {
+  //       console.log("")
+  //       console.log("/-----------------------------------/")
+  //       console.log("        Admin Token Generated")
+  //       console.log("/-----------------------------------/")
+  //     }
+  //   } else {
+  //     alert("Network error check your connection")
+  //   }
+  // }
 
 
   componentDidMount = () => {
-    this.unsubscribe()
-    this.checkAdminToken()
+    // this.unsubscribe()
+    // this.checkAdminToken()
   }
 
   render() {

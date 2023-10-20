@@ -101,11 +101,11 @@ class Products extends Component {
 
                                     // console.log("products[p].custom_attributes[i].attribute_code", products[p].custom_attributes[i].value)
 
-                                    await axios.get('https://wpstaging51.a2zcreatorz.com/aljaber_newsite/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then((data) => {
+                                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then((data) => {
 
                                         // console.log("Data coming for brands:", data?.data)
                                         prod.data.brand = data?.data
-                                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true) {
+                                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1) {
                                             products.push(prod?.data)
                                         } else {
                                             tempProducts.push(prod?.data)
@@ -308,6 +308,27 @@ class Products extends Component {
     componentDidMount = () => {
         this.createData()
         this.inner_Categories()
+       
+    }
+    componentWillUnmount=()=>{
+         api.get('/categories/' + '' + '/products', {
+            headers: {
+                Authorization: `Bearer ${''}`,
+            },
+        }).catch((err)=>{
+            console.log("Request Cancel")
+        })
+         api.get('/products/attributes/' + '' + '/options', {
+            headers: {
+                Authorization: `Bearer ${''}`,
+            },
+        }).catch((err)=>{
+            console.log("Request Cancel")
+        })
+
+        axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + "",).catch((err)=>{
+            console.log("Request Cancel")
+        })
     }
 
     render() {

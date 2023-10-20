@@ -241,23 +241,25 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
                                     key={String(index)}
                                 >
                                     <>
-                                        {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true ) && <TouchableOpacity
+                                        {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true) && <TouchableOpacity
                                             onPress={() => selectedItem(products, index)}
                                             style={styles.product_Cont}
                                         >
+                                            <View style={styles.product_inner_Cont}>
+                                                <Image
+                                                    resizeMode='stretch'
+                                                    source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
+                                                    style={{ width: "70%", height: 80, borderRadius: 10 }}
+                                                />
+                                                <Text numberOfLines={2} style={styles.product_Name}>{products?.brand}</Text>
+                                                <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.name}</Text>
+                                                <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
 
-                                            <Image
-                                                resizeMode='stretch'
-                                                source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
-                                                style={{ width: "100%", height: 110, borderRadius: 10 }}
-                                            />
-                                            <Text numberOfLines={2} style={styles.product_Name}>{products?.brand}</Text>
-                                            <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 0 }]}>{products?.name}</Text>
-                                            <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
+                                                <TouchableOpacity style={styles?.addToCart_Cont}>
+                                                    <Text style={styles.addToCart}>Add to Cart</Text>
+                                                </TouchableOpacity>
+                                            </View>
 
-                                            <TouchableOpacity style={styles?.addToCart_Cont}>
-                                                <Text style={styles.addToCart}>Add to Cart</Text>
-                                            </TouchableOpacity>
 
 
                                         </TouchableOpacity>}
@@ -345,23 +347,33 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         marginHorizontal: 10,
         width: width / 2 - 20,
-        height: 230,
+        height: 210,
         backgroundColor: "#fffff",
-        borderRadius: 5,
+        marginBottom: 50,
         alignItems: "center",
-        // elevation: 4,
-        // shadowColor: '#000',
-        // shadowOffset: { width: 0, height: 2 },
-        // shadowOpacity: 0.4,
-        // shadowRadius: 1.5,
-        // borderTopWidth: 0.4,
-        borderColor: "#bbb"
+
+    },
+    product_inner_Cont: {
+        width: "100%",
+        height: "100%",
+        elevation: 4,
+        backgroundColor: "white",
+        paddingBottom: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 1.5,
+        borderTopWidth: 0.4,
+        borderColor: "#bbb",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 10,
     },
     product_Name: {
         fontSize: 12,
         fontWeight: "600",
         color: "#020621",
-        marginTop: 10,
+        marginTop: 0,
         textAlign: "center",
     },
     addToCart: {

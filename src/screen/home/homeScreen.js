@@ -99,9 +99,9 @@ class HomeScreen extends Component {
     }
 
     componentDidMount = () => {
+        this.props.navigation.addListener('focus', async () => this.adminApi());
         this.getDefaultCategories()
         this.unsubscribe()
-        // this.randomProducts()
     }
 
     adminApi = async () => {
@@ -122,6 +122,7 @@ class HomeScreen extends Component {
                         adminToken: res?.data
                     })
                 })
+             
             }
         })
             .catch((err) => {
@@ -179,6 +180,7 @@ class HomeScreen extends Component {
 
                         setTimeout(() => {
                             this.defaultCategories()
+                            this.randomProducts()
                         }, 500)
 
                     })
@@ -404,51 +406,110 @@ class HomeScreen extends Component {
 
     }
 
-    randomProducts = () => {
+    randomProducts = async () => {
+        var { userData } = this.props
+        var sku_arr = []
+        var check = false
 
-        let randomProducts = []
-        let RPID = []
-        for (let p = 0; p < 6; p++) {
+        // Fetch all Products
+        await api.get('/products?fields=items[id,sku,name,type_id]&searchCriteria=all', {
+            headers: {
+                Authorization: `Bearer ${userData?.admintoken}`,
+            },
+        }).then((res) => {
 
-            if (RPID.length == 0) {
-                const randomIndex = Math.floor(Math.random() * ProductData.length);
-                // console.log("randomIndex RPID LENGTH COND", randomIndex)
-                randomProducts[p] = ProductData[randomIndex]
-                RPID.push(randomIndex)
-            } else {
-                for (let t = 0; t < RPID.length; t++) {
-                    const randomIndex = Math.floor(Math.random() * ProductData.length);
-                    if (RPID[t] !== randomIndex) {
-                        // const randomIndex = Math.floor(Math.random() * ProductData.length);
-                        // console.log("randomIndex RPID LENGTH COND", randomIndex)
-                        randomProducts[p] = ProductData[randomIndex]
-                    } else {
-                        const randomIndex = Math.floor(Math.random() * ProductData.length);
-                        // console.log("randomIndex RPID LENGTH COND", randomIndex)
-                        randomProducts[p] = ProductData[randomIndex]
+            if (res?.data) {
+                console.log("Response All Products API", res?.data?.items)
+                for (let r = 0; r < res?.data?.items?.length; r++) {
+
+                    // console.log("Index of Loop", r)
+                    // store only that have type_id simple
+                    if (res?.data?.items[r]?.type_id == "simple") {
+                        // if (r == res?.data.length - 1) {
+                        //   console.log("Check condition Working")
+                        //     check = true
+                        // }
+                        sku_arr.push(res?.data?.items[r])
                     }
                 }
             }
 
+        }).catch((err) => {
+            console.log("Error All Products API", err)
+        })
 
+        // Generate random Index number to store some from huge amount of products
+        console.log("Stored Products length", sku_arr?.length)
 
+        var store_product = []
+        var index = 15
+        var store_index = []
+        for (let i = 0; i < index; i++) {
+            var random_index = parseInt(Math.random() * sku_arr?.length);
 
+            // check for repitition in values
+            // console.log("Random Index", random_index)
+            const findIndex = store_index.find((i) => {
+                //console.log("IIIIII",i)
+                return i == random_index
+            })
+            // console.log("Random_index generated",)
+            if (findIndex !== random_index) {
+                store_index.push(random_index)
+            } else {
+                random_index = parseInt(Math.random() * sku_arr?.length);
+                //store_index.push(random_index)
+            }
+
+            // console.log("")
+            // console.log("--------")
+            // // console.log("Data Picked Up", sku_arr[random_index])
+            // console.log("--------")
+            // console.log("")
+
+            // Getting product details from each sku
+            await api.get('/products/' + sku_arr[random_index]?.sku, {
+                headers: {
+                    Authorization: `Bearer ${userData?.admintoken}`,
+                },
+            }).then((res) => {
+                if (res?.data) {
+                    // console.log("Product Details Api in Random Products Function Response:   ", res?.data?.name, "  ", sku_arr[random_index],)
+                    if (res?.data?.price > 0 && res?.data?.visibility == 4 && res?.data?.extension_attributes?.stock_item?.is_in_stock == true && res?.data?.status == 1) {
+                        // storing products with its detail in array
+                        store_product.push(res?.data)
+                    } else {
+                        console.log(" adding Index 1")
+                        index = index + 1
+                    }
+
+                }
+
+            }).catch((err) => {
+                console.log("Product Details Api in Random Products Function ERROR", err)
+                index = index + 1
+            })
 
         }
-        // console.log("randomProducts Array", randomProducts)
 
         setImmediate(() => {
-            this.setState({
-                randomProducts: randomProducts,
-            })
+            this.setState(
+                {
+                    randomProducts: store_product
+                }
+            )
         })
+        // for (let p = 0; p < store_product.length; p++) {
+        //     console.log("Stored Products ", store_product[p]?.name, " ", store_product[p]?.visibility, " ", store_product[p]?.price, " ", store_product[p]?.extension_attributes?.stock_item?.is_in_stock)
+        // }
+
 
     }
 
 
 
     render() {
-
+        // console.log("random Produuct", this.state.randomProducts)
         return (
             <View style={styles.mainContainer}>
 
@@ -466,12 +527,12 @@ class HomeScreen extends Component {
                         firstSubItem={this.state.firstSubItem}
                     />}
 
-                    <ProductList
+                    {this.state.randomProducts !== null && <ProductList
                         screenName="Home"
-                        data={ProductData == null ? [] : ProductData}
+                        data={this.state.randomProducts}
                         loader={this.state.loader}
                         navProps={this.props.navigation}
-                    />
+                    />}
 
 
                     {/** Categories like men, women etc */}
@@ -480,9 +541,6 @@ class HomeScreen extends Component {
                         mainCatPos={this.state.topCategoryData == null ? null : this.state.topCategoryData[0]?.position}
                         navProps={this.props.navigation}
                     />
-
-
-
 
                 </ScrollView>
 
