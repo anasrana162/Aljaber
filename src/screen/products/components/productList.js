@@ -16,7 +16,8 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
     }
 
     const [openSort, setOpenSort] = useState(false)
-
+    const [imageSelected, setImageSelected] = useState(null)
+    const [imageSelectedIndex, setImageSelectedIndex] = useState(null)
     const sort = [
         {
             id: 1,
@@ -41,6 +42,17 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
 
 
     ]
+
+    const OnTouchIn = (images, index) => {
+        if(images[1]?.file == undefined){
+            setImageSelected(images[0]?.file)
+            setImageSelectedIndex(index)
+        }else{
+
+            setImageSelected(images[1]?.file)
+            setImageSelectedIndex(index)
+        }
+    }
 
     return (
         <View style={styles?.mainContainer}>
@@ -230,7 +242,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
 
                 {data != null && <View style={[styles.productList_cont, {
                     flexWrap: screenName == "Home" ? null : "wrap",
-                    marginBottom: screenName == "Home" ? 20 : 320,
+                    marginBottom: screenName == "Home" ? 60 : 320,
                 }]}>
                     {
                         data.map((products, index) => {
@@ -243,14 +255,43 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
                                     <>
                                         {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true) && <TouchableOpacity
                                             onPress={() => selectedItem(products, index)}
+                                            onPressIn={() => OnTouchIn(products?.media_gallery_entries, index)}
+                                            onPressOut={() => { setImageSelected(null); setImageSelectedIndex(null) }}
                                             style={styles.product_Cont}
+                                            activeOpacity={0.8}
                                         >
                                             <View style={styles.product_inner_Cont}>
-                                                <Image
-                                                    resizeMode='stretch'
-                                                    source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
-                                                    style={{ width: "70%", height: 80, borderRadius: 10 }}
-                                                />
+                                                {(imageSelected !== null && imageSelectedIndex == index) ?
+                                                    <>
+                                                        <Image
+                                                            resizeMode='stretch'
+                                                            source={{ uri: imageUrl + imageSelected }}
+                                                            style={{ width: "70%", height: 80, borderRadius: 10 }}
+                                                        />
+                                                        <View style={{
+                                                            position: "absolute",
+                                                            width: "100%",
+                                                            height: 85,
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                            borderTopLeftRadius: 10,
+                                                            borderTopRightRadius: 10,
+                                                            top: 0,
+                                                            backgroundColor: "rgba(52,52,52,0.4)",
+                                                            zIndex: 200
+                                                        }}>
+                                                        </View>
+                                                    </>
+                                                    :
+
+                                                    <Image
+                                                        resizeMode='stretch'
+                                                        source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
+                                                        style={{ width: "70%", height: 80, borderRadius: 10 }}
+                                                    />
+                                                }
+
+
                                                 <Text numberOfLines={2} style={styles.product_Name}>{products?.brand}</Text>
                                                 <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.name}</Text>
                                                 <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
@@ -349,7 +390,7 @@ const styles = StyleSheet.create({
         width: width / 2 - 20,
         height: 210,
         backgroundColor: "#fffff",
-        marginBottom: 50,
+        // marginBottom: 50,
         alignItems: "center",
 
     },
