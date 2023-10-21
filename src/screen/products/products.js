@@ -38,7 +38,7 @@ class Products extends Component {
 
     createData = async () => {
         var { item, productApiCounter } = this.state;
-        const { userData: { admintoken }, actions, userData } = this.props
+        const { userData: { admintoken, allproducts }, actions, userData } = this.props
         // console.log("item Products Screen]]]]]]]]]]]]]]]]",)
 
         setImmediate(() => {
@@ -50,7 +50,8 @@ class Products extends Component {
         })
 
         let products = []
-        let tempProducts = []
+        let configurable_Products = []
+        let tempPRoducts = []
         await api.get('/categories/' + item.id + '/products', {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
@@ -74,7 +75,7 @@ class Products extends Component {
 
                     // console.log("Api Array index current", products)
                     if (p == temp.length - 1) {
-                        console.log("Products List", products)
+                        // console.log("Products List", products)
                         setImmediate(() => {
                             this.setState({
                                 loaderFilter: false,
@@ -86,6 +87,10 @@ class Products extends Component {
                     // for (let p = 0; p < products.length; p++) {
 
                     for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
+
+                       
+
+
                         if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
                             await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
                                 headers: {
@@ -101,14 +106,49 @@ class Products extends Component {
 
                                     // console.log("products[p].custom_attributes[i].attribute_code", products[p].custom_attributes[i].value)
 
-                                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then((data) => {
+                                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
 
                                         // console.log("Data coming for brands:", data?.data)
                                         prod.data.brand = data?.data
                                         if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1) {
                                             products.push(prod?.data)
-                                        } else {
-                                            tempProducts.push(prod?.data)
+                                        } if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1) {
+
+                                            for (let cf = 0; cf < allproducts.length; cf++) {
+                                                for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
+
+                                                    if (prod?.data?.extension_attributes?.configurable_product_links[tp] == allproducts[cf]?.id) {
+                                                        // console.log("show Configurable varients filter", allproducts[cf]?.id," ",prod?.data?.extension_attributes?.configurable_product_links[tp])
+                                                        await api.get('/products/' + allproducts[cf]?.sku, {
+                                                            headers: {
+                                                                Authorization: `Bearer ${admintoken}`,
+                                                            },
+                                                        }).then(async (cfPD) => {
+                                                            // await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,)
+                                                            // console.log("Configurable Product Details Api Response |||||", cfPD?.data?.name, "   ", cfPD?.data?.id)
+
+                                                            cfPD.data.brand = data?.data // brand value
+
+                                                            tempPRoducts.push(cfPD?.data)
+                                                            prod.data.price = cfPD.data?.price
+                                                            prod.data.product_varients = tempPRoducts
+                                                            console.log("Configurable Product Details Api Response", prod?.data?.name, "   ", prod?.data?.id)
+                                                            products.push(prod?.data)
+
+
+                                                        }).catch((err) => {
+                                                            console.log("Configurable Product Details Api Error", err)
+                                                        })
+
+                                                    } else {
+                                                        break;
+                                                    }
+
+
+                                                }
+
+                                            }
+
                                         }
 
 
@@ -130,7 +170,7 @@ class Products extends Component {
                     // }
 
                     // this is for loader skeleton 
-                    // console.log("Products Lenght", products?.length)
+                    // console.log("Products Lenght", products[1]?.product_varients[0]?.name)
                     if (products?.length >= 1) {
                         setImmediate(() => {
                             this.setState({
@@ -308,25 +348,25 @@ class Products extends Component {
     componentDidMount = () => {
         this.createData()
         this.inner_Categories()
-       
+
     }
-    componentWillUnmount=()=>{
-         api.get('/categories/' + '' + '/products', {
+    componentWillUnmount = () => {
+        api.get('/categories/' + '' + '/products', {
             headers: {
                 Authorization: `Bearer ${''}`,
             },
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log("Request Cancel")
         })
-         api.get('/products/attributes/' + '' + '/options', {
+        api.get('/products/attributes/' + '' + '/options', {
             headers: {
                 Authorization: `Bearer ${''}`,
             },
-        }).catch((err)=>{
+        }).catch((err) => {
             console.log("Request Cancel")
         })
 
-        axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + "",).catch((err)=>{
+        axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + "",).catch((err) => {
             console.log("Request Cancel")
         })
     }

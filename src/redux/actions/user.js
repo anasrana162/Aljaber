@@ -1,5 +1,5 @@
 import {
-    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT,CREATEDDEFAULTCAT
+    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT,CREATEDDEFAULTCAT,ALLPRODUCTS
     //  MISSING_DATA, SELECTED_PROGRAM,
     // SHOPS, ORDER_ADDRESS, ITEM_DETAILS, ORDER_DETAILS, SELECTED_VARIENT, PLAN_DETAILS, MENU_DETAILS, PRICE_DETAILS, SUBSCRIPTIONS
 } from '../constants';
@@ -39,6 +39,12 @@ export function createdDefaultCategories(createddefaultcategory) {
     return {
         type: CREATEDDEFAULTCAT,
         payload: createddefaultcategory
+    }
+}
+export function allProducts(allproducts) {
+    return {
+        type: ALLPRODUCTS,
+        payload: allproducts
     }
 }
 

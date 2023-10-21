@@ -4,6 +4,7 @@ export const USER = 'USER_DATA';
 export const ADMINTOKEN = 'ADMINTOKEN';
 export const DEFAULTCAT = 'DEFAULTCAT';
 export const CREATEDDEFAULTCAT = 'CREATEDDEFAULTCAT';
+export const ALLPRODUCTS = 'ALLPRODUCTS';
 // export const MISSING_DATA = 'MISSING_DATA';
 // export const SELECTED_PROGRAM = 'SELECTED_PROGRAM';
 // export const SHOPS = 'SHOPS';

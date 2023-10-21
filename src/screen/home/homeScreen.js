@@ -122,7 +122,7 @@ class HomeScreen extends Component {
                         adminToken: res?.data
                     })
                 })
-             
+
             }
         })
             .catch((err) => {
@@ -492,7 +492,10 @@ class HomeScreen extends Component {
 
         }
 
+       
         setImmediate(() => {
+            var {actions} = this.props
+            actions?.allProducts(sku_arr)
             this.setState(
                 {
                     randomProducts: store_product

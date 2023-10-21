@@ -69,9 +69,9 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
                                 case 45:
                                     item.is_active = false
                                     break;
-                                // case 81:
-                                //     item.is_active = false
-                                //     break;
+                                case 34:
+                                    item.is_active = false
+                                    break;
                             }
                             return (
                                 <View

@@ -97,9 +97,9 @@ class ProductDetails extends Component {
     }
 
     getDescription = () => {
-        var { product_details: { custom_attributes } } = this.props?.route?.params
+        var { product_details: { custom_attributes,product_varients } } = this.props?.route?.params
         // console.log("product_details Images Length", media_gallery_entries.length)
-        // console.log("product_details Images", custom_attributes)
+        console.log("product_details Images", product_varients)
 
         for (let i = 0; i < custom_attributes.length; i++) {
             if (custom_attributes[i]?.attribute_code == "description") {

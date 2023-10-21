@@ -1,5 +1,5 @@
 import {
-    LANGUAGE, TOKEN, USER, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT
+    LANGUAGE, TOKEN, USER, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS
     //  MISSING_DATA, SELECTED_PROGRAM,
     // SHOPS, ORDER_ADDRESS, ITEM_DETAILS, ORDER_DETAILS, SELECTED_VARIENT, PLAN_DETAILS, MENU_DETAILS, PRICE_DETAILS, SUBSCRIPTIONS
 } from '../constants';
@@ -11,6 +11,7 @@ const initialState = {
     admintoken: null,
     defaultcategory: null,
     createddefaultcategory: null,
+    allproducts: null,
     // missing_data: false,
     // selected_program: {},
     // selected_varient: {},
@@ -56,6 +57,11 @@ const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 createddefaultcategory: action.payload
+            }
+        case ALLPRODUCTS:
+            return {
+                ...state,
+                allproducts: action.payload
             }
         // case MISSING_DATA:
         //     return {
