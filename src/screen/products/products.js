@@ -88,8 +88,6 @@ class Products extends Component {
 
                     for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
 
-                       
-
 
                         if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
                             await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
@@ -110,44 +108,83 @@ class Products extends Component {
 
                                         // console.log("Data coming for brands:", data?.data)
                                         prod.data.brand = data?.data
-                                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1) {
+                                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
                                             products.push(prod?.data)
-                                        } if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1) {
+                                        }
+                                        if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
+                                            // tempPRoducts.push(prod?.data)
 
-                                            for (let cf = 0; cf < allproducts.length; cf++) {
-                                                for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
+                                            console.log("prod?.data?.extension_attributes?.configurable_product_links?.length", prod?.data?.extension_attributes?.configurable_product_links)
 
-                                                    if (prod?.data?.extension_attributes?.configurable_product_links[tp] == allproducts[cf]?.id) {
-                                                        // console.log("show Configurable varients filter", allproducts[cf]?.id," ",prod?.data?.extension_attributes?.configurable_product_links[tp])
-                                                        await api.get('/products/' + allproducts[cf]?.sku, {
-                                                            headers: {
-                                                                Authorization: `Bearer ${admintoken}`,
-                                                            },
-                                                        }).then(async (cfPD) => {
-                                                            // await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,)
-                                                            // console.log("Configurable Product Details Api Response |||||", cfPD?.data?.name, "   ", cfPD?.data?.id)
 
-                                                            cfPD.data.brand = data?.data // brand value
+                                            for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
+                                                console.log("VAlue Given for varients", prod?.data?.extension_attributes?.configurable_product_links[tp])
+                                                const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
+                                                // for (let cf = 0; cf < allproducts.length; cf++) {
+                                                console.log("Product With index", selected_products)
+
+                                                if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
+                                                    // console.log("show Configurable varients filter", allproducts[cf]?.id," ",prod?.data?.extension_attributes?.configurable_product_links[tp])
+
+                                                    var check = false
+                                                    await api.get('/products/' + selected_products?.sku, {
+                                                        headers: {
+                                                            Authorization: `Bearer ${admintoken}`,
+                                                        },
+                                                    }).then(async (cfPD) => {
+                                                        // await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,)
+                                                        console.log("Configurable Product Details Api Response |||||", cfPD?.data?.name, "   ", cfPD?.data?.id)
+
+                                                        cfPD.data.brand = data?.data // brand value
+                                                        // if (tempPRoducts?.length !== prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
 
                                                             tempPRoducts.push(cfPD?.data)
+                                                            // check = true
+                                                      
+                                                        // prod.data.price = cfPD.data?.price
+                                                        // prod.data.product_varients = tempPRoducts
+                                                        // console.log("Configurable Product Details Api Response", prod?.data?.name, "   ", prod?.data?.id)
+
+                                                        // configurable_Products.push(prod?.data)
+                                                        if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
+                                                            // for(let t= 0;t<configurable_Products?.length;t++){
                                                             prod.data.price = cfPD.data?.price
                                                             prod.data.product_varients = tempPRoducts
-                                                            console.log("Configurable Product Details Api Response", prod?.data?.name, "   ", prod?.data?.id)
+                                                            console.log("")
+                                                            console.log("")
+                                                            console.log("---------FINAL----------")
+                                                            console.log("")
+                                                            console.log("prod?.data", prod?.data?.id, "  ", prod?.data?.name, "  ", prod?.data?.type_id)
+                                                            console.log("")
+                                                            console.log("---------FINAL----------")
+                                                            console.log("")
+                                                            console.log("")
                                                             products.push(prod?.data)
+                                                            tempPRoducts=[]
+                                                            check = true
+
+                                                        }
 
 
-                                                        }).catch((err) => {
-                                                            console.log("Configurable Product Details Api Error", err)
-                                                        })
+                                                    }).catch((err) => {
+                                                        console.log("Configurable Product Details Api Error", err)
 
-                                                    } else {
+                                                    })
+                                                    if (check == true) {
+                                                        console.log("breaken-----------------------------------------")
                                                         break;
                                                     }
 
 
+
+                                                } else {
+
                                                 }
 
+
+
                                             }
+                                            //  products.push(temp)
 
                                         }
 
@@ -166,6 +203,7 @@ class Products extends Component {
 
                             break;
                         }
+
                     }
                     // }
 
@@ -222,6 +260,70 @@ class Products extends Component {
 
             }
         })
+
+        // for (let cf = 0; cf < tempPRoducts.length; cf++) {
+        //     console.log("")
+        //     console.log("-----------")
+        //     console.log("Configurable Products Name", tempPRoducts[cf].name)
+        //     console.log("-----------")
+        //     console.log("")
+        //     console.log("-----------")
+        //     console.log("Configurable Products Index", cf)
+        //     console.log("-----------")
+        //     console.log("")
+        //     console.log("-----------")
+        //     console.log("Configurable Products id", tempPRoducts[cf].id)
+        //     console.log("")
+        //     console.log("-----------")
+        //     console.log("Configurable Products extension_attributes?.configurable_product_links", tempPRoducts[cf].extension_attributes?.configurable_product_links)
+        //     console.log("-----------")
+        //     console.log("")
+
+        //     for (let cpl = 0; cpl < tempPRoducts[cf].extension_attributes?.configurable_product_links.length; cpl++) {
+
+        //         // console.log("CPL Items", tempPRoducts[cf].extension_attributes?.configurable_product_links[cpl])
+
+        //         const selected_products = allproducts.filter((value) => value?.id == tempPRoducts[cf].extension_attributes?.configurable_product_links[cpl])[0]
+        //         if (tempPRoducts[cf].extension_attributes?.configurable_product_links[cpl] == selected_products?.id && selected_products?.type_id == "virtual"){
+        //             console.log("check:    ", selected_products)
+
+        //             await api.get('/products/' + selected_products?.sku, {
+        //                 headers: {
+        //                     Authorization: `Bearer ${admintoken}`,
+        //                 },
+        //             }).then(async (cfPD) => {
+        //                 // await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,)
+        //                 // console.log("Configurable Product Details Api Response |||||", cfPD?.data?.name, "   ", cfPD?.data?.id)
+
+        //                 cfPD.data.brand = tempPRoducts[cf]?.brand // brand value
+
+        //                 configurable_Products.push(cfPD?.data)
+        //                 tempPRoducts[cf].price = cfPD.data?.price
+        //                 tempPRoducts[cf].product_varients = configurable_Products
+        //                 console.log("Configurable Product Details Api Response", tempPRoducts[cf]?.name, "   ", tempPRoducts[cf]?.id)
+        //                 products.push(tempPRoducts[cf])
+
+
+        //             }).catch((err) => {
+        //                 console.log("Configurable Product Details Api Error", err)
+        //             })
+        //         }
+
+        //     }
+
+
+
+        // }
+        // setImmediate(() => {
+        //     this.setState({
+        //         products: products,
+        //         original: products,
+        //         // loader: false,
+        //     })
+        //     //s console.log("Products State", this.state.products[0].custom_attributes)
+        // })
+
+
     }
 
     inner_Categories = () => {

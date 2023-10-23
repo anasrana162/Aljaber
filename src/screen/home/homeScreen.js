@@ -409,6 +409,7 @@ class HomeScreen extends Component {
     randomProducts = async () => {
         var { userData } = this.props
         var sku_arr = []
+        var temp_sku_arr=[]
         var check = false
 
         // Fetch all Products
@@ -424,6 +425,7 @@ class HomeScreen extends Component {
 
                     // console.log("Index of Loop", r)
                     // store only that have type_id simple
+                    temp_sku_arr?.push(res?.data?.items[r])
                     if (res?.data?.items[r]?.type_id == "simple") {
                         // if (r == res?.data.length - 1) {
                         //   console.log("Check condition Working")
@@ -495,7 +497,7 @@ class HomeScreen extends Component {
        
         setImmediate(() => {
             var {actions} = this.props
-            actions?.allProducts(sku_arr)
+            actions?.allProducts(temp_sku_arr)
             this.setState(
                 {
                     randomProducts: store_product

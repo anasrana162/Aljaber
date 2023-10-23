@@ -265,6 +265,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
                                                     <>
                                                         <Image
                                                             resizeMode='stretch'
+                                                            // 91596cb40167486f0a253bd4173ab8c2
                                                             source={{ uri: imageUrl + imageSelected }}
                                                             style={{ width: "70%", height: 80, borderRadius: 10 }}
                                                         />
@@ -397,15 +398,15 @@ const styles = StyleSheet.create({
     product_inner_Cont: {
         width: "100%",
         height: "100%",
-        elevation: 4,
-        backgroundColor: "white",
-        paddingBottom: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.4,
-        shadowRadius: 1.5,
-        borderTopWidth: 0.4,
-        borderColor: "#bbb",
+        // elevation: 4,
+        // backgroundColor: "white",
+        // paddingBottom: 10,
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.4,
+        // shadowRadius: 1.5,
+        // borderTopWidth: 0.4,
+        // borderColor: "#bbb",
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 10,

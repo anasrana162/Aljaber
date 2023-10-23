@@ -60,7 +60,7 @@ const DetailsTabNav = ({ navProps, details_tab, ProductName, main_infor }) => {
                     <TouchableOpacity
                         onPress={() => TabPress("main_info")}
                         style={[styles.btn, { width: "40%" }]}>
-                        <Text style={styles.btnText}>Main Information</Text>
+                        <Text style={styles.btnText}>More Information</Text>
                         {main_info && <View style={styles.btnLine}></View>}
                     </TouchableOpacity>}
 

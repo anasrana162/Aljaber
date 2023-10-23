@@ -78,6 +78,7 @@ class ProductDetails extends Component {
         this.getDescription()
         this.checkOptions()
         this.getMain_Info()
+        this.checkVarients()
     }
 
     checkOptions = () => {
@@ -96,10 +97,21 @@ class ProductDetails extends Component {
         }
     }
 
-    getDescription = () => {
-        var { product_details: { custom_attributes,product_varients } } = this.props?.route?.params
+    checkVarients = () => {
+        var { product_details: { product_varients } } = this.props?.route?.params
         // console.log("product_details Images Length", media_gallery_entries.length)
-        console.log("product_details Images", product_varients)
+        console.log("Product Varients", product_varients)
+
+        for (let pv = 0; pv < product_varients.length; pv++) {
+            console.log("PRoduct Varients Item",product_varients[pv]?.id,"   ", product_varients[pv]?.name)
+        }
+
+    }
+
+    getDescription = () => {
+        var { product_details: { custom_attributes, product_varients } } = this.props?.route?.params
+        // console.log("product_details Images Length", media_gallery_entries.length)
+        // console.log("product_details Images", product_varients)
 
         for (let i = 0; i < custom_attributes.length; i++) {
             if (custom_attributes[i]?.attribute_code == "description") {
