@@ -1,17 +1,22 @@
 import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView, Animated } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Entypo from "react-native-vector-icons/Entypo"
 import { PinchGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler'
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
+const imageUrl2 = "https://aljaberoptical.com/media/catalog/product/cache/91596cb40167486f0a253bd4173ab8c2"
+const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_selected }) => {
 
-const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style }) => {
+    const [selected, setSelected] = useState('')
 
-    const [selected, setSelected] = useState(fisrtImage)
     const selectImage = (obj) => {
         console.log("OBJ selected:", obj)
         setSelected(obj)
     }
+
+    useEffect(() => {
+        setSelected(fisrtImage)
+    }, [])
 
     const onNext = () => {
         if (data[selected?.index + 1] == undefined) {
@@ -58,10 +63,10 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style }) => {
         }
     }
 
-    // console.log("adata ", data)
+    console.log("adata ", fisrtImage)
     return (
         <GestureHandlerRootView style={[styles.mainContainer, style]}>
-      
+
             <View style={{
                 width: width - 10,
                 height: usage == "open" ? 400 : 200,
@@ -89,33 +94,41 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style }) => {
                         onPress={() => onImagePress(selected)}
                         style={{ width: "60%", height: "100%", justifyContent: "center", alignItems: "center", alignSelf: "center" }}
                     >
-                        <Image
-                            source={{ uri: imageUrl + selected?.url }}
-                            style={{
-                                width: "100%", height: "100%",
-                            }}
-                            resizeMode='contain'
-                        />
-                    </TouchableOpacity>
-                    :
-                  
-                        <PinchGestureHandler
-                            onActivated={() => { console.log("working") }}
-                            onGestureEvent={this.onZoomEventFunction}
-                            onHandlerStateChange={this.onZoomStateChangeFunction}
-                        >
-
-                            <Animated.Image
-                                source={{ uri: imageUrl + selected?.url }}
-                                style={[{ width: "80%", height: "100%", zIndex: 700 }, {
-                                    transform: [{
-                                        scale: this.scale
-                                    }]
-                                }]}
+                        {/* {varient_selected ? */}
+                            <Image
+                                source={{ uri: imageUrl2 + selected?.url }}
+                                style={{
+                                    width: "100%", height: "100%",
+                                }}
                                 resizeMode='contain'
                             />
-                        </PinchGestureHandler>
-                    
+                            {/* // : <Image
+                            //     source={{ uri: imageUrl2 + selected?.url }}
+                            //     style={{
+                            //         width: "100%", height: "100%",
+                            //     }}
+                            //     resizeMode='contain'
+                            // />} */}
+                    </TouchableOpacity>
+                    :
+
+                    <PinchGestureHandler
+                        onActivated={() => { console.log("working") }}
+                        onGestureEvent={this.onZoomEventFunction}
+                        onHandlerStateChange={this.onZoomStateChangeFunction}
+                    >
+
+                        <Animated.Image
+                            source={{ uri: imageUrl + selected?.url }}
+                            style={[{ width: "80%", height: "100%", zIndex: 700 }, {
+                                transform: [{
+                                    scale: this.scale
+                                }]
+                            }]}
+                            resizeMode='contain'
+                        />
+                    </PinchGestureHandler>
+
                 }
 
             </View>
@@ -137,11 +150,21 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style }) => {
                                         borderWidth: image?.id == selected?.id ? 1 : null
                                     }]}>
 
-                                    <Image
-                                        source={{ uri: imageUrl + image.file }}
-                                        style={{ width: "100%", height: "100%" }}
-                                        resizeMode='contain'
-                                    />
+                                    {/* {varient_selected ? */}
+                                        <Image
+                                            source={{ uri: imageUrl2 +  image.file }}
+                                            style={{
+                                                width: "100%", height: "100%",
+                                            }}
+                                            resizeMode='contain'
+                                        />
+                                        {/* : <Image
+                                            source={{ uri: imageUrl + selected?.url }}
+                                            style={{
+                                                width: "100%", height: "100%",
+                                            }}
+                                            resizeMode='contain'
+                                        />} */}
                                 </TouchableOpacity>
                             )
                         })
@@ -154,7 +177,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style }) => {
             >
 
             </ScrollView> */}
-    
+
         </GestureHandlerRootView>
     )
 }
@@ -173,7 +196,7 @@ const styles = StyleSheet.create({
     image_selector_cont: {
         width: "100%",
         height: 70,
-        backgroundColor:"white",
+        backgroundColor: "white",
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",

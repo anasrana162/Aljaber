@@ -11,6 +11,7 @@ const Options = ({
     onChangeText,
     option_package_size,
     option_power,
+    product_varients,
     selectedItemLeftPower,
     selectedItemLeftPackage,
     selectedItemRightPower,
@@ -18,6 +19,7 @@ const Options = ({
     openDropDown,
     leftEyeQuantity,
     rigthEyeQuantity,
+    selectedVarient,
 }) => {
 
     const [checked, setChecked] = useState(false)
@@ -48,6 +50,33 @@ const Options = ({
 
 
             </View>}
+
+            {product_varients !== null &&
+                <View style={styles.colorFlatlist}>
+                    <ScrollView
+                        horizontal
+                        style={{ width: "100%" }}
+                    >
+                        {
+                            product_varients?.map((data, index) => {
+                                // console.log("data", data?.color?.toLowerCase())
+                                return (
+                                    <TouchableOpacity
+                                        onPress={() => selectedVarient(data, index)}
+                                        key={String(index)}
+                                        style={[styles.color_cont, {
+                                            backgroundColor: data?.color?.toLowerCase()
+                                        }]}>
+
+                                    </TouchableOpacity>
+                                )
+
+                            })
+                        }
+
+                    </ScrollView>
+                </View>
+            }
 
             {checked ?
                 <>
@@ -200,6 +229,22 @@ const styles = StyleSheet.create({
         alignItems: "center",
 
     },
+    colorFlatlist: {
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        marginTop: 20,
+    },
+    color_cont: {
+        width: 40,
+        height: 40,
+        borderRadius: 80,
+        borderWidth: 0.3,
+        marginHorizontal: 5,
+    },
+
     quantityTextInp: {
         width: "80%",
         height: 45,

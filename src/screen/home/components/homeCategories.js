@@ -22,7 +22,7 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
         <View style={[styles.mainContainer, {
             //  height: 300 * data?.length,
             //marginTop: 80,
-            marginBottom: 40
+            marginBottom: 0
 
         }]}>
             <Text style={[styles.text_item, {

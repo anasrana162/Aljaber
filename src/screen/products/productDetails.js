@@ -15,6 +15,7 @@ import Options from './components/options';
 import StoreFeatures from './components/storeFeatures';
 import DetailsTabNav from './detailsTabNav';
 import api from '../../api/api';
+import axios from 'axios';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -65,6 +66,11 @@ class ProductDetails extends Component {
                 "option_type_id": null,
 
             },
+            product_varients: null,
+            product_varient_selected: null,
+            varient_selected: false,
+            media_gallery_entries: [],
+            imageKey: 0,
             leftEyeQuantity: 1,
             rigthEyeQuantity: 1,
             eyedir: '',
@@ -75,123 +81,209 @@ class ProductDetails extends Component {
     }
 
     componentDidMount = () => {
-        this.getDescription()
-        this.checkOptions()
-        this.getMain_Info()
-        this.checkVarients()
+        this.getDescription('prop')
+        this.checkOptions('prop')
+        this.getMain_Info('prop')
+        this.checkVarients('prop')
+        this.productImages("prop")
     }
 
-    checkOptions = () => {
+    checkOptions = (key) => {
         var { product_details: { options } } = this.props.route.params
-        // console.log("OPtions For Product", options)
+        console.log("OPtions For Product", options)
 
-        for (let i = 0; i < options.length; i++) {
+        var x = [];
 
-            if (options[i]?.title == "PACKAGE SIZE") {
-                this.setState({ option_package_size: options[i] })
+        switch (key) {
+            case "prop":
+                x = options
+                break;
+
+            case "varient":
+                x = this.state.product_varient_selected?.options
+        }
+
+        if (x.length == 0) {
+            return console.log("option are null")
+        }
+
+        for (let i = 0; i < x.length; i++) {
+
+            if (x[i]?.title == "PACKAGE SIZE") {
+                this.setState({ option_package_size: x[i] })
             }
-            if (options[i]?.title == "POWER") {
-                this.setState({ option_power: options[i] })
+            if (x[i]?.title == "POWER") {
+                this.setState({ option_power: x[i] })
             }
 
         }
     }
 
-    checkVarients = () => {
+    checkVarients = async () => {
         var { product_details: { product_varients } } = this.props?.route?.params
         // console.log("product_details Images Length", media_gallery_entries.length)
-        console.log("Product Varients", product_varients)
+        // console.log("Product Varients", product_varients)
 
         for (let pv = 0; pv < product_varients.length; pv++) {
-            console.log("PRoduct Varients Item",product_varients[pv]?.id,"   ", product_varients[pv]?.name)
+            // console.log("PRoduct Varients Item", product_varients[pv]?.id, "   ", product_varients[pv]?.name)
+
+            for (let ca = 0; ca < product_varients[pv]?.custom_attributes?.length; ca++) {
+                if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
+                    // console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
+
+                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + product_varients[pv]?.custom_attributes[ca]?.value,)
+                        .then(async (data) => {
+                            // console.log("Color Code", data?.data)
+                            product_varients[pv].color = data?.data
+                        }).catch((err) => {
+                            console.log("Error Color APi", err)
+                        })
+
+                }
+            }
+
         }
+
+        setImmediate(() => {
+            this.setState({ product_varients: product_varients })
+        })
+
+        // console.log("PRoduct Varients Item", product_varients[1]?.color, "   ", product_varients[1]?.name)
 
     }
 
-    getDescription = () => {
+    productImages = (key) => {
+        var { product_details: { media_gallery_entries, } } = this.props?.route?.params
+
+        // console.log("media_gallery_entries", this.state.product_varient_selected?.media_gallery_entries)
+
+        switch (key) {
+            case "prop":
+                setImmediate(() => {
+                    this.setState({
+                        media_gallery_entries: media_gallery_entries,
+                    })
+                })
+                break;
+
+            case "varient":
+                // x = custom_attributes
+                setImmediate(() => {
+                    this.setState({
+                        media_gallery_entries: [...this.state.product_varient_selected?.media_gallery_entries,...media_gallery_entries],
+                        imageKey: this.state.imageKey + 1
+                    })
+                })
+
+        }
+    }
+
+    getDescription = (key) => {
         var { product_details: { custom_attributes, product_varients } } = this.props?.route?.params
         // console.log("product_details Images Length", media_gallery_entries.length)
-        // console.log("product_details Images", product_varients)
+        // console.log("product_details description", this.state.product_varient_selected)
 
-        for (let i = 0; i < custom_attributes.length; i++) {
-            if (custom_attributes[i]?.attribute_code == "description") {
+        var x = '';
+
+        switch (key) {
+            case "prop":
+                x = custom_attributes
+                break;
+
+            case "varient":
+                // x = custom_attributes
+                x = this.state.product_varient_selected?.custom_attributes
+        }
+        // console.log("XX",this.state.product_varient_selected)
+
+        for (let i = 0; i < x.length; i++) {
+            if (x[i]?.attribute_code == "description") {
                 setImmediate(() => {
-                    this.setState({ description: custom_attributes[i]?.value })
+                    this.setState({ description: x[i]?.value })
                 })
-                console.log("description", custom_attributes[i]?.value)
+                console.log("description", x[i]?.value)
                 break;
             }
         }
     }
 
-    getMain_Info = async () => {
+    getMain_Info = async (key) => {
         var { product_details: { custom_attributes } } = this.props?.route?.params
         const { userData: { admintoken }, actions, userData } = this.props
 
         var { main_info_temp } = this.state
+        var x = '';
 
+        switch (key) {
+            case "prop":
+                x = custom_attributes
+                break;
+
+            case "varient":
+                x = this.state.product_varient_selected?.custom_attributes
+        }
         let temp = []
-        for (let i = 0; i < custom_attributes.length; i++) {
-            if (custom_attributes[i]?.attribute_code == "brands") {
+        for (let i = 0; i < x.length; i++) {
+            if (x[i]?.attribute_code == "brands") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 //  console.log("brands", custom_attributes[i])
                 // break;
             }
-            if (custom_attributes[i]?.attribute_code == "color") {
+            if (x[i]?.attribute_code == "color") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("color", custom_attributes[i])
                 // break;
             }
-            if (custom_attributes[i]?.attribute_code == "size") {
+            if (x[i]?.attribute_code == "size") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("size", custom_attributes[i])
                 // break;
             }
-            if (custom_attributes[i]?.attribute_code == "contact_lenses") {
+            if (x[i]?.attribute_code == "contact_lenses") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("brands", custom_attributes[i])
                 // break;
             }
-            if (custom_attributes[i]?.attribute_code == "contact_lens_diameter") {
+            if (x[i]?.attribute_code == "contact_lens_diameter") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("contact_lens_diameter", custom_attributes[i])
                 // break;
             }
-            if (custom_attributes[i]?.attribute_code == "contact_lens_base_curve") {
+            if (x[i]?.attribute_code == "contact_lens_base_curve") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("contact_lens_base_curve", custom_attributes[i])
                 // break;
             }
 
-            if (custom_attributes[i]?.attribute_code == "water_container_content") {
+            if (x[i]?.attribute_code == "water_container_content") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("water_container_content", custom_attributes[i])
                 // break;
             }
-            if (custom_attributes[i]?.attribute_code == "contact_lens_usage") {
+            if (x[i]?.attribute_code == "contact_lens_usage") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("contact_lens_usage", custom_attributes[i])
                 // break;
             }
-            if (custom_attributes[i]?.attribute_code == "box_content_pcs") {
+            if (x[i]?.attribute_code == "box_content_pcs") {
 
-                temp.push(custom_attributes[i])
+                temp.push(x[i])
 
                 // console.log("box_content_pcs", custom_attributes[i])
                 // break;
@@ -439,17 +531,37 @@ class ProductDetails extends Component {
     }
 
     onImagePress = (selected) => {
-        console.log("Selected Outside", selected)
+        // console.log("Selected Outside", selected)
         setImmediate(() => {
             this.setState({ bigImage: selected, openBigImageModal: true })
         })
     }
 
+    selectedVarient = (data, index) => {
+        // console.log("VArient Selected", data)
+        setImmediate(() => {
+            this.setState({ product_varient_selected: data, varient_selected: true })
+        })
+        setTimeout(() => {
+
+            this.getDescription("varient")
+            this.getMain_Info("varient")
+            this.checkOptions("varient")
+            this.productImages("varient")
+        }, 1000)
+    }
+
     render() {
+
         var {
             product_details,
-            product_details: { extension_attributes: { stock_item } },
+            product_details: { product_varients, extension_attributes: { stock_item } },
         } = this.props?.route?.params
+
+        var {
+            product_varient_selected,
+            media_gallery_entries,
+        } = this.state
         const tagsStyles = {
             body: {
                 color: "black",
@@ -470,18 +582,32 @@ class ProductDetails extends Component {
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     style={{ width: width - 20, }}>
+
                     <ImageCarousel
                         usage="openModal"
-                        data={product_details?.media_gallery_entries}
+                        key={String(this.state.imageKey)}
+                        data={media_gallery_entries}
                         onImagePress={(selected) => this.onImagePress(selected)}
-                        fisrtImage={{
-                            id: product_details?.media_gallery_entries[0]?.id,
-                            url: product_details?.media_gallery_entries[0]?.file,
-                            index: 0,
-                        }} />
+                        varient_selected={this.state.varient_selected}
+                        fisrtImage={this.state.product_varient_selected == null ?
+                            {
+                                id: product_details?.media_gallery_entries[0]?.id,
+                                url: product_details?.media_gallery_entries[0]?.file,
+                                index: 0,
+                            }
+                            :
+                            {
+                                id: this.state.product_varient_selected?.media_gallery_entries[0].id,
+                                url: this.state.product_varient_selected?.media_gallery_entries[0]?.file,
+                                index: 0,
+                            }}
+                    />
+
+
+
 
                     {/* Product Name */}
-                    <Text style={styles.product_name}>{product_details?.name}</Text>
+                    < Text style={styles.product_name}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
 
                     {/* Product Description */}
                     {this.state.description !== '' &&
@@ -496,7 +622,7 @@ class ProductDetails extends Component {
                     {/* Price , quantity, add to cart */}
                     <View style={styles.row_cont}>
                         {/* Price */}
-                        <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_details?.price}</Text>
+                        <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_varient_selected !== null ? product_varient_selected?.price : product_details?.price}</Text>
 
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
 
@@ -558,6 +684,8 @@ class ProductDetails extends Component {
                     <Options
                         option_package_size={this.state.option_package_size}
                         option_power={this.state.option_power}
+                        selectedVarient={(data, index) => this.selectedVarient(data, index)}
+                        product_varients={this.state.product_varients}
                         dropdown={this.state.dropdown}
                         checkMarked={(val) => this.checkMarked(val)}
                         selectedItemLeftPower={this.state.selectedItemLeftPower}

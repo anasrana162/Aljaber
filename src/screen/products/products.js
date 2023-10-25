@@ -39,8 +39,6 @@ class Products extends Component {
     createData = async () => {
         var { item, productApiCounter } = this.state;
         const { userData: { admintoken, allproducts }, actions, userData } = this.props
-        // console.log("item Products Screen]]]]]]]]]]]]]]]]",)
-
         setImmediate(() => {
             this.setState({
                 loader: true,
@@ -52,30 +50,26 @@ class Products extends Component {
         let products = []
         let configurable_Products = []
         let tempPRoducts = []
+
+        // Api to fetch  Array of products sku's of category selected
+
         await api.get('/categories/' + item.id + '/products', {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
         }).then(async (res) => {
-            //console.log("Product Api:", res?.data)
             var temp = res?.data
-            // console.log("Products Index:", temp?.length)
-            for (let p = 0; p < temp.length; p++) {
-                // console.log("res?.data?:", temp[p]?.sku)
 
+            // once the Array of sku is fetched we use it in a loop to fetch every product detail in the array
+
+            for (let p = 0; p < temp.length; p++) {
                 await api.get('/products/' + temp[p]?.sku, {
                     headers: {
                         Authorization: `Bearer ${admintoken}`,
                     },
                 }).then(async (prod) => {
-                    // console.log("Product Details Api:", prod?.data?.visibility, "  ", prod?.data?.price)
 
-
-                    //    products.push(prod?.data)
-
-                    // console.log("Api Array index current", products)
                     if (p == temp.length - 1) {
-                        // console.log("Products List", products)
                         setImmediate(() => {
                             this.setState({
                                 loaderFilter: false,
@@ -84,83 +78,94 @@ class Products extends Component {
                         })
                     }
 
-                    // for (let p = 0; p < products.length; p++) {
+                    // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
+                    // on the screen as it is not in the main body of the object
 
                     for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
 
+                        // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
 
                         if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-                            await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
-                                headers: {
-                                    Authorization: `Bearer ${admintoken}`,
-                                },
-                            })
-                                .then(async (res) => {
-                                    // console.log("")
-                                    // console.log("----------------------------")
-                                    // console.log("Item DEtails Api:", res?.data)
-                                    // console.log("----------------------------")
-                                    // console.log('')
 
-                                    // console.log("products[p].custom_attributes[i].attribute_code", products[p].custom_attributes[i].value)
+                            // then we run the API for fetching attributes value by passing the ID we fetch before
+                            // await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
+                            //     headers: {
+                            //         Authorization: `Bearer ${admintoken}`,
+                            //     },
+                            // })
+                            //     .then(async (res) => {
+                            //         console.log("RES",res?.data)
 
                                     await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-
-                                        // console.log("Data coming for brands:", data?.data)
                                         prod.data.brand = data?.data
+
+                                        // Condition for fetching products with type_id:"simple"
+
                                         if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
                                             products.push(prod?.data)
                                         }
+
+                                        // Condition for fetching products with type_id:"Configurable"
+
                                         if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-                                            // tempPRoducts.push(prod?.data)
 
-                                            console.log("prod?.data?.extension_attributes?.configurable_product_links?.length", prod?.data?.extension_attributes?.configurable_product_links)
-
+                                            // Checking value of configurable_product_links (product Varients)
 
                                             for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
-                                                console.log("VAlue Given for varients", prod?.data?.extension_attributes?.configurable_product_links[tp])
+
+                                                // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
+
                                                 const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
-                                                // for (let cf = 0; cf < allproducts.length; cf++) {
-                                                console.log("Product With index", selected_products)
+
+                                                // Condition
 
                                                 if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
-                                                    // console.log("show Configurable varients filter", allproducts[cf]?.id," ",prod?.data?.extension_attributes?.configurable_product_links[tp])
+
+                                                    // if id's match then the value "sku" is picked up from the matching product object and then we run an api
+                                                    // to fetch details for the varient because they are not in the products object from all products api
 
                                                     var check = false
+
+                                                    // Api for fetching product details
+
                                                     await api.get('/products/' + selected_products?.sku, {
                                                         headers: {
                                                             Authorization: `Bearer ${admintoken}`,
                                                         },
                                                     }).then(async (cfPD) => {
-                                                        // await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,)
-                                                        console.log("Configurable Product Details Api Response |||||", cfPD?.data?.name, "   ", cfPD?.data?.id)
+
+                                                        // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
+                                                        // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
+                                                        // long process already done above to save time while fetching for its main version of product
 
                                                         cfPD.data.brand = data?.data // brand value
-                                                        // if (tempPRoducts?.length !== prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
 
-                                                            tempPRoducts.push(cfPD?.data)
-                                                            // check = true
-                                                      
-                                                        // prod.data.price = cfPD.data?.price
-                                                        // prod.data.product_varients = tempPRoducts
-                                                        // console.log("Configurable Product Details Api Response", prod?.data?.name, "   ", prod?.data?.id)
+                                                        // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
+                                                        // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
+                                                        // together
 
-                                                        // configurable_Products.push(prod?.data)
+                                                        tempPRoducts.push(cfPD?.data)
+
+                                                        // here's the condition once the configurable_product_links array reach its end
                                                         if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
-                                                            // for(let t= 0;t<configurable_Products?.length;t++){
+
+                                                            //we also change the value of price of the main product because products with type_id have "0" price
+                                                            // so we take a price from its varient overwrite (Note price of all vareints are same)
                                                             prod.data.price = cfPD.data?.price
+
+                                                            // then we create an of product_varients and push into main product's object to show and display the varients in
+                                                            // product details screen
                                                             prod.data.product_varients = tempPRoducts
-                                                            console.log("")
-                                                            console.log("")
-                                                            console.log("---------FINAL----------")
-                                                            console.log("")
-                                                            console.log("prod?.data", prod?.data?.id, "  ", prod?.data?.name, "  ", prod?.data?.type_id)
-                                                            console.log("")
-                                                            console.log("---------FINAL----------")
-                                                            console.log("")
-                                                            console.log("")
+
+                                                            // then we push this product into main products array with all of these things so it can be displayed
+                                                            // in the Products screen
                                                             products.push(prod?.data)
-                                                            tempPRoducts=[]
+
+                                                            // Emptying the temporary array that we pushed products varients so the varients of other products
+                                                            // dont get added in the other products
+                                                            tempPRoducts = []
+
+                                                            // setting value of check to true from false to break the loop once it reaches its end
                                                             check = true
 
                                                         }
@@ -170,37 +175,25 @@ class Products extends Component {
                                                         console.log("Configurable Product Details Api Error", err)
 
                                                     })
+
+                                                    // this condition break the loop from further adding more products
                                                     if (check == true) {
-                                                        console.log("breaken-----------------------------------------")
+
                                                         break;
                                                     }
-
-
-
                                                 } else {
 
                                                 }
-
-
-
                                             }
-                                            //  products.push(temp)
-
                                         }
-
-
-
                                     }).catch((err) => {
                                         console.log("DAta for Brands Api errr", err)
                                     })
-
-
-                                })
-                                .catch((err) => {
-                                    console.log("More_info Api Error", err?.response)
-                                    //alert("Cant fetch More Information Data, Please Try again!")
-                                })
-
+                                // })
+                                // .catch((err) => {
+                                //     console.log("More_info Api Error", err?.response)
+                                //     //alert("Cant fetch More Information Data, Please Try again!")
+                                // })
                             break;
                         }
 
@@ -208,7 +201,6 @@ class Products extends Component {
                     // }
 
                     // this is for loader skeleton 
-                    // console.log("Products Lenght", products[1]?.product_varients[0]?.name)
                     if (products?.length >= 1) {
                         setImmediate(() => {
                             this.setState({
@@ -217,13 +209,12 @@ class Products extends Component {
                         })
                     }
 
+                    // setting the products in the state once they are all done 
                     setImmediate(() => {
                         this.setState({
                             products: products,
                             original: products,
-                            // loader: false,
                         })
-                        //s console.log("Products State", this.state.products[0].custom_attributes)
                     })
 
 
@@ -260,69 +251,6 @@ class Products extends Component {
 
             }
         })
-
-        // for (let cf = 0; cf < tempPRoducts.length; cf++) {
-        //     console.log("")
-        //     console.log("-----------")
-        //     console.log("Configurable Products Name", tempPRoducts[cf].name)
-        //     console.log("-----------")
-        //     console.log("")
-        //     console.log("-----------")
-        //     console.log("Configurable Products Index", cf)
-        //     console.log("-----------")
-        //     console.log("")
-        //     console.log("-----------")
-        //     console.log("Configurable Products id", tempPRoducts[cf].id)
-        //     console.log("")
-        //     console.log("-----------")
-        //     console.log("Configurable Products extension_attributes?.configurable_product_links", tempPRoducts[cf].extension_attributes?.configurable_product_links)
-        //     console.log("-----------")
-        //     console.log("")
-
-        //     for (let cpl = 0; cpl < tempPRoducts[cf].extension_attributes?.configurable_product_links.length; cpl++) {
-
-        //         // console.log("CPL Items", tempPRoducts[cf].extension_attributes?.configurable_product_links[cpl])
-
-        //         const selected_products = allproducts.filter((value) => value?.id == tempPRoducts[cf].extension_attributes?.configurable_product_links[cpl])[0]
-        //         if (tempPRoducts[cf].extension_attributes?.configurable_product_links[cpl] == selected_products?.id && selected_products?.type_id == "virtual"){
-        //             console.log("check:    ", selected_products)
-
-        //             await api.get('/products/' + selected_products?.sku, {
-        //                 headers: {
-        //                     Authorization: `Bearer ${admintoken}`,
-        //                 },
-        //             }).then(async (cfPD) => {
-        //                 // await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,)
-        //                 // console.log("Configurable Product Details Api Response |||||", cfPD?.data?.name, "   ", cfPD?.data?.id)
-
-        //                 cfPD.data.brand = tempPRoducts[cf]?.brand // brand value
-
-        //                 configurable_Products.push(cfPD?.data)
-        //                 tempPRoducts[cf].price = cfPD.data?.price
-        //                 tempPRoducts[cf].product_varients = configurable_Products
-        //                 console.log("Configurable Product Details Api Response", tempPRoducts[cf]?.name, "   ", tempPRoducts[cf]?.id)
-        //                 products.push(tempPRoducts[cf])
-
-
-        //             }).catch((err) => {
-        //                 console.log("Configurable Product Details Api Error", err)
-        //             })
-        //         }
-
-        //     }
-
-
-
-        // }
-        // setImmediate(() => {
-        //     this.setState({
-        //         products: products,
-        //         original: products,
-        //         // loader: false,
-        //     })
-        //     //s console.log("Products State", this.state.products[0].custom_attributes)
-        // })
-
 
     }
 

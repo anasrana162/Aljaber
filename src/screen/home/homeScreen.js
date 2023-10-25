@@ -16,6 +16,7 @@ import { bindActionCreators } from 'redux';
 import Loading from '../../components_reusable/loading';
 import { ImageArray } from '../categories/categoryData';
 import { ProductData } from './productData';
+import StoreFeatures from '../products/components/storeFeatures';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -399,7 +400,6 @@ class HomeScreen extends Component {
         // console.log("Top Categories:", arr[0]?.children_data)
         setImmediate(() => {
             this.setState({
-                loader: false,
                 topCategoryData: arr
             })
         })
@@ -409,7 +409,7 @@ class HomeScreen extends Component {
     randomProducts = async () => {
         var { userData } = this.props
         var sku_arr = []
-        var temp_sku_arr=[]
+        var temp_sku_arr = []
         var check = false
 
         // Fetch all Products
@@ -432,7 +432,9 @@ class HomeScreen extends Component {
                         //     check = true
                         // }
                         sku_arr.push(res?.data?.items[r])
+
                     }
+
                 }
             }
 
@@ -494,12 +496,13 @@ class HomeScreen extends Component {
 
         }
 
-       
+
         setImmediate(() => {
-            var {actions} = this.props
+            var { actions } = this.props
             actions?.allProducts(temp_sku_arr)
             this.setState(
                 {
+                    loader: false,
                     randomProducts: store_product
                 }
             )
@@ -546,6 +549,8 @@ class HomeScreen extends Component {
                         mainCatPos={this.state.topCategoryData == null ? null : this.state.topCategoryData[0]?.position}
                         navProps={this.props.navigation}
                     />
+
+                    <StoreFeatures screenName={"home"} />
 
                 </ScrollView>
 
