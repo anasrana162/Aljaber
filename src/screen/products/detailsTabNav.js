@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         width: "95%",
         justifyContent: "center",
         alignItems: "center",
-
+        marginTop: 30,
     },
     btnText: {
         fontWeight: "700",

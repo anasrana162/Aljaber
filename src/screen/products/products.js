@@ -14,6 +14,7 @@ import CategoryList from './components/categoryList';
 import ProductList from './components/productList';
 import { ImageArray } from '../categories/categoryData';
 import axios from 'axios';
+import FilterBoard from './components/filterBoard';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -29,6 +30,28 @@ class Products extends Component {
             loader: false,
             loaderFilter: false,
             productApiCounter: 0,
+            filterBoardOpen: false,
+            contact_lens_diameter: {
+                name: "Contact Lens Diameter",
+                attribute_code: "contact_lens_diameter",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            contact_lens_base_curve: {
+                name: "Contact Lens Base Curve",
+                attribute_code: "contact_lens_base_curve",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            water_container_content:{
+                name: "Water Container Content",
+                attribute_code: "water_container_content",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
         };
     }
 
@@ -96,104 +119,105 @@ class Products extends Component {
                             //     .then(async (res) => {
                             //         console.log("RES",res?.data)
 
-                                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-                                        prod.data.brand = data?.data
+                            await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
+                                prod.data.brand = data?.data
 
-                                        // Condition for fetching products with type_id:"simple"
+                                // Condition for fetching products with type_id:"simple"
 
-                                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-                                            products.push(prod?.data)
-                                        }
+                                if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
+                                    products.push(prod?.data)
+                                    this.createFilterData(prod?.data)
+                                }
 
-                                        // Condition for fetching products with type_id:"Configurable"
+                                // Condition for fetching products with type_id:"Configurable"
 
-                                        if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
+                                if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
 
-                                            // Checking value of configurable_product_links (product Varients)
+                                    // Checking value of configurable_product_links (product Varients)
 
-                                            for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
+                                    for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
 
-                                                // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
+                                        // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
 
-                                                const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
+                                        const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
 
-                                                // Condition
+                                        // Condition
 
-                                                if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
+                                        if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
 
-                                                    // if id's match then the value "sku" is picked up from the matching product object and then we run an api
-                                                    // to fetch details for the varient because they are not in the products object from all products api
+                                            // if id's match then the value "sku" is picked up from the matching product object and then we run an api
+                                            // to fetch details for the varient because they are not in the products object from all products api
 
-                                                    var check = false
+                                            var check = false
 
-                                                    // Api for fetching product details
+                                            // Api for fetching product details
 
-                                                    await api.get('/products/' + selected_products?.sku, {
-                                                        headers: {
-                                                            Authorization: `Bearer ${admintoken}`,
-                                                        },
-                                                    }).then(async (cfPD) => {
+                                            await api.get('/products/' + selected_products?.sku, {
+                                                headers: {
+                                                    Authorization: `Bearer ${admintoken}`,
+                                                },
+                                            }).then(async (cfPD) => {
 
-                                                        // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
-                                                        // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
-                                                        // long process already done above to save time while fetching for its main version of product
+                                                // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
+                                                // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
+                                                // long process already done above to save time while fetching for its main version of product
 
-                                                        cfPD.data.brand = data?.data // brand value
+                                                cfPD.data.brand = data?.data // brand value
 
-                                                        // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
-                                                        // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
-                                                        // together
+                                                // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
+                                                // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
+                                                // together
 
-                                                        tempPRoducts.push(cfPD?.data)
+                                                tempPRoducts.push(cfPD?.data)
 
-                                                        // here's the condition once the configurable_product_links array reach its end
-                                                        if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
+                                                // here's the condition once the configurable_product_links array reach its end
+                                                if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
 
-                                                            //we also change the value of price of the main product because products with type_id have "0" price
-                                                            // so we take a price from its varient overwrite (Note price of all vareints are same)
-                                                            prod.data.price = cfPD.data?.price
+                                                    //we also change the value of price of the main product because products with type_id have "0" price
+                                                    // so we take a price from its varient overwrite (Note price of all vareints are same)
+                                                    prod.data.price = cfPD.data?.price
 
-                                                            // then we create an of product_varients and push into main product's object to show and display the varients in
-                                                            // product details screen
-                                                            prod.data.product_varients = tempPRoducts
+                                                    // then we create an of product_varients and push into main product's object to show and display the varients in
+                                                    // product details screen
+                                                    prod.data.product_varients = tempPRoducts
 
-                                                            // then we push this product into main products array with all of these things so it can be displayed
-                                                            // in the Products screen
-                                                            products.push(prod?.data)
+                                                    // then we push this product into main products array with all of these things so it can be displayed
+                                                    // in the Products screen
+                                                    products.push(prod?.data)
+                                                    this.createFilterData(prod?.data)
+                                                    // Emptying the temporary array that we pushed products varients so the varients of other products
+                                                    // dont get added in the other products
+                                                    tempPRoducts = []
 
-                                                            // Emptying the temporary array that we pushed products varients so the varients of other products
-                                                            // dont get added in the other products
-                                                            tempPRoducts = []
-
-                                                            // setting value of check to true from false to break the loop once it reaches its end
-                                                            check = true
-
-                                                        }
-
-
-                                                    }).catch((err) => {
-                                                        console.log("Configurable Product Details Api Error", err)
-
-                                                    })
-
-                                                    // this condition break the loop from further adding more products
-                                                    if (check == true) {
-
-                                                        break;
-                                                    }
-                                                } else {
+                                                    // setting value of check to true from false to break the loop once it reaches its end
+                                                    check = true
 
                                                 }
+
+
+                                            }).catch((err) => {
+                                                console.log("Configurable Product Details Api Error", err)
+
+                                            })
+
+                                            // this condition break the loop from further adding more products
+                                            if (check == true) {
+
+                                                break;
                                             }
+                                        } else {
+
                                         }
-                                    }).catch((err) => {
-                                        console.log("DAta for Brands Api errr", err)
-                                    })
-                                // })
-                                // .catch((err) => {
-                                //     console.log("More_info Api Error", err?.response)
-                                //     //alert("Cant fetch More Information Data, Please Try again!")
-                                // })
+                                    }
+                                }
+                            }).catch((err) => {
+                                console.log("DAta for Brands Api errr", err)
+                            })
+                            // })
+                            // .catch((err) => {
+                            //     console.log("More_info Api Error", err?.response)
+                            //     //alert("Cant fetch More Information Data, Please Try again!")
+                            // })
                             break;
                         }
 
@@ -252,6 +276,103 @@ class Products extends Component {
             }
         })
 
+    }
+
+    createFilterData = async (product) => {
+        // console.log("Product From CreateData Function:", product)
+        var filterData = []
+        var { custom_attributes } = product
+        var brand = product?.brand
+        var { contact_lens_diameter, contact_lens_base_curve } = this.state
+        for (let i = 0; i < custom_attributes.length; i++) {
+            // console.log(" ")
+            // console.log("Products on create Data function " + i + "index  ", custom_attributes[i])
+            // console.log(" ")
+
+            if (custom_attributes[i]?.attribute_code == "contact_lens_diameter") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for contact_lens_diameter", value)
+                contact_lens_diameter.count = contact_lens_diameter?.count + 1
+                contact_lens_diameter?.product_ids.push(product?.id)
+                console.log(contact_lens_diameter?.value)
+                var check = contact_lens_diameter?.value.filter((val) => val == value)[0]
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! contact_lens_diameter")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+
+                    contact_lens_diameter?.value?.push(value)
+                    this.setState({ contact_lens_diameter })
+                    console.log(contact_lens_diameter)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "contact_lens_base_curve") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                console.log("VAlue for contact_lens_base_curve", value)
+
+                contact_lens_base_curve.count = contact_lens_base_curve?.count + 1
+                contact_lens_base_curve?.product_ids.push(product?.id)
+                console.log(contact_lens_base_curve?.value)
+                var check = contact_lens_base_curve?.value.filter((val) => val == value)[0]
+
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! contact_lens_base_curve")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+                    contact_lens_base_curve?.value.push(value)
+                    this.setState({ contact_lens_base_curve })
+                    console.log(contact_lens_base_curve)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "water_container_content") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                console.log("VAlue for water_container_content", value)
+
+                water_container_content.count = water_container_content?.count + 1
+                water_container_content?.product_ids.push(product?.id)
+                console.log(water_container_content?.value)
+                var check = water_container_content?.value.filter((val) => val == value)[0]
+
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! contact_lens_base_curve")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+                    water_container_content?.value.push(value)
+                    this.setState({ water_container_content })
+                    console.log(water_container_content)
+                }
+
+            }
+
+
+
+
+        }
+
+    }
+
+    attributeDetail = async (code) => {
+
+        var result = await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + code).then(async (data) => {
+
+            console.log("Data?.data", data?.data)
+            return data?.data
+
+        }).catch((err) => {
+            console.log("Attribute DEtail Function Api Error", err)
+        })
+        return await result
     }
 
     inner_Categories = () => {
@@ -399,17 +520,30 @@ class Products extends Component {
         axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + "",).catch((err) => {
             console.log("Request Cancel")
         })
+
+        axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + "").catch((err) => {
+            console.log("Request Cancel")
+        })
+    }
+
+    openFilterBoard = () => {
+        console.log("opening")
+        setImmediate(() => {
+            this.setState({
+                filterBoardOpen: !this.state.filterBoardOpen
+            })
+        })
     }
 
     render() {
         var { item } = this.props?.route?.params;
         return (
-            <View style={styles.mainContainer}>
+            <View style={styles.mainContainer} >
                 {/** Screen Header */}
-                <HomeHeader />
+                < HomeHeader />
 
                 {/** Top Image & Category Name */}
-                <ImageView
+                < ImageView
                     source={item?.parent_id == 102 ?
                         { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.parent_id + ".jpg" }
                         :
@@ -419,7 +553,8 @@ class Products extends Component {
                 />
 
                 {/** Categories if it exists */}
-                {this.state.categories !== null &&
+                {
+                    this.state.categories !== null &&
                     <CategoryList
                         categories={this.state.categories}
                         selectedItem={(item, index) => this.selectedItems(item, index)}
@@ -434,11 +569,17 @@ class Products extends Component {
                     loader={this.state.loader}
                     navProps={this.props.navigation}
                     sortBY={(key) => this.sortBy(key)}
+                    openFilterBoard={() => this.openFilterBoard()}
                     loaderFilter={this.state.loaderFilter}
                 />
 
+                {
+                    this.state.filterBoardOpen &&
+                    <FilterBoard onDismiss={() => this.openFilterBoard()} />
+                }
 
-            </View>
+
+            </View >
         )
     }
 }

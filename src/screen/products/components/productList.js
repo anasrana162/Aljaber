@@ -6,7 +6,7 @@ import LottieView from 'lottie-react-native';
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter }) => {
+const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoard, loaderFilter }) => {
     //  console.log("Products", data)
 
 
@@ -44,10 +44,10 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
     ]
 
     const OnTouchIn = (images, index) => {
-        if(images[1]?.file == undefined){
+        if (images[1]?.file == undefined) {
             setImageSelected(images[0]?.file)
             setImageSelectedIndex(index)
-        }else{
+        } else {
 
             setImageSelected(images[1]?.file)
             setImageSelectedIndex(index)
@@ -96,7 +96,8 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, loaderFilter 
 
                     {/* Filter */}
                     <TouchableOpacity
-                        disabled={loaderFilter}
+                        // disabled={loaderFilter}
+                        onPress={openFilterBoard}
                         style={styles.filterBox}>
                         <Text style={styles?.filterBox_Text}>FILTER</Text>
                     </TouchableOpacity>

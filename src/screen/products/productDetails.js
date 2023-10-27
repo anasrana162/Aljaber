@@ -124,7 +124,11 @@ class ProductDetails extends Component {
         // console.log("product_details Images Length", media_gallery_entries.length)
         // console.log("Product Varients", product_varients)
 
-        for (let pv = 0; pv < product_varients.length; pv++) {
+        if (product_varients?.length == 0) {
+            return console.log("no varients")
+        }
+
+        for (let pv = 0; pv < product_varients?.length; pv++) {
             // console.log("PRoduct Varients Item", product_varients[pv]?.id, "   ", product_varients[pv]?.name)
 
             for (let ca = 0; ca < product_varients[pv]?.custom_attributes?.length; ca++) {
@@ -170,7 +174,7 @@ class ProductDetails extends Component {
                 // x = custom_attributes
                 setImmediate(() => {
                     this.setState({
-                        media_gallery_entries: [...this.state.product_varient_selected?.media_gallery_entries,...media_gallery_entries],
+                        media_gallery_entries: [...this.state.product_varient_selected?.media_gallery_entries, ...media_gallery_entries],
                         imageKey: this.state.imageKey + 1
                     })
                 })
@@ -224,6 +228,9 @@ class ProductDetails extends Component {
         }
         let temp = []
         for (let i = 0; i < x.length; i++) {
+
+            // console.log("Attribute Codes",x[i]?.attribute_code)
+
             if (x[i]?.attribute_code == "brands") {
 
                 temp.push(x[i])
@@ -239,6 +246,83 @@ class ProductDetails extends Component {
                 // break;
             }
             if (x[i]?.attribute_code == "size") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "model_no") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "frame_color") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "frame_shape") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "frame_type") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "frame_material") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "bridge_size") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "lens_size") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "lense_color") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "temple_color") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "temple_material") {
+
+                temp.push(x[i])
+
+                // console.log("size", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "polarized") {
 
                 temp.push(x[i])
 
@@ -282,6 +366,13 @@ class ProductDetails extends Component {
                 // break;
             }
             if (x[i]?.attribute_code == "box_content_pcs") {
+
+                temp.push(x[i])
+
+                // console.log("box_content_pcs", custom_attributes[i])
+                // break;
+            }
+            if (x[i]?.attribute_code == "chain_size") {
 
                 temp.push(x[i])
 
@@ -332,11 +423,11 @@ class ProductDetails extends Component {
                                 items.push(obj)
                                 // break;
                             }
-                            if (temp[j]?.attribute_codee == "size") {
+                            if (temp[j]?.attribute_code == "size") {
 
                                 obj = {
                                     "id": 3,
-                                    "color": res?.data[k]?.label
+                                    "size": res?.data[k]?.label
                                 }
 
                                 items.push(obj)
@@ -394,6 +485,126 @@ class ProductDetails extends Component {
                                 obj = {
                                     "id": 9,
                                     "box_content_pcs": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "model_no") {
+
+                                obj = {
+                                    "id": 10,
+                                    "model_no": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "frame_color") {
+
+                                obj = {
+                                    "id": 11,
+                                    "frame_color": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "frame_shape") {
+
+                                obj = {
+                                    "id": 12,
+                                    "frame_shape": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "frame_type") {
+
+                                obj = {
+                                    "id": 13,
+                                    "frame_type": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "frame_material") {
+
+                                obj = {
+                                    "id": 14,
+                                    "frame_material": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "bridge_size") {
+
+                                obj = {
+                                    "id": 15,
+                                    "bridge_size": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "lens_size") {
+
+                                obj = {
+                                    "id": 16,
+                                    "lens_size": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "lense_color") {
+
+                                obj = {
+                                    "id": 17,
+                                    "lense_color": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "temple_color") {
+
+                                obj = {
+                                    "id": 18,
+                                    "temple_color": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "temple_material") {
+
+                                obj = {
+                                    "id": 19,
+                                    "temple_material": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "polarized") {
+
+                                obj = {
+                                    "id": 20,
+                                    "polarized": res?.data[k]?.label
+                                }
+
+                                items.push(obj)
+                                break;
+                            }
+                            if (temp[j]?.attribute_code == "chain_size") {
+
+                                obj = {
+                                    "id": 21,
+                                    "chain_size": res?.data[k]?.label
                                 }
 
                                 items.push(obj)
@@ -568,6 +779,7 @@ class ProductDetails extends Component {
                 alignItems: "center",
                 width: "90%",
                 fontFamily: "Careem-Bold",
+                marginTop:10
             },
             a: {
                 color: "green",
@@ -607,7 +819,9 @@ class ProductDetails extends Component {
 
 
                     {/* Product Name */}
-                    < Text style={styles.product_name}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
+                    < Text style={[styles.product_name,{
+                          marginTop:10,
+                    }]}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
 
                     {/* Product Description */}
                     {this.state.description !== '' &&
@@ -796,14 +1010,15 @@ const styles = StyleSheet.create({
     product_name: {
         fontSize: 18,
         fontWeight: "600",
-        color: "#020621"
+        color: "#020621",
+      
     },
     row_cont: {
         width: "100%",
         flexDirection: "row",
         justifyContent: 'space-between',
         alignItems: "center",
-        marginTop: 10
+        marginTop: 20
     },
     row_quantity: {
         //width: 100,
