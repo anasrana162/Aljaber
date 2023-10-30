@@ -45,9 +45,51 @@ class Products extends Component {
                 product_ids: [],
                 value: [],
             },
-            water_container_content:{
+            water_container_content: {
                 name: "Water Container Content",
                 attribute_code: "water_container_content",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            contact_lens_usage: {
+                name: "Contact Lens Usage",
+                attribute_code: "contact_lens_usage",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            brands: {
+                name: "Brands",
+                attribute_code: "brands",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            size: {
+                name: "Size",
+                attribute_code: "size",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            model_no: {
+                name: "Model No",
+                attribute_code: "model_no",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            box_content_pcs: {
+                name: "Color",
+                attribute_code: "color",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            box_content_pcs: {
+                name: "Box Content (PCS)",
+                attribute_code: "box_content_pcs",
                 count: 0,
                 product_ids: [],
                 value: [],
@@ -163,6 +205,7 @@ class Products extends Component {
                                                 // long process already done above to save time while fetching for its main version of product
 
                                                 cfPD.data.brand = data?.data // brand value
+                                                cfPD.data.parent_product_id = prod?.data?.id
 
                                                 // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
                                                 // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
@@ -281,9 +324,32 @@ class Products extends Component {
     createFilterData = async (product) => {
         // console.log("Product From CreateData Function:", product)
         var filterData = []
-        var { custom_attributes } = product
-        var brand = product?.brand
-        var { contact_lens_diameter, contact_lens_base_curve } = this.state
+        var { custom_attributes, product_varients, } = product
+        // var brand = product?.brand
+        // console.log(" ")
+        // console.log("---------------------")
+        // console.log("---------------------")
+        // console.log("product varients", product_varients)
+        // console.log("---------------------")
+        // console.log("---------------------")
+        // console.log(" ")
+        // Fetching color filters
+        if (product_varients !== undefined) {
+
+            for (let pv = 0; pv < product_varients.length; pv++) {
+                console.log(" ")
+                console.log("---------------------")
+                console.log("---------------------")
+                console.log("parent_product_id", product_varients[pv]?.parent_product_id)
+                console.log("---------------------")
+                console.log("---------------------")
+                console.log(" ")
+
+            }
+        }
+
+
+        var { contact_lens_diameter, contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs } = this.state
         for (let i = 0; i < custom_attributes.length; i++) {
             // console.log(" ")
             // console.log("Products on create Data function " + i + "index  ", custom_attributes[i])
@@ -294,7 +360,7 @@ class Products extends Component {
                 // console.log("VAlue for contact_lens_diameter", value)
                 contact_lens_diameter.count = contact_lens_diameter?.count + 1
                 contact_lens_diameter?.product_ids.push(product?.id)
-                console.log(contact_lens_diameter?.value)
+                // console.log(contact_lens_diameter?.value)
                 var check = contact_lens_diameter?.value.filter((val) => val == value)[0]
                 if (check == value) {
                     console.log("")
@@ -306,17 +372,17 @@ class Products extends Component {
 
                     contact_lens_diameter?.value?.push(value)
                     this.setState({ contact_lens_diameter })
-                    console.log(contact_lens_diameter)
+                    // console.log(contact_lens_diameter)
                 }
 
             }
             if (custom_attributes[i]?.attribute_code == "contact_lens_base_curve") {
                 var value = await this.attributeDetail(custom_attributes[i]?.value)
-                console.log("VAlue for contact_lens_base_curve", value)
+                // console.log("VAlue for contact_lens_base_curve", value)
 
                 contact_lens_base_curve.count = contact_lens_base_curve?.count + 1
                 contact_lens_base_curve?.product_ids.push(product?.id)
-                console.log(contact_lens_base_curve?.value)
+                // console.log(contact_lens_base_curve?.value)
                 var check = contact_lens_base_curve?.value.filter((val) => val == value)[0]
 
                 if (check == value) {
@@ -328,17 +394,17 @@ class Products extends Component {
                 } else {
                     contact_lens_base_curve?.value.push(value)
                     this.setState({ contact_lens_base_curve })
-                    console.log(contact_lens_base_curve)
+                    // console.log(contact_lens_base_curve)
                 }
 
             }
             if (custom_attributes[i]?.attribute_code == "water_container_content") {
                 var value = await this.attributeDetail(custom_attributes[i]?.value)
-                console.log("VAlue for water_container_content", value)
+                // console.log("VAlue for water_container_content", value)
 
                 water_container_content.count = water_container_content?.count + 1
                 water_container_content?.product_ids.push(product?.id)
-                console.log(water_container_content?.value)
+                // console.log(water_container_content?.value)
                 var check = water_container_content?.value.filter((val) => val == value)[0]
 
                 if (check == value) {
@@ -350,7 +416,117 @@ class Products extends Component {
                 } else {
                     water_container_content?.value.push(value)
                     this.setState({ water_container_content })
-                    console.log(water_container_content)
+                    // console.log(water_container_content)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "contact_lens_usage") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for contact_lens_usage", value)
+
+                contact_lens_usage.count = contact_lens_usage?.count + 1
+                contact_lens_usage?.product_ids.push(product?.id)
+                // console.log(contact_lens_usage?.value)
+                var check = contact_lens_usage?.value.filter((val) => val == value)[0]
+
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! contact_lens_usage")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+                    contact_lens_usage?.value.push(value)
+                    this.setState({ contact_lens_usage })
+                    // console.log(contact_lens_usage)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "brands") {
+                var value = product?.brand
+                // console.log("VAlue for contact_lens_usage", value)
+
+                brands.count = brands?.count + 1
+                brands?.product_ids.push(product?.id)
+                // console.log(brands?.value)
+                var check = brands?.value.filter((val) => val == value)[0]
+
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! contact_lens_usage")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+                    brands?.value.push(value)
+                    this.setState({ brands })
+                    // console.log(brands)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "size") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                console.log("VAlue for size", value)
+
+                size.count = size?.count + 1
+                size?.product_ids.push(product?.id)
+                console.log(size?.value)
+                var check = size?.value.filter((val) => val == value)[0]
+
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! size")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+                    size?.value.push(value)
+                    this.setState({ size })
+                    console.log(size)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "model_no") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                console.log("VAlue for model_no", value)
+
+                model_no.count = model_no?.count + 1
+                model_no?.product_ids.push(product?.id)
+                console.log(model_no?.value)
+                var check = model_no?.value.filter((val) => val == value)[0]
+
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! size")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+                    model_no?.value.push(value)
+                    this.setState({ model_no })
+                    console.log(model_no)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "box_content_pcs") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                console.log("VAlue for box_content_pcs", value)
+
+                box_content_pcs.count = box_content_pcs?.count + 1
+                box_content_pcs?.product_ids.push(product?.id)
+                console.log(box_content_pcs?.value)
+                var check = box_content_pcs?.value.filter((val) => val == value)[0]
+
+                if (check == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! size")
+                    console.log("---------------------")
+                    console.log("")
+                } else {
+                    box_content_pcs?.value.push(value)
+                    this.setState({ box_content_pcs })
+                    console.log(box_content_pcs)
                 }
 
             }
