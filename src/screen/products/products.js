@@ -82,13 +82,13 @@ class Products extends Component {
                 product_ids: [],
                 value: [],
             },
-            box_content_pcs: {
-                name: "Color",
-                attribute_code: "color",
-                count: 0,
-                product_ids: [],
-                value: [],
-            },
+            // box_content_pcs: {
+            //     name: "Color",
+            //     attribute_code: "color",
+            //     count: 0,
+            //     product_ids: [],
+            //     value: [],
+            // },
             color: {
                 name: "Colors",
                 attribute_code: "color",
@@ -883,7 +883,7 @@ class Products extends Component {
 
             var fids = filtered_product_ids.filter((val) => val == product_ids[a])[0]
             if (fids == product_ids[a]) {
-                console.log("Removing ID", fids)
+                //console.log("Removing ID", fids)
                 const index = filtered_product_ids.indexOf(fids);
                 filtered_product_ids.splice(index, 1)
             } else {

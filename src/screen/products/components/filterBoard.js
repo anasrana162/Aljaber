@@ -33,7 +33,7 @@ const FilterBoard = ({
     const [brands_open, setbrands_open] = useState(false)
     const [size_open, setsize_open] = useState(false)
     const [model_no_open, setmodel_no_open] = useState(false)
-    const [box_content_pcs_open, setsbox_content_pcs_open] = useState(false)
+    const [box_content_pcs_open, setbox_content_pcs_open] = useState(false)
     const [color_open, setcolor_open] = useState(false)
 
     // state for holding values
@@ -64,6 +64,10 @@ const FilterBoard = ({
     const [checkBox_wcc, setcheckBox_wcc] = useState([])
     const [checkBox_clu, setcheckBox_clu] = useState([])
     const [checkBox_brand, setcheckBox_brand] = useState([])
+    const [checkBox_size, setcheckBox_size] = useState([])
+    const [checkBox_model_no, setcheckBox_model_no] = useState([])
+    const [checkBox_bcp, setcheckBox_bcp] = useState([])
+    const [checkBox_color, setcheckBox_color] = useState([])
 
     // keys
     const [cld_key, setcld_key] = useState(0)
@@ -71,13 +75,15 @@ const FilterBoard = ({
     const [wcc_key, setwcc_key] = useState(0)
     const [clu_key, setclu_key] = useState(0)
     const [brand_key, setbrand_key] = useState(0)
+    const [size_key, setsize_key] = useState(0)
+    const [model_no_key, setmodel_no_key] = useState(0)
+    const [bcp_key, setbcp_key] = useState(0)
+    const [color_key, setcolor_key] = useState(0)
 
 
     const openCheckBox = (id, code, product_ids) => {
-        console.log()
         switch (code) {
             case "contact_lens_diameter":
-                console.log("ID Recieved on contact_lens_diameter", id, "  ", product_ids)
                 setcld_key(cld_key + 1)
                 checkBox_cld.push(id)
                 setcheckBox_cld(checkBox_cld)
@@ -112,6 +118,32 @@ const FilterBoard = ({
                 applyFilter(product_ids)
                 break;
 
+            case "size":
+                setsize_key(size_key + 1)
+                checkBox_size.push(id)
+                setcheckBox_size(checkBox_size)
+                applyFilter(product_ids)
+                break;
+            case "model_no":
+                setmodel_no_key(model_no_key + 1)
+                checkBox_model_no.push(id)
+                setcheckBox_model_no(checkBox_model_no)
+                applyFilter(product_ids)
+                break;
+
+            case "box_content_pcs":
+                setbcp_key(bcp_key + 1)
+                checkBox_bcp.push(id)
+                setcheckBox_bcp(checkBox_bcp)
+                applyFilter(product_ids)
+                break;
+            // case "size":
+            //     setsize_key(size_key + 1)
+            //     checkBox_size.push(id)
+            //     setcheckBox_size(checkBox_size)
+            //     applyFilter(product_ids)
+            //     break;
+
         }
 
     }
@@ -119,8 +151,6 @@ const FilterBoard = ({
 
         switch (code) {
             case "contact_lens_diameter":
-
-                console.log("ID RECEIVED", id)
                 const index = checkBox_cld.indexOf(id);
                 checkBox_cld.splice(index, 1)
                 setcld_key(cld_key + 1)
@@ -129,7 +159,6 @@ const FilterBoard = ({
                 break;
 
             case "contact_lens_base_curve":
-                console.log("ID RECEIVED", id)
                 const index1 = checkBox_clbc.indexOf(id);
                 checkBox_clbc.splice(index1, 1)
                 setclbc_key(clbc_key + 1)
@@ -138,7 +167,6 @@ const FilterBoard = ({
                 break;
 
             case "water_container_content":
-                console.log("ID RECEIVED", id)
                 const index2 = checkBox_wcc.indexOf(id);
                 checkBox_wcc.splice(index2, 1)
                 setwcc_key(wcc_key + 1)
@@ -147,19 +175,42 @@ const FilterBoard = ({
                 break;
 
             case "contact_lens_usage":
-                console.log("ID RECEIVED", id)
                 const index3 = checkBox_clu.indexOf(id);
                 checkBox_clu.splice(index3, 1)
                 setclu_key(clu_key + 1)
                 setcheckBox_clu(checkBox_clu)
                 removeFilter(product_ids)
                 break;
+
             case "brands":
-                console.log("ID RECEIVED", id)
                 const index4 = checkBox_brand.indexOf(id);
                 checkBox_brand.splice(index4, 1)
                 setbrand_key(brand_key + 1)
                 setcheckBox_brand(checkBox_brand)
+                removeFilter(product_ids)
+                break;
+
+            case "size":
+                const index5 = checkBox_size.indexOf(id);
+                checkBox_size.splice(index5, 1)
+                setsize_key(size_key + 1)
+                setcheckBox_size(checkBox_size)
+                removeFilter(product_ids)
+                break;
+
+            case "model_no":
+                const index6 = checkBox_model_no.indexOf(id);
+                checkBox_model_no.splice(index5, 1)
+                setbcp_key(model_no_key + 1)
+                setcheckBox_model_no(checkBox_model_no)
+                removeFilter(product_ids)
+                break;
+
+            case "box_content_pcs":
+                const index7 = checkBox_bcp.indexOf(id);
+                checkBox_bcp.splice(index7, 1)
+                setbcp_key(bcp_key + 1)
+                setcheckBox_bcp(checkBox_bcp)
                 removeFilter(product_ids)
                 break;
 
@@ -244,6 +295,39 @@ const FilterBoard = ({
                                         openFilterDataCont={() => setbrands_open(!brands_open)}
                                     />
                                 }
+                                {size?.value?.length > 0 &&
+                                    <FBListCont
+                                        filterData={size}
+                                        filterData_Cont_Open={size_open}
+                                        // checkBox={wcc_check}
+                                        checkBoxID={checkBox_size}
+                                        openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
+                                        closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
+                                        openFilterDataCont={() => setsize_open(!size_open)}
+                                    />
+                                }
+                                {model_no?.value?.length > 0 &&
+                                    <FBListCont
+                                        filterData={model_no}
+                                        filterData_Cont_Open={model_no_open}
+                                        // checkBox={wcc_check}
+                                        checkBoxID={checkBox_model_no}
+                                        openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
+                                        closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
+                                        openFilterDataCont={() => setmodel_no_open(!model_no_open)}
+                                    />
+                                }
+                                {box_content_pcs?.value?.length > 0 &&
+                                    <FBListCont
+                                        filterData={box_content_pcs}
+                                        filterData_Cont_Open={box_content_pcs_open}
+                                        // checkBox={wcc_check}
+                                        checkBoxID={checkBox_bcp}
+                                        openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
+                                        closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
+                                        openFilterDataCont={() => setbox_content_pcs_open(!box_content_pcs_open)}
+                                    />
+                                }
 
 
                             </ScrollView>
@@ -268,7 +352,7 @@ const styles = StyleSheet.create({
         height: height,
         backgroundColor: "rgba(52,52,52,0.05)",
         position: "absolute",
-        zIndex: 400
+        zIndex: 400,
     },
     mainContainer1: {
         width: "100%",
@@ -276,7 +360,8 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         backgroundColor: "rgba(52,52,52,0.05)",
         position: "absolute",
-        zIndex: 1
+        zIndex: 1,
+
     },
     inner_main: {
         width: width / 2.1,
@@ -285,6 +370,7 @@ const styles = StyleSheet.create({
         // position: "absolute",
         // left:0,
         zIndex: 400,
+
     },
     inner_main1: {
         width: "100%",
@@ -293,6 +379,9 @@ const styles = StyleSheet.create({
         // position: "absolute",
         // left:0,
         zIndex: 400,
+        // paddingBottom: 400,
+
+
     },
 
 })
