@@ -22,7 +22,7 @@ const FilterBoard = ({
     filterBoardOpen,
     removeFilter,
     // Data
-    contact_lens_diameter, contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs, color
+    contact_lens_diameter, lense_color, frame_type,contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs, color
 }) => {
 
     // states for open value cantainer
@@ -35,6 +35,8 @@ const FilterBoard = ({
     const [model_no_open, setmodel_no_open] = useState(false)
     const [box_content_pcs_open, setbox_content_pcs_open] = useState(false)
     const [color_open, setcolor_open] = useState(false)
+    const [lense_color_open, setlense_color_open] = useState(false)
+    const [frame_type_open, setframe_type_open] = useState(false)
 
     // state for holding values
     const [contact_lens_diameter_state, setcontact_lens_diameter_state] = useState("")
@@ -46,6 +48,7 @@ const FilterBoard = ({
     const [model_no_state, setmodel_no_state] = useState("")
     const [box_content_pcs_state, setsbox_content_pcs_state] = useState("")
     const [color_state, setcolor_state] = useState("")
+    const [lense_color_state, setlense_color_state] = useState("")
 
     // state for holding values
     // const [cld_check, setcld_check] = useState("")
@@ -68,6 +71,8 @@ const FilterBoard = ({
     const [checkBox_model_no, setcheckBox_model_no] = useState([])
     const [checkBox_bcp, setcheckBox_bcp] = useState([])
     const [checkBox_color, setcheckBox_color] = useState([])
+    const [checkBox_lc, setcheckBox_lc] = useState([])
+    const [checkBox_ft, setcheckBox_ft] = useState([])
 
     // keys
     const [cld_key, setcld_key] = useState(0)
@@ -79,6 +84,8 @@ const FilterBoard = ({
     const [model_no_key, setmodel_no_key] = useState(0)
     const [bcp_key, setbcp_key] = useState(0)
     const [color_key, setcolor_key] = useState(0)
+    const [lc_key, setlc_key] = useState(0)
+    const [ft_key, setft_key] = useState(0)
 
 
     const openCheckBox = (id, code, product_ids) => {
@@ -137,12 +144,24 @@ const FilterBoard = ({
                 setcheckBox_bcp(checkBox_bcp)
                 applyFilter(product_ids)
                 break;
-            // case "size":
-            //     setsize_key(size_key + 1)
-            //     checkBox_size.push(id)
-            //     setcheckBox_size(checkBox_size)
-            //     applyFilter(product_ids)
-            //     break;
+            case "color":
+                setcolor_key(color_key + 1)
+                checkBox_color.push(id)
+                setcheckBox_color(checkBox_color)
+                applyFilter(product_ids)
+                break;
+            case "lense_color":
+                setlc_key(lc_key + 1)
+                checkBox_lc.push(id)
+                setcheckBox_lc(checkBox_lc)
+                applyFilter(product_ids)
+                break;
+            case "frame_type":
+                setft_key(ft_key + 1)
+                checkBox_lc.push(id)
+                setcheckBox_ft(checkBox_ft)
+                applyFilter(product_ids)
+                break;
 
         }
 
@@ -200,7 +219,7 @@ const FilterBoard = ({
 
             case "model_no":
                 const index6 = checkBox_model_no.indexOf(id);
-                checkBox_model_no.splice(index5, 1)
+                checkBox_model_no.splice(index6, 1)
                 setbcp_key(model_no_key + 1)
                 setcheckBox_model_no(checkBox_model_no)
                 removeFilter(product_ids)
@@ -211,6 +230,27 @@ const FilterBoard = ({
                 checkBox_bcp.splice(index7, 1)
                 setbcp_key(bcp_key + 1)
                 setcheckBox_bcp(checkBox_bcp)
+                removeFilter(product_ids)
+                break;
+            case "color":
+                const index8 = checkBox_color.indexOf(id);
+                checkBox_color.splice(index8, 1)
+                setcolor_key(color_key + 1)
+                setcheckBox_bcp(checkBox_color)
+                removeFilter(product_ids)
+                break;
+            case "lense_color":
+                const index9 = checkBox_lc.indexOf(id);
+                checkBox_lc.splice(index9, 1)
+                setlc_key(lc_key + 1)
+                setcheckBox_lc(checkBox_lc)
+                removeFilter(product_ids)
+                break;
+            case "frame_type":
+                const index10 = checkBox_ft.indexOf(id);
+                checkBox_ft.splice(index9, 1)
+                setft_key(ft_key + 1)
+                setcheckBox_ft(checkBox_ft)
                 removeFilter(product_ids)
                 break;
 
@@ -326,6 +366,44 @@ const FilterBoard = ({
                                         openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
                                         closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
                                         openFilterDataCont={() => setbox_content_pcs_open(!box_content_pcs_open)}
+                                    />
+                                }
+
+                                {lense_color?.value?.length > 0 &&
+                                    <FBListCont
+                                        filterData={lense_color}
+                                        filterData_Cont_Open={lense_color_open}
+                                        // checkBox={wcc_check}
+                                        checkBoxID={checkBox_lc}
+                                        openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
+                                        closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
+                                        openFilterDataCont={() => setlense_color_open(!lense_color_open)}
+                                    />
+                                }
+
+                                {frame_type?.value?.length > 0 &&
+                                    <FBListCont
+                                        filterData={frame_type}
+                                        filterData_Cont_Open={frame_type_open}
+                                        // checkBox={wcc_check}
+                                        checkBoxID={checkBox_ft}
+                                        openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
+                                        closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
+                                        openFilterDataCont={() => setframe_type_open(!frame_type_open)}
+                                    />
+                                }
+
+
+                                {color?.value?.length > 0 &&
+                                    <FBListCont
+                                        filterData={color}
+                                        filterData_Cont_Open={color_open}
+                                        isColor={true}
+                                        // checkBox={wcc_check}
+                                        checkBoxID={checkBox_color}
+                                        openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
+                                        closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
+                                        openFilterDataCont={() => setcolor_open(!color_open)}
                                     />
                                 }
 

@@ -2,7 +2,7 @@ import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, T
 import React, { useState } from 'react'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-const FBListCont = ({ filterData, checkBox, checkBoxID, filterData_Cont_Open, openFilterDataCont, openCheckBox, closeCheckBox }) => {
+const FBListCont = ({ filterData, checkBox, checkBoxID, filterData_Cont_Open, isColor, openFilterDataCont, openCheckBox, closeCheckBox }) => {
 
     // console.log("checkBoxID={checkBoxID}", checkBoxID)
 
@@ -19,7 +19,45 @@ const FBListCont = ({ filterData, checkBox, checkBoxID, filterData_Cont_Open, op
                 </TouchableOpacity>
             </View>
 
-            {filterData_Cont_Open == true &&
+            {(filterData_Cont_Open == true && isColor == true) &&
+
+                <View style={[styles.inner_item_list_cont, { flexWrap: "wrap" }]}>
+                    {
+
+                        filterData?.value?.map((data, index) => {
+                            console.log(" filterData?.value", filterData)
+                            return (
+                                <TouchableOpacity
+                                    key={String(index)}
+                                    onPress={() => {
+                                        if(checkBoxID?.filter((check_data) => check_data == data?.color_name)[0] == data?.color_name){
+
+                                            closeCheckBox(data?.color_name, filterData?.attribute_code, data?.product_ids)
+                                        }else{
+
+                                            openCheckBox(data?.color_name, filterData?.attribute_code, data?.product_ids)}}
+                                        }
+                                    style={[styles.touchable, { backgroundColor: data?.color_code }]}>
+                                    <>
+                                        {checkBoxID?.filter((check_data) => check_data == data?.color_name)[0] == data?.color_name ?
+                                            <>
+                                                <AntDesign name="check" size={16} color="white" />
+                                            </>
+
+                                            : <></>}
+                                    </>
+                                </TouchableOpacity>
+
+
+                            )
+                        })}
+                </View>
+            }
+
+
+
+            {(filterData_Cont_Open == true && isColor == undefined) &&
+
                 <>
                     {
                         filterData?.value?.map((data, index) => {
@@ -34,14 +72,14 @@ const FBListCont = ({ filterData, checkBox, checkBoxID, filterData_Cont_Open, op
                                     {checkBoxID?.filter((check_data) => check_data == data?.id)[0] == data?.id ?
                                         <TouchableOpacity
                                             // onPress={() => setcld_check(!cld_check)}
-                                            onPress={() => closeCheckBox(data?.id, filterData?.attribute_code,data?.product_ids)}
+                                            onPress={() => closeCheckBox(data?.id, filterData?.attribute_code, data?.product_ids)}
                                         >
                                             <MaterialIcons name="check-box" size={20} color="#777" />
                                         </TouchableOpacity>
                                         :
                                         <TouchableOpacity
                                             // onPress={() => setcld_check(!cld_check)}
-                                            onPress={() => openCheckBox(data?.id, filterData?.attribute_code,data?.product_ids)}
+                                            onPress={() => openCheckBox(data?.id, filterData?.attribute_code, data?.product_ids)}
 
                                         >
                                             <MaterialIcons name="check-box-outline-blank" size={20} color="#777" />
@@ -101,5 +139,14 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "#777",
         marginLeft: 5,
+    },
+    touchable: {
+        width: 30,
+        height: 30,
+        borderRadius: 30,
+        justifyContent:"center",
+        alignItems:"center",
+        margin: 5,
+        borderWidth:0.5,
     }
 })

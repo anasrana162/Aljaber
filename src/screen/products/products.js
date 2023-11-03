@@ -82,13 +82,6 @@ class Products extends Component {
                 product_ids: [],
                 value: [],
             },
-            // box_content_pcs: {
-            //     name: "Color",
-            //     attribute_code: "color",
-            //     count: 0,
-            //     product_ids: [],
-            //     value: [],
-            // },
             color: {
                 name: "Colors",
                 attribute_code: "color",
@@ -99,6 +92,20 @@ class Products extends Component {
             box_content_pcs: {
                 name: "Box Content (PCS)",
                 attribute_code: "box_content_pcs",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            lense_color: {
+                name: "Lense Color",
+                attribute_code: "lense_color",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            frame_type: {
+                name: "Frame Type",
+                attribute_code: "frame_type",
                 count: 0,
                 product_ids: [],
                 value: [],
@@ -122,7 +129,6 @@ class Products extends Component {
         })
 
         let products = []
-        let configurable_Products = []
         let tempPRoducts = []
 
         // Api to fetch  Array of products sku's of category selected
@@ -160,15 +166,6 @@ class Products extends Component {
                         // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
 
                         if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
-                            // then we run the API for fetching attributes value by passing the ID we fetch before
-                            // await api.get('/products/attributes/' + prod?.data.custom_attributes[i].attribute_code + '/options', {
-                            //     headers: {
-                            //         Authorization: `Bearer ${admintoken}`,
-                            //     },
-                            // })
-                            //     .then(async (res) => {
-                            //         console.log("RES",res?.data)
 
                             await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
                                 prod.data.brand = data?.data
@@ -243,38 +240,26 @@ class Products extends Component {
 
                                                     // setting value of check to true from false to break the loop once it reaches its end
                                                     check = true
-
                                                 }
-
 
                                             }).catch((err) => {
                                                 console.log("Configurable Product Details Api Error", err)
-
                                             })
 
                                             // this condition break the loop from further adding more products
                                             if (check == true) {
-
                                                 break;
                                             }
                                         } else {
-
                                         }
                                     }
                                 }
                             }).catch((err) => {
                                 console.log("DAta for Brands Api errr", err)
                             })
-                            // })
-                            // .catch((err) => {
-                            //     console.log("More_info Api Error", err?.response)
-                            //     //alert("Cant fetch More Information Data, Please Try again!")
-                            // })
                             break;
                         }
-
                     }
-                    // }
 
                     // this is for loader skeleton 
                     if (products?.length >= 1) {
@@ -293,10 +278,7 @@ class Products extends Component {
                         })
                     })
 
-
                 }).catch((err) => {
-                    //alert("Network Error Code: (CAT#1)")
-
                     console.log("Product Detail Api error on:  ", temp[p]?.sku)
                     return setImmediate(() => {
                         this.setState({
@@ -334,31 +316,12 @@ class Products extends Component {
         // console.log("Product From CreateData Function:", product)
         var filterData = []
         var { custom_attributes, product_varients, } = product
-        var { contact_lens_diameter, contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state
-        // var brand = product?.brand
-        // console.log(" ")
-        // console.log("---------------------")
-        // console.log("---------------------")
-        // console.log("product varients", product_varients)
-        // console.log("---------------------")
-        // console.log("---------------------")
-        // console.log(" ")
-        // Fetching color filters
+        var { contact_lens_diameter, contact_lens_base_curve,frame_type, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
         if (product_varients !== undefined) {
-
             for (let pv = 0; pv < product_varients.length; pv++) {
-                // console.log(" ")
-                // console.log("---------------------")
-                // console.log("---------------------")
-                // console.log("parent_product_id", product_varients[pv]?.parent_product_id)
-                // console.log("---------------------")
-                // console.log("---------------------")
-                // console.log(" ")
-
                 for (let ca = 0; ca < product_varients[pv]?.custom_attributes.length; ca++) {
-
                     if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
-                        // console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
+                        console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
 
                         await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + product_varients[pv]?.custom_attributes[ca]?.value,)
                             .then(async (data) => {
@@ -366,18 +329,29 @@ class Products extends Component {
                                 product_varients[pv].color = {
                                     color_name: product_varients[pv]?.custom_attributes[ca]?.value,
                                     color_code: data?.data,
+                                    product_ids: []
                                 }
                                 color.count = color?.count + 1
                                 color?.product_ids.push(product?.id)
-                                var check = color?.value.filter((val) => val == product_varients[pv].color?.color_name)[0]
-                                if (check = product_varients[pv].color?.color_name) {
-                                    // console.log("")
-                                    // console.log("---------------------")
-                                    // console.log("already exists! COLOR")
-                                    // console.log("---------------------")
-                                    // console.log("")
+                                var check = color?.value.filter((val) => val?.color_name == product_varients[pv].color?.color_name)[0]
+                                // console.log("Check Color Value", check)
+                                if (check?.color_name == product_varients[pv].color?.color_name) {
+                                    console.log("")
+                                    console.log("---------------------")
+                                    console.log("already exists! COLOR")
+                                    console.log("---------------------")
+                                    console.log("")
+                                    for (let n = 0; n < color?.value.length; n++) {
+                                        if (color?.value[n].color_name == product_varients[pv].color?.color_name) {
+                                            // console.log("found Value Color",)
+                                            color.value[n].product_ids.push(product?.id)
+                                            //this.setState({ color })
+                                            break;
+                                        }
+                                    }
                                 } else {
 
+                                    product_varients[pv].color.product_ids.push(product?.id)
                                     color?.value?.push(product_varients[pv].color)
                                     this.setState({ color })
                                     // console.log(contact_lens_diameter)
@@ -391,21 +365,14 @@ class Products extends Component {
 
                     }
                 }
-
-
             }
         }
 
-
-
         for (let i = 0; i < custom_attributes.length; i++) {
-            // console.log(" ")
-            // console.log("Products on create Data function " + i + "index  ", custom_attributes[i])
-            // console.log(" ")
 
             if (custom_attributes[i]?.attribute_code == "contact_lens_diameter") {
                 var value = await this.attributeDetail(custom_attributes[i]?.value)
-                // console.log("VAlue for contact_lens_diameter", value)
+                console.log("VAlue for contact_lens_diameter", value)
                 contact_lens_diameter.count = contact_lens_diameter?.count + 1
                 contact_lens_diameter?.product_ids.push(product?.id)
                 // console.log(contact_lens_diameter?.value)
@@ -421,7 +388,7 @@ class Products extends Component {
 
                     for (let n = 0; n < contact_lens_diameter?.value.length; n++) {
                         if (contact_lens_diameter?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             contact_lens_diameter.value[n].product_ids.push(product?.id)
                             contact_lens_diameter.value[n].product_count = contact_lens_diameter?.value[n].product_count + 1
                             break;
@@ -460,7 +427,7 @@ class Products extends Component {
                     // console.log("")
                     for (let n = 0; n < contact_lens_base_curve?.value.length; n++) {
                         if (contact_lens_base_curve?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             contact_lens_base_curve.value[n].product_ids.push(product?.id)
                             contact_lens_base_curve.value[n].product_count = contact_lens_base_curve?.value[n].product_count + 1
                             break;
@@ -497,7 +464,7 @@ class Products extends Component {
                     // console.log("")
                     for (let n = 0; n < water_container_content?.value.length; n++) {
                         if (water_container_content?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             water_container_content.value[n].product_ids.push(product?.id)
                             water_container_content.value[n].product_count = water_container_content?.value[n].product_count + 1
                             break;
@@ -534,7 +501,7 @@ class Products extends Component {
                     // console.log("")
                     for (let n = 0; n < contact_lens_usage?.value.length; n++) {
                         if (contact_lens_usage?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             contact_lens_usage?.value[n].product_ids.push(product?.id)
                             contact_lens_usage.value[n].product_count = contact_lens_usage?.value[n].product_count + 1
                             break;
@@ -571,7 +538,7 @@ class Products extends Component {
                     // console.log("")
                     for (let n = 0; n < brands?.value.length; n++) {
                         if (brands?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             brands?.value[n].product_ids.push(product?.id)
                             brands.value[n].product_count = brands?.value[n].product_count + 1
                             break;
@@ -608,7 +575,7 @@ class Products extends Component {
                     // console.log("")
                     for (let n = 0; n < size?.value.length; n++) {
                         if (size?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             size?.value[n].product_ids.push(product?.id)
                             size.value[n].product_count = size?.value[n].product_count + 1
                             break;
@@ -645,7 +612,7 @@ class Products extends Component {
                     // console.log("")
                     for (let n = 0; n < model_no?.value.length; n++) {
                         if (model_no?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             model_no?.value[n].product_ids.push(product?.id)
                             model_no.value[n].product_count = model_no?.value[n].product_count + 1
                             break;
@@ -662,6 +629,125 @@ class Products extends Component {
                     model_no?.value.push(obj)
                     this.setState({ model_no })
                     // console.log(model_no)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "lense_color") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for model_no", value)
+
+                lense_color.count = lense_color?.count + 1
+                lense_color?.product_ids.push(product?.id)
+                // console.log(model_no?.value)
+                var check = lense_color?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < lense_color?.value.length; n++) {
+                        if (lense_color?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            lense_color?.value[n].product_ids.push(product?.id)
+                            lense_color.value[n].product_count = lense_color?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    lense_color?.value.push(obj)
+                    this.setState({ lense_color })
+                    // console.log(model_no)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "color") {
+                var value = await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + custom_attributes[i]?.value).then(async (data) => {
+
+                    // console.log("Data?.data", data?.data)
+                    return data?.data
+
+                }).catch((err) => {
+                    console.log("Attribute DEtail Function Api Error", err)
+                })
+                // console.log("VAlue for box_content_pcs", value)
+
+                color.count = color?.count + 1
+                color?.product_ids.push(product?.id)
+                var check = color?.value.filter((val) => val?.color_code == value)[0]
+                console.log("check |||||", check, " ", value)
+
+                if (check?.color_code == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! color inner func")
+                    console.log("---------------------")
+                    console.log("")
+                    for (let n = 0; n < color?.value.length; n++) {
+                        if (color?.value[n].color_code == value) {
+                            console.log("found Value color",)
+                            color?.value[n].product_ids.push(product?.id)
+                            // let temp = color?.value[n].product_ids.filter((val,index) => color?.value[n].product_ids.indexOf(val) === index)
+                            this.setState({ color })
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        color_name: custom_attributes[i]?.value,
+                        color_code: value,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    color?.value.push(obj)
+                    // let temp1=color?.value.filter((val,index) => val.product_ids.indexOf(val) === index)
+                    this.setState({ color })
+                    // console.log(box_content_pcs)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "frame_type") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                frame_type.count = frame_type?.count + 1
+                frame_type?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = frame_type?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < frame_type?.value.length; n++) {
+                        if (frame_type?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            frame_type?.value[n].product_ids.push(product?.id)
+                            frame_type.value[n].product_count = frame_type?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    frame_type?.value.push(obj)
+                    this.setState({ frame_type })
+                    // console.log(box_content_pcs)
                 }
 
             }
@@ -682,7 +768,7 @@ class Products extends Component {
                     // console.log("")
                     for (let n = 0; n < box_content_pcs?.value.length; n++) {
                         if (box_content_pcs?.value[n].product_name == value) {
-                            console.log("found Value",)
+                            // console.log("found Value",)
                             box_content_pcs?.value[n].product_ids.push(product?.id)
                             box_content_pcs.value[n].product_count = box_content_pcs?.value[n].product_count + 1
                             break;
@@ -702,15 +788,10 @@ class Products extends Component {
                 }
 
             }
-
-
-
-
         }
-
     }
 
-    attributeDetail = async (code) => {
+    attributeDetail = async (code, key) => {
 
         var result = await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + code).then(async (data) => {
 
@@ -721,6 +802,7 @@ class Products extends Component {
             console.log("Attribute DEtail Function Api Error", err)
         })
         return await result
+
     }
 
     inner_Categories = () => {
@@ -846,68 +928,45 @@ class Products extends Component {
 
     applyFilter = (product_ids) => {
         var { filtered_product_ids, products, filtered_products } = this.state
-
-
         filtered_product_ids = [...filtered_product_ids, ...product_ids]
         filtered_products = []
         filtered_product_ids = filtered_product_ids.filter((item, index) => filtered_product_ids.indexOf(item) === index)
-
         setImmediate(() => {
             this.setState({ filtered_product_ids, })
         })
-
-
         for (let i = 0; i < filtered_product_ids?.length; i++) {
-
             var filterData = products.filter((prs) => prs?.id == filtered_product_ids[i])[0]
             filtered_products.push(filterData)
-
             if (i == filtered_product_ids?.length - 1) {
                 break;
             }
-            // console.log("Filter Products:", filterData)
-
-
         }
-
         setImmediate(() => {
             this.setState({ filtered_products })
         })
-
-
     }
 
     removeFilter = (product_ids) => {
         var { filtered_product_ids, products, filtered_products } = this.state
         for (let a = 0; a < product_ids.length; a++) {
-
             var fids = filtered_product_ids.filter((val) => val == product_ids[a])[0]
             if (fids == product_ids[a]) {
-                //console.log("Removing ID", fids)
                 const index = filtered_product_ids.indexOf(fids);
                 filtered_product_ids.splice(index, 1)
             } else {
                 console.log("let it rip!")
             }
-
         }
-
-        filtered_products=[]
-
+        filtered_products = []
         for (let i = 0; i < filtered_product_ids?.length; i++) {
-
             var filterData = products.filter((prs) => prs?.id == filtered_product_ids[i])[0]
             filtered_products.push(filterData)
-
             if (i == filtered_product_ids?.length - 1) {
                 break;
             }
-            // console.log("Filter Products:", filterData)
-
-
         }
         setImmediate(() => {
-            this.setState({ filtered_products,filtered_products })
+            this.setState({ filtered_products, filtered_products })
         })
     }
 
@@ -916,6 +975,7 @@ class Products extends Component {
         this.inner_Categories()
 
     }
+
     componentWillUnmount = () => {
         api.get('/categories/' + '' + '/products', {
             headers: {
@@ -952,7 +1012,8 @@ class Products extends Component {
 
     render() {
         var { item } = this.props?.route?.params;
-        var { contact_lens_diameter, contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state
+        var { contact_lens_diameter, contact_lens_base_curve,frame_type, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
+        
         return (
             <View style={styles.mainContainer} >
                 {/** Screen Header */}
@@ -999,12 +1060,14 @@ class Products extends Component {
                     brands={brands}
                     size={size}
                     model_no={model_no}
+                    lense_color={lense_color}
+                    frame_type={frame_type}
                     box_content_pcs={box_content_pcs}
                     color={color}
                     applyFilter={(product_ids) => this.applyFilter(product_ids)}
                     removeFilter={(product_ids) => this.removeFilter(product_ids)}
-                    onDismiss={() => this.openFilterBoard()} />
-
+                    onDismiss={() => this.openFilterBoard()}
+                />
 
 
             </View >
