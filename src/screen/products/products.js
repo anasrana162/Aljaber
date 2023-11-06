@@ -33,6 +33,10 @@ class Products extends Component {
             filterBoardOpen: false,
             filtered_product_ids: [],
             filtered_products: [],
+            filterKey: 0,
+            highest_price: "",
+            lowest_price: "",
+            filteredPrice: "",
             contact_lens_diameter: {
                 name: "Contact Lens Diameter",
                 attribute_code: "contact_lens_diameter",
@@ -110,6 +114,63 @@ class Products extends Component {
                 product_ids: [],
                 value: [],
             },
+            frame_shape: {
+                name: "Frame Shape",
+                attribute_code: "frame_shape",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            polarized: {
+                name: "Polarized",
+                attribute_code: "polarized",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            frame_color: {
+                name: "Frame Color",
+                attribute_code: "frame_color",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            frame_material: {
+                name: "Frame Material",
+                attribute_code: "frame_material",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            bridge_size: {
+                name: "Bridge Size",
+                attribute_code: "bridge_size",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            temple_color: {
+                name: "Temple Color",
+                attribute_code: "temple_color",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            temple_material: {
+                name: "Temple Material",
+                attribute_code: "temple_material",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+            gender: {
+                name: "Gender",
+                attribute_code: "gender",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
+
         };
     }
 
@@ -270,9 +331,23 @@ class Products extends Component {
                         })
                     }
 
+                    // var highest_price = Math.max(...products)
+
+
+                    var sorted = products.slice().sort(function (a, b) {
+                        return a.price - b.price;
+                    });
+
+                    var smallest = sorted[0],
+                        largest = sorted[sorted.length - 1];
+                    console.log("")
+                    console.log("highest_price", smallest?.price, largest?.price)
+                    console.log("")
                     // setting the products in the state once they are all done 
                     setImmediate(() => {
                         this.setState({
+                            highest_price: largest?.price,
+                            lowest_price: smallest?.price,
                             products: products,
                             original: products,
                         })
@@ -316,7 +391,7 @@ class Products extends Component {
         // console.log("Product From CreateData Function:", product)
         var filterData = []
         var { custom_attributes, product_varients, } = product
-        var { contact_lens_diameter, contact_lens_base_curve,frame_type, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
+        var { contact_lens_diameter, contact_lens_base_curve, bridge_size, gender, temple_material, temple_color, frame_type, polarized, frame_color, frame_shape, frame_material, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
         if (product_varients !== undefined) {
             for (let pv = 0; pv < product_varients.length; pv++) {
                 for (let ca = 0; ca < product_varients[pv]?.custom_attributes.length; ca++) {
@@ -669,6 +744,51 @@ class Products extends Component {
                 }
 
             }
+            if (custom_attributes[i]?.attribute_code == "frame_color") {
+                var value = await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + custom_attributes[i]?.value).then(async (data) => {
+
+                    // console.log("Data?.data", data?.data)
+                    return data?.data
+
+                }).catch((err) => {
+                    console.log("Attribute DEtail Function Api Error", err)
+                })
+                // console.log("VAlue for box_content_pcs", value)
+
+                frame_color.count = frame_color?.count + 1
+                frame_color?.product_ids.push(product?.id)
+                var check = frame_color?.value.filter((val) => val?.color_code == value)[0]
+                console.log("check |||||", check, " ", value)
+
+                if (check?.color_code == value) {
+                    console.log("")
+                    console.log("---------------------")
+                    console.log("already exists! color inner func")
+                    console.log("---------------------")
+                    console.log("")
+                    for (let n = 0; n < frame_color?.value.length; n++) {
+                        if (frame_color?.value[n].color_code == value) {
+                            console.log("found Value color",)
+                            frame_color?.value[n].product_ids.push(product?.id)
+                            // let temp = color?.value[n].product_ids.filter((val,index) => color?.value[n].product_ids.indexOf(val) === index)
+                            this.setState({ frame_color })
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        color_name: custom_attributes[i]?.value,
+                        color_code: value,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    frame_color?.value.push(obj)
+                    // let temp1=color?.value.filter((val,index) => val.product_ids.indexOf(val) === index)
+                    this.setState({ frame_color })
+                    // console.log(box_content_pcs)
+                }
+
+            }
             if (custom_attributes[i]?.attribute_code == "color") {
                 var value = await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + custom_attributes[i]?.value).then(async (data) => {
 
@@ -714,6 +834,80 @@ class Products extends Component {
                 }
 
             }
+            if (custom_attributes[i]?.attribute_code == "bridge_size") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                bridge_size.count = bridge_size?.count + 1
+                bridge_size?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = bridge_size?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < bridge_size?.value.length; n++) {
+                        if (bridge_size?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            bridge_size?.value[n].product_ids.push(product?.id)
+                            bridge_size.value[n].product_count = bridge_size?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    bridge_size?.value.push(obj)
+                    this.setState({ bridge_size })
+                    // console.log(box_content_pcs)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "frame_material") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                frame_material.count = frame_material?.count + 1
+                frame_material?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = frame_material?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < frame_material?.value.length; n++) {
+                        if (frame_material?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            frame_material?.value[n].product_ids.push(product?.id)
+                            frame_material.value[n].product_count = frame_material?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    frame_material?.value.push(obj)
+                    this.setState({ frame_material })
+                    // console.log(box_content_pcs)
+                }
+
+            }
             if (custom_attributes[i]?.attribute_code == "frame_type") {
                 var value = await this.attributeDetail(custom_attributes[i]?.value)
                 // console.log("VAlue for box_content_pcs", value)
@@ -747,6 +941,191 @@ class Products extends Component {
                     obj.product_ids.push(product?.id)
                     frame_type?.value.push(obj)
                     this.setState({ frame_type })
+                    // console.log(box_content_pcs)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "polarized") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                polarized.count = polarized?.count + 1
+                polarized?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = polarized?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < polarized?.value.length; n++) {
+                        if (polarized?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            polarized?.value[n].product_ids.push(product?.id)
+                            polarized.value[n].product_count = polarized?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    polarized?.value.push(obj)
+                    this.setState({ polarized })
+                    // console.log(box_content_pcs)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "temple_color") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                temple_color.count = temple_color?.count + 1
+                temple_color?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = temple_color?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < temple_color?.value.length; n++) {
+                        if (temple_color?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            temple_color?.value[n].product_ids.push(product?.id)
+                            temple_color.value[n].product_count = temple_color?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    temple_color?.value.push(obj)
+                    this.setState({ temple_color })
+                    // console.log(box_content_pcs)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "gender") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                gender.count = gender?.count + 1
+                gender?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = gender?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < gender?.value.length; n++) {
+                        if (gender?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            gender?.value[n].product_ids.push(product?.id)
+                            gender.value[n].product_count = gender?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    gender?.value.push(obj)
+                    this.setState({ gender })
+                    // console.log(box_content_pcs)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "temple_material") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                temple_material.count = temple_material?.count + 1
+                temple_material?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = temple_material?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < temple_material?.value.length; n++) {
+                        if (temple_material?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            temple_material?.value[n].product_ids.push(product?.id)
+                            temple_material.value[n].product_count = temple_material?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    temple_material?.value.push(obj)
+                    this.setState({ temple_material })
+                    // console.log(box_content_pcs)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "frame_shape") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for box_content_pcs", value)
+
+                frame_shape.count = frame_shape?.count + 1
+                frame_shape?.product_ids.push(product?.id)
+                // console.log(box_content_pcs?.value)
+                var check = frame_shape?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < frame_shape?.value.length; n++) {
+                        if (frame_shape?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            frame_shape?.value[n].product_ids.push(product?.id)
+                            frame_shape.value[n].product_count = frame_shape?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    frame_shape?.value.push(obj)
+                    this.setState({ frame_shape })
                     // console.log(box_content_pcs)
                 }
 
@@ -926,6 +1305,35 @@ class Products extends Component {
         }
     }
 
+    updatePriceFilter = (val) => {
+        var { products, filtered_products } = this.state
+        console.log("Price Value:|||||||||", val)
+        setImmediate(() => {
+            this.setState({
+                filteredPrice: parseInt(val)
+            })
+        })
+        filtered_products = []
+        // var filterData = products.filter((prs) => prs?.price <= parseInt(val))[0]
+
+        for (let i = 0; i < products.length; i++) {
+            if (products[i]?.price <= parseInt(val)) {
+
+                console.log("products[i]" + i,"   ",products[i])
+
+                filtered_products.push(products[i])
+            }
+        }
+
+        filtered_products = filtered_products.filter((prs, index) => filtered_products.indexOf(prs) === index)
+
+        console.log("filterData", filtered_products)
+        setImmediate(() => {
+            this.setState({ filtered_products, })
+        })
+
+    }
+
     applyFilter = (product_ids) => {
         var { filtered_product_ids, products, filtered_products } = this.state
         filtered_product_ids = [...filtered_product_ids, ...product_ids]
@@ -942,7 +1350,7 @@ class Products extends Component {
             }
         }
         setImmediate(() => {
-            this.setState({ filtered_products })
+            this.setState({ filtered_products, })
         })
     }
 
@@ -1012,8 +1420,8 @@ class Products extends Component {
 
     render() {
         var { item } = this.props?.route?.params;
-        var { contact_lens_diameter, contact_lens_base_curve,frame_type, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
-        
+        var { contact_lens_diameter, contact_lens_base_curve, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
+
         return (
             <View style={styles.mainContainer} >
                 {/** Screen Header */}
@@ -1052,20 +1460,33 @@ class Products extends Component {
 
 
                 <FilterBoard
+                    key={filterKey}
                     filterBoardOpen={this.state.filterBoardOpen}
                     contact_lens_diameter={contact_lens_diameter}
                     contact_lens_base_curve={contact_lens_base_curve}
                     water_container_content={water_container_content}
                     contact_lens_usage={contact_lens_usage}
                     brands={brands}
+                    frame_shape={frame_shape}
+                    price={filteredPrice}
                     size={size}
                     model_no={model_no}
                     lense_color={lense_color}
                     frame_type={frame_type}
+                    frame_color={frame_color}
+                    frame_material={frame_material}
+                    bridge_size={bridge_size}
+                    lowest_price={lowest_price}
+                    highest_price={highest_price}
+                    temple_color={temple_color}
+                    temple_material={temple_material}
+                    polarized={polarized}
+                    gender={gender}
                     box_content_pcs={box_content_pcs}
                     color={color}
                     applyFilter={(product_ids) => this.applyFilter(product_ids)}
                     removeFilter={(product_ids) => this.removeFilter(product_ids)}
+                    updatePriceFilter={(val) => this.updatePriceFilter(val)}
                     onDismiss={() => this.openFilterBoard()}
                 />
 

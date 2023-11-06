@@ -2,7 +2,9 @@ import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, T
 import React, { useState } from 'react'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-const FBListCont = ({ filterData, checkBox, checkBoxID, filterData_Cont_Open, isColor, openFilterDataCont, openCheckBox, closeCheckBox }) => {
+import Slider from '@react-native-community/slider';
+
+const FBListCont = ({ filterData, checkBox, filteredPrice, highest_price, lowest_price, isPrice, checkBoxID, filterData_Cont_Open, isColor, openFilterDataCont, openCheckBox, closeCheckBox }) => {
 
     // console.log("checkBoxID={checkBoxID}", checkBoxID)
 
@@ -11,13 +13,39 @@ const FBListCont = ({ filterData, checkBox, checkBoxID, filterData_Cont_Open, is
             style={styles.item_cont}
         >
             <View style={styles.inner_item_cont}>
-                <Text style={styles.item_text}>{filterData?.name}</Text>
+                {isPrice == true ?
+                    <Text style={styles.item_text}>Price</Text>
+                    :
+                    <Text style={styles.item_text}>{filterData?.name}</Text>}
                 <TouchableOpacity
                     onPress={openFilterDataCont}
                     style={{ padding: 10 }}>
                     <AntDesign name={filterData_Cont_Open == true ? "minus" : "plus"} size={20} color="#777" />
                 </TouchableOpacity>
             </View>
+
+            {(filterData_Cont_Open == true &&isPrice == true) ?
+                <>
+                    {console.log(filteredPrice)}
+                    <Text style={[styles.product_name,{alignSelf:"center",fontWeight:"800"}]}>{filteredPrice}</Text>
+                    <Slider
+                        style={{ width: "90%", height: 40,alignSelf:"center" }}
+                        minimumValue={lowest_price}
+                        maximumValue={highest_price}
+                        minimumTrackTintColor="black"
+                        maximumTrackTintColor="#000000"
+                        // on
+                        onSlidingComplete={(val) => openCheckBox("", "price", val)}
+                    />
+                    <View style={[styles.inner_item_list_cont, { justifyContent: "space-between" }]}>
+                        <Text style={[styles.product_name,{fontWeight:"700"}]}>{lowest_price}</Text>
+                        <Text style={[styles.product_name,{fontWeight:"700"}]}>{highest_price}</Text>
+                    </View>
+                </>
+
+                :
+                null
+            }
 
             {(filterData_Cont_Open == true && isColor == true) &&
 
@@ -30,13 +58,15 @@ const FBListCont = ({ filterData, checkBox, checkBoxID, filterData_Cont_Open, is
                                 <TouchableOpacity
                                     key={String(index)}
                                     onPress={() => {
-                                        if(checkBoxID?.filter((check_data) => check_data == data?.color_name)[0] == data?.color_name){
+                                        if (checkBoxID?.filter((check_data) => check_data == data?.color_name)[0] == data?.color_name) {
 
                                             closeCheckBox(data?.color_name, filterData?.attribute_code, data?.product_ids)
-                                        }else{
+                                        } else {
 
-                                            openCheckBox(data?.color_name, filterData?.attribute_code, data?.product_ids)}}
+                                            openCheckBox(data?.color_name, filterData?.attribute_code, data?.product_ids)
                                         }
+                                    }
+                                    }
                                     style={[styles.touchable, { backgroundColor: data?.color_code }]}>
                                     <>
                                         {checkBoxID?.filter((check_data) => check_data == data?.color_name)[0] == data?.color_name ?
@@ -144,9 +174,9 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         borderRadius: 30,
-        justifyContent:"center",
-        alignItems:"center",
+        justifyContent: "center",
+        alignItems: "center",
         margin: 5,
-        borderWidth:0.5,
+        borderWidth: 0.5,
     }
 })
