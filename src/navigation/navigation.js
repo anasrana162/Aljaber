@@ -8,6 +8,9 @@ import Account from '../screen/account/account';
 import Categories from '../screen/categories/categories';
 import Products from '../screen/products/products';
 import ProductDetails from '../screen/products/productDetails';
+import About_us from '../screen/account/about_us';
+import Contact_us from '../screen/account/contact_us';
+
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -18,12 +21,14 @@ export default class Navigation extends Component {
                 <Stack.Navigator
                     screenOptions={{
                         headerShown: false,
-                        animation:'fade'
-                           // language == 'AR' ? 'slide_from_left' : 'slide_from_right',
+                        animation: 'fade'
+                        // language == 'AR' ? 'slide_from_left' : 'slide_from_right',
                     }}>
                     <Stack.Screen name="GetStarted" component={GetStarted} />
                     <Stack.Screen name="HomeScreen" component={HomeScreen} />
                     <Stack.Screen name="Account" component={Account} />
+                    <Stack.Screen name="About_us" component={About_us} />
+                    <Stack.Screen name="Contact_us" component={Contact_us} />
                     <Stack.Screen name="Categories" component={Categories} />
                     <Stack.Screen name="Products" component={Products} />
                     <Stack.Screen name="ProductDetails" component={ProductDetails} />

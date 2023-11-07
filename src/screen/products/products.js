@@ -156,6 +156,13 @@ class Products extends Component {
                 product_ids: [],
                 value: [],
             },
+            temple_size: {
+                name: "Temple Size",
+                attribute_code: "temple_size",
+                count: 0,
+                product_ids: [],
+                value: [],
+            },
             temple_material: {
                 name: "Temple Material",
                 attribute_code: "temple_material",
@@ -391,7 +398,7 @@ class Products extends Component {
         // console.log("Product From CreateData Function:", product)
         var filterData = []
         var { custom_attributes, product_varients, } = product
-        var { contact_lens_diameter, contact_lens_base_curve, bridge_size, gender, temple_material, temple_color, frame_type, polarized, frame_color, frame_shape, frame_material, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
+        var { contact_lens_diameter, contact_lens_base_curve, temple_size,bridge_size, gender, temple_material, temple_color, frame_type, polarized, frame_color, frame_shape, frame_material, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
         if (product_varients !== undefined) {
             for (let pv = 0; pv < product_varients.length; pv++) {
                 for (let ca = 0; ca < product_varients[pv]?.custom_attributes.length; ca++) {
@@ -666,6 +673,43 @@ class Products extends Component {
                     obj.product_ids.push(product?.id)
                     size?.value.push(obj)
                     this.setState({ size })
+                    // console.log(size)
+                }
+
+            }
+            if (custom_attributes[i]?.attribute_code == "temple_size") {
+                var value = await this.attributeDetail(custom_attributes[i]?.value)
+                // console.log("VAlue for size", value)
+
+                temple_size.count = temple_size?.count + 1
+                temple_size?.product_ids.push(product?.id)
+                // console.log(size?.value)
+                var check = temple_size?.value.filter((val) => val?.product_name == value)[0]
+
+                if (check?.product_name == value) {
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! size")
+                    // console.log("---------------------")
+                    // console.log("")
+                    for (let n = 0; n < size?.value.length; n++) {
+                        if (temple_size?.value[n].product_name == value) {
+                            // console.log("found Value",)
+                            temple_size?.value[n].product_ids.push(product?.id)
+                            temple_size.value[n].product_count = temple_size?.value[n].product_count + 1
+                            break;
+                        }
+                    }
+                } else {
+                    var obj = {
+                        id: custom_attributes[i]?.value,
+                        product_name: value,
+                        product_count: 1,
+                        product_ids: []
+                    }
+                    obj.product_ids.push(product?.id)
+                    temple_size?.value.push(obj)
+                    this.setState({ temple_size })
                     // console.log(size)
                 }
 
@@ -1420,7 +1464,7 @@ class Products extends Component {
 
     render() {
         var { item } = this.props?.route?.params;
-        var { contact_lens_diameter, contact_lens_base_curve, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
+        var { contact_lens_diameter, contact_lens_base_curve,temple_size, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
 
         return (
             <View style={styles.mainContainer} >
@@ -1470,6 +1514,7 @@ class Products extends Component {
                     frame_shape={frame_shape}
                     price={filteredPrice}
                     size={size}
+                    temple_size={temple_size}
                     model_no={model_no}
                     lense_color={lense_color}
                     frame_type={frame_type}

@@ -6,6 +6,7 @@ import Settings from './components/settings';
 import Entypo from 'react-native-vector-icons/Entypo'
 import AuthSelector from './components/authSelector';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Information from './components/information';
 
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
@@ -69,6 +70,9 @@ class Account extends Component {
                         {/** Settings */}
                         <Settings />
 
+                        {/** Infromation */}
+                        <Information navProps={this.props.navigation} />
+
                         {/** logo copyright */}
                         <Image
                             source={require("../../../assets/aljabirlogo.png")}
@@ -78,10 +82,10 @@ class Account extends Component {
                         <Text style={styles.copyright_text}>Version 1.0 build 1</Text>
 
                         <View style={styles.social_icon_main_cont}>
-                        <FontAwesome name="facebook-f" size={34} color="#3F51B5" />
-                        <FontAwesome name="twitter" size={34} color="#3F51B5" />
-                        <FontAwesome name="instagram" size={34} color="#3F51B5" />
-                        <FontAwesome name="youtube-play" size={34} color="#3F51B5" />
+                            <FontAwesome name="facebook-f" size={34} color="#3F51B5" />
+                            <FontAwesome name="twitter" size={34} color="#3F51B5" />
+                            <FontAwesome name="instagram" size={34} color="#3F51B5" />
+                            <FontAwesome name="youtube-play" size={34} color="#3F51B5" />
                         </View>
 
                         <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 20 }} />
@@ -174,7 +178,7 @@ const styles = StyleSheet.create({
         height: 20
     },
     inner_cont_main: {
-        marginBottom:150,
+        marginBottom: 150,
         alignItems: "center",
         width: width - 20,
         height: height,

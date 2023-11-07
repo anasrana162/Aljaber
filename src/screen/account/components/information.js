@@ -2,37 +2,53 @@ import { Text, StyleSheet, View, Dimensions, NativeModules, TouchableOpacity, Pl
 import React, { Component, PureComponent, memo } from 'react'
 import Ionicons from "react-native-vector-icons/Ionicons"
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
-
+import MaterialIcons from "react-native-vector-icons/MaterialIcons"
+import Entypo from "react-native-vector-icons/Entypo"
 const width = Dimensions.get("screen").width
-const Settings = ({ navProps }) => {
+
+const Information = ({ navProps }) => {
+
+    const onPress = (key) => {
+        switch (key) {
+            case "about_us":
+                navProps.navigate("About_us")
+                break;
+            case "contact_us":
+                navProps.navigate("Contact_us")
+                break;
+        }
+    }
+
     return (
         <>
 
-            <Text style={styles.heading}>Settings</Text>
-{/* 
-            <TouchableOpacity
-                activeOpacity={0.8}
-                style={[styles.mainContainer, { marginTop: 20 }]}>
-                <Ionicons name="map-outline" color='#3F51B5' size={30} />
-                <Text style={styles.text_list}>Store locator</Text>
-                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
-            </TouchableOpacity> */}
+            <Text style={styles.heading}>Information</Text>
 
             <TouchableOpacity
                 activeOpacity={0.8}
-                style={styles.mainContainer}>
-                <MaterialCommunityIcons name="home-city" color='#3F51B5' size={30} />
-                <Text style={styles.text_list}>Country</Text>
+                onPress={() => onPress("about_us")}
+                style={[styles.mainContainer, { marginTop: 20 }]}>
+                <Entypo name="info" color='#3F51B5' size={30} />
+                <Text style={styles.text_list}>About us</Text>
                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
             </TouchableOpacity>
 
             <TouchableOpacity
                 activeOpacity={0.8}
+                onPress={() => onPress("contact_us")}
+                style={styles.mainContainer}>
+                <MaterialIcons name="contact-mail" size={24} color='#3F51B5' />
+                <Text style={styles.text_list}>Contact us</Text>
+                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
+            </TouchableOpacity>
+
+            {/* <TouchableOpacity
+                activeOpacity={0.8}
                 style={styles.mainContainer}>
                 <Ionicons name="globe-outline" color='#3F51B5' size={30} />
                 <Text style={styles.text_list}>Language</Text>
-                <Text style={[styles.text_list,{ position: "absolute", right: 30 }]}>English</Text>
-                {/* <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} /> */}
+                <Text style={[styles.text_list, { position: "absolute", right: 30 }]}>English</Text>
+                
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -49,14 +65,14 @@ const Settings = ({ navProps }) => {
                 <Ionicons name="star-outline" color='#3F51B5' size={30} />
                 <Text style={styles.text_list}>Rate our app</Text>
                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 15 }} />
         </>
     )
 }
 
-export default Settings
+export default Information
 
 const styles = StyleSheet.create({
     mainContainer: {

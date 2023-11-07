@@ -777,9 +777,11 @@ class ProductDetails extends Component {
             body: {
                 color: "black",
                 alignItems: "center",
-                width: "90%",
+                width: "95%",
                 fontFamily: "Careem-Bold",
-                marginTop:10
+                marginTop:10,
+                textAlign:"justify",
+                alignSelf:"center"
             },
             a: {
                 color: "green",

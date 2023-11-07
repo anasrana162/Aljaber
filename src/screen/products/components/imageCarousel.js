@@ -119,7 +119,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
                     >
 
                         <Animated.Image
-                            source={{ uri: imageUrl + selected?.url }}
+                            source={{ uri: imageUrl2 + selected?.url }}
                             style={[{ width: "80%", height: "100%", zIndex: 700 }, {
                                 transform: [{
                                     scale: this.scale

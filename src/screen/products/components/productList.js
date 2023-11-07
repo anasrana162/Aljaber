@@ -85,7 +85,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                                                 sortBY(data?.key)
                                             }}
                                         >
-                                            <Text>{data.name}</Text>
+                                            <Text style={{fontSize:14,color:"black", fontWeight:"500"}}>{data.name}</Text>
                                         </TouchableOpacity>
                                     )
                                 })}

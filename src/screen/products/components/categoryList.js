@@ -57,4 +57,9 @@ const styles = StyleSheet.create({
         marginTop: 10,
         //  backgroundColor: "#bbb"
     },
+    text_item:{
+        fontSize:14,
+        fontWeight:"500",
+        color:"black"
+    }
 })

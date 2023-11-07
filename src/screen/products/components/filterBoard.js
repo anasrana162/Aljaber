@@ -23,7 +23,7 @@ const FilterBoard = ({
     removeFilter,
     updatePriceFilter,
     // Data
-    contact_lens_diameter, lense_color, price, frame_type, highest_price, lowest_price, gender, frame_shape, temple_material, bridge_size, frame_color, temple_color, frame_material, polarized, contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs, color
+    contact_lens_diameter, lense_color, price, temple_size, frame_type, highest_price, lowest_price, gender, frame_shape, temple_material, bridge_size, frame_color, temple_color, frame_material, polarized, contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs, color
 }) => {
 
     // states for open value cantainer
@@ -47,6 +47,9 @@ const FilterBoard = ({
     const [temple_color_open, settemple_color_open] = useState(false)
     const [temple_material_open, settemple_material_open] = useState(false)
     const [gender_open, setgender_open] = useState(false)
+    const [temple_size_open, settemple_size_open] = useState(false)
+
+    const [show_filters, setShow_filters] = useState(false)
 
     // state for holding values
     const [contact_lens_diameter_state, setcontact_lens_diameter_state] = useState("")
@@ -67,6 +70,7 @@ const FilterBoard = ({
     const [temple_color_state, settemple_color_state] = useState("")
     const [temple_material_state, settemple_material_state] = useState("")
     const [gender_state, setgender_state] = useState("")
+    const [temple_size_state, settemple_size_state] = useState("")
 
     // state for holding values
     // const [cld_check, setcld_check] = useState("")
@@ -99,6 +103,7 @@ const FilterBoard = ({
     const [checkBox_tc, setcheckBox_tc] = useState([])
     const [checkBox_tm, setcheckBox_tm] = useState([])
     const [checkBox_gender, setcheckBox_gender] = useState([])
+    const [checkBox_ts, setcheckBox_ts] = useState([])
 
     // keys
     const [cld_key, setcld_key] = useState(0)
@@ -120,10 +125,11 @@ const FilterBoard = ({
     const [tc_key, settc_key] = useState(0)
     const [tm_key, settm_key] = useState(0)
     const [gender_key, setgender_key] = useState(0)
+    const [ts_key, setts_key] = useState(0)
 
 
     const openCheckBox = (id, code, product_ids) => {
-        
+
         switch (code) {
             case "contact_lens_diameter":
                 setcld_key(cld_key + 1)
@@ -243,6 +249,13 @@ const FilterBoard = ({
                 applyFilter(product_ids)
                 break;
 
+            case "temple_size":
+                setts_key(ts_key + 1)
+                checkBox_ts.push(id)
+                setcheckBox_ts(checkBox_ts)
+                applyFilter(product_ids)
+                break;
+
             case "gender":
                 setgender_key(gender_key + 1)
                 checkBox_gender.push(id)
@@ -258,7 +271,6 @@ const FilterBoard = ({
                 break;
 
             case "price":
-               
                 updatePriceFilter(product_ids)
                 break;
 
@@ -372,6 +384,14 @@ const FilterBoard = ({
                 removeFilter(product_ids)
                 break;
 
+            case "temple_size":
+                const indexts = checkBox_ts.indexOf(id);
+                checkBox_ts.splice(indexts, 1)
+                setts_key(ts_key + 1)
+                setcheckBox_ts(checkBox_ts)
+                removeFilter(product_ids)
+                break;
+
             case "frame_color":
                 const indexfc = checkBox_fc.indexOf(id);
                 checkBox_fc.splice(indexfc, 1)
@@ -440,11 +460,11 @@ const FilterBoard = ({
 
                         <View style={styles.inner_main1}>
 
-                            <ScrollView>
+                            <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
 
 
 
-                                {contact_lens_diameter?.value?.length > 0 &&
+                                {(show_filters == true && contact_lens_diameter?.value?.length > 0) &&
                                     <FBListCont
                                         key={cld_key}
                                         filterData={contact_lens_diameter}
@@ -456,7 +476,7 @@ const FilterBoard = ({
                                         openFilterDataCont={() => setcontact_lens_diameter_open(!contact_lens_diameter_open)}
                                     />
                                 }
-                                {contact_lens_base_curve?.value?.length > 0 &&
+                                {(show_filters == true && contact_lens_base_curve?.value?.length > 0) &&
                                     <FBListCont
                                         // key={clbc_key}
                                         filterData={contact_lens_base_curve}
@@ -468,7 +488,7 @@ const FilterBoard = ({
                                         openFilterDataCont={() => setcontact_lens_base_curve_open(!contact_lens_base_curve_open)}
                                     />
                                 }
-                                {water_container_content?.value?.length > 0 &&
+                                {(show_filters == true && water_container_content?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={water_container_content}
                                         filterData_Cont_Open={water_container_content_open}
@@ -479,7 +499,7 @@ const FilterBoard = ({
                                         openFilterDataCont={() => setwater_container_content_open(!water_container_content_open)}
                                     />
                                 }
-                                {contact_lens_usage?.value?.length > 0 &&
+                                {(show_filters == true && contact_lens_usage?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={contact_lens_usage}
                                         filterData_Cont_Open={contact_lens_usage_open}
@@ -538,7 +558,7 @@ const FilterBoard = ({
                                 />
 
 
-                                {box_content_pcs?.value?.length > 0 &&
+                                {(show_filters == true && box_content_pcs?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={box_content_pcs}
                                         filterData_Cont_Open={box_content_pcs_open}
@@ -550,7 +570,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {lense_color?.value?.length > 0 &&
+                                {(show_filters == true && lense_color?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={lense_color}
                                         filterData_Cont_Open={lense_color_open}
@@ -562,7 +582,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {frame_color?.value?.length > 0 &&
+                                {(show_filters == true && frame_color?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={frame_color}
                                         filterData_Cont_Open={frame_coloropen}
@@ -575,7 +595,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {frame_type?.value?.length > 0 &&
+                                {(show_filters == true && frame_type?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={frame_type}
                                         filterData_Cont_Open={frame_type_open}
@@ -587,7 +607,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {frame_shape?.value?.length > 0 &&
+                                {(show_filters == true && frame_shape?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={frame_shape}
                                         filterData_Cont_Open={frame_shape_open}
@@ -599,7 +619,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {frame_material?.value?.length > 0 &&
+                                {(show_filters == true && frame_material?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={frame_material}
                                         filterData_Cont_Open={frame_material_open}
@@ -611,7 +631,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {temple_color?.value?.length > 0 &&
+                                {(show_filters == true && temple_color?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={temple_color}
                                         filterData_Cont_Open={temple_color_open}
@@ -623,7 +643,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {temple_material?.value?.length > 0 &&
+                                {(show_filters == true && temple_material?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={temple_material}
                                         filterData_Cont_Open={temple_material_open}
@@ -634,8 +654,19 @@ const FilterBoard = ({
                                         openFilterDataCont={() => settemple_material_open(!temple_material_open)}
                                     />
                                 }
+                                {(show_filters == true && temple_size?.value?.length > 0) &&
+                                    <FBListCont
+                                        filterData={temple_size}
+                                        filterData_Cont_Open={temple_size_open}
+                                        // checkBox={wcc_check}
+                                        checkBoxID={checkBox_ts}
+                                        openCheckBox={(id, code, product_ids) => openCheckBox(id, code, product_ids)}
+                                        closeCheckBox={(id, code, product_ids) => closeCheckBox(id, code, product_ids)}
+                                        openFilterDataCont={() => settemple_size_open(!temple_size_open)}
+                                    />
+                                }
 
-                                {bridge_size?.value?.length > 0 &&
+                                {(show_filters == true && bridge_size?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={bridge_size}
                                         filterData_Cont_Open={bridge_size_open}
@@ -647,7 +678,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {polarized?.value?.length > 0 &&
+                                {(show_filters == true && polarized?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={polarized}
                                         filterData_Cont_Open={polarized_open}
@@ -659,7 +690,7 @@ const FilterBoard = ({
                                     />
                                 }
 
-                                {gender?.value?.length > 0 &&
+                                {(show_filters == true && gender?.value?.length > 0) &&
                                     <FBListCont
                                         filterData={gender}
                                         filterData_Cont_Open={gender_open}
@@ -685,8 +716,14 @@ const FilterBoard = ({
                                 }
 
 
-                            </ScrollView>
 
+                                <TouchableOpacity
+                                    onPress={() => setShow_filters(!show_filters)}
+                                    style={styles.filter_more}>
+                                    <Text style={styles.filter_btn_text}>{show_filters == true ? "Show less" : "Show More"}</Text>
+                                </TouchableOpacity>
+
+                            </ScrollView>
 
                         </View>
 
@@ -738,5 +775,24 @@ const styles = StyleSheet.create({
 
 
     },
+    filter_more: {
+        width: 100,
+        height: 40,
+        backgroundColor: "white",
+        borderWidth: 2,
+        borderRadius: 10,
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 300,
+        marginTop: 20,
+        marginBottom: 100
+    },
+
+    filter_btn_text: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "black"
+    }
 
 })

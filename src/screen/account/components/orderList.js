@@ -16,13 +16,13 @@ const OrderList = () => {
                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
             </TouchableOpacity>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 activeOpacity={0.8}
                 style={styles.mainContainer}>
                 <Ionicons name="eye" color='#3F51B5' size={30} />
                 <Text style={styles.text_list}>Book an appointment</Text>
                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 15 }} />
         </>
