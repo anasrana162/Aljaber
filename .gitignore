@@ -3,7 +3,7 @@
 .DS_Store
 
 #IOS
-ios/
+# ios/
 
 #Android
 android/
