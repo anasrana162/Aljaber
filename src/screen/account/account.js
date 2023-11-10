@@ -40,6 +40,23 @@ class Account extends Component {
 
     }
 
+    checkProps = () => {
+        if( this.props?.route?.params?.modal !== undefined && this.props?.route?.params?.modal == "open" ){
+
+            setImmediate(() => {
+                this.setState({
+                    authModal: true
+                })
+            })
+        }else{
+            console.log("Nothing to check Account.js")
+        }
+    }
+
+    componentDidMount = () => {
+        this.checkProps()
+    }
+
     render() {
         return (
             <View style={styles.mainContainer}>

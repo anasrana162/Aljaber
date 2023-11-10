@@ -109,7 +109,7 @@ const Options = ({
                                 {/* white container */}
                                 <View style={styles.pre_type_cont}>
 
-                                    <View style={[styles.pre_inner_type_cont, { width: "40%" }]}>
+                                    {/* <View style={[styles.pre_inner_type_cont, { width: "40%" }]}>
 
                                         <View style={styles.pres_conts}>
                                             <Text style={styles.grid_text}>{option_package_size?.title}</Text>
@@ -141,8 +141,8 @@ const Options = ({
 
                                             </View>
                                         </View>
-                                    </View>
-                                    <View style={[styles.pre_inner_type_cont, { width: "35%" }]}>
+                                    </View> */}
+                                    <View style={[styles.pre_inner_type_cont, { width: "60%" }]}>
 
                                         <View style={styles.pres_conts}>
                                             <Text style={styles.grid_text}>{option_power?.title}</Text>
@@ -172,7 +172,7 @@ const Options = ({
                                             </View>
                                         </View>
                                     </View>
-                                    <View style={[styles.pre_inner_type_cont, { width: "25%" }]}>
+                                    <View style={[styles.pre_inner_type_cont, { width: "40%" }]}>
 
                                         <View style={styles.pres_conts}>
                                             <Text style={styles.grid_text}>QTY</Text>
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
         flexWrap: "wrap",
-        marginTop: 0,
+        marginTop: 10,
     },
     color_cont: {
         width: 40,

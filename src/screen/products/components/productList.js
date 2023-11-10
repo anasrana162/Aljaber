@@ -6,7 +6,7 @@ import LottieView from 'lottie-react-native';
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoard, loaderFilter }) => {
+const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoard, loaderFilter, addToCart }) => {
     //  console.log("Products", data)
 
 
@@ -54,6 +54,8 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
         }
     }
 
+  
+
     return (
         <View style={styles?.mainContainer}>
 
@@ -85,7 +87,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                                                 sortBY(data?.key)
                                             }}
                                         >
-                                            <Text style={{fontSize:14,color:"black", fontWeight:"500"}}>{data.name}</Text>
+                                            <Text style={{ fontSize: 14, color: "black", fontWeight: "500" }}>{data.name}</Text>
                                         </TouchableOpacity>
                                     )
                                 })}
@@ -298,7 +300,9 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                                                 <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.name}</Text>
                                                 <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
 
-                                                <TouchableOpacity style={styles?.addToCart_Cont}>
+                                                <TouchableOpacity
+                                                    onPress={() => addToCart(products, index)}
+                                                    style={styles?.addToCart_Cont}>
                                                     <Text style={styles.addToCart}>Add to Cart</Text>
                                                 </TouchableOpacity>
                                             </View>

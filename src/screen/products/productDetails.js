@@ -75,7 +75,7 @@ class ProductDetails extends Component {
             rigthEyeQuantity: 1,
             eyedir: '',
             dropdown: false,
-            optionSelected: [],
+            optionSelected: null,
             checked: false,
         };
     }
@@ -90,7 +90,7 @@ class ProductDetails extends Component {
 
     checkOptions = (key) => {
         var { product_details: { options } } = this.props.route.params
-        console.log("OPtions For Product", options)
+        // console.log("OPtions For Product", options)
 
         var x = [];
 
@@ -100,8 +100,11 @@ class ProductDetails extends Component {
                 break;
 
             case "varient":
-                x = this.state.product_varient_selected?.options
+                // x = this.state.product_varient_selected?.options
+                x = options
         }
+
+    console.log("OPtions For Product", x)
 
         if (x.length == 0) {
             return console.log("option are null")
@@ -721,7 +724,7 @@ class ProductDetails extends Component {
     }
 
     openDropDown = (val, eyedir) => {
-        console.log(eyedir)
+        console.log(eyedir,val)
         setImmediate(() => {
             this.setState({ dropdown: !this.state.dropdown, optionSelected: val, eyedir: eyedir })
         })
@@ -953,7 +956,7 @@ class ProductDetails extends Component {
                     />
                 </Modal>
 
-                {this.state.optionSelected.length !== 0 &&
+                {this.state.optionSelected  !== null &&
                     <Modal
                         animationType="slide"
                         transparent={true}

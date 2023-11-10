@@ -10,9 +10,10 @@ import api from '../../../api/api'
 import { connect } from 'react-redux';
 import * as userActions from "../../../redux/actions/user"
 import { bindActionCreators } from 'redux';
+import axios from 'axios'
 const width = Dimensions.get("screen").width
 
- class Login extends Component {
+class Login extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -83,65 +84,94 @@ const width = Dimensions.get("screen").width
     }
 
 
-    loginFunction = () => {
+    loginFunction = async () => {
         var { email, emailFlag, password, passwordFlag, } = this.state
-        var { props,actions } = this.props
-      
+        var { props, actions, userData } = this.props
+
         // set loader to true to show loader
         setImmediate(() => {
             this.setState({
                 loader: true
             })
         })
-       
+
         //checiking if validation flags for error are false ?
         console.log("/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(txt)", /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
         console.log("emailFlag", email)
         if (emailFlag == false && passwordFlag == false) {
             // api.post()
-            api.post('integration/customer/token', {
+            var customerToken = await api.post('integration/customer/token', {
                 username: email.toLowerCase(),
                 password: password,
             }).then((res) => {
-                console.log(res?.data)
-                if (res?.data) {
-                    //alert("Login Successful!")
-                    // this.props.modal()
 
+                console.log("Customer Token", res?.data)
+                //alert("Login Successful!")
+                // this.props.modal()
+                return res?.data
 
-                    api.get('customers/me', {
-                        headers: {
-                            Authorization: `Bearer ${res?.data}`,
-                        },
-                    }).then((res) => {
-                        console.log("User Data:", res?.data)
-                        actions.userToken(res?.data)
-                        setImmediate(() => {
-                            this.setState({
-                                loader: false,
-                            })
-                        })
-                        props.navigation.navigate("HomeScreen")
-                        
-                    }).catch((err) => {
-                        alert("Network Error Code: (cd1)")
-                        console.log("customer sata Api error: ", err)
-                        setImmediate(() => {
-                            this.setState({
-                                loader: false
-                            })
-                        })
-                    })
-                }
             }).catch((err) => {
                 alert("Network Error Code: (APL1)")
-                console.log("Login Api error: ", err)
+                console.log("Login Api error: ", err.response)
                 setImmediate(() => {
                     this.setState({
                         loader: false
                     })
                 })
             })
+            console.log("customerToken", customerToken)
+            if (customerToken !== "") {
+                const res = await axios.post(
+                    "https://aljaberoptical.com/pub/rest/V1/carts/mine",
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${customerToken}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                ).then((result) => {
+
+
+                    console.log("========Success ALJEBER============", result?.data);
+
+                    api.get('customers/me', {
+                        headers: {
+                            Authorization: `Bearer ${customerToken}`,
+                        },
+                    }).then((user_data) => {
+
+
+                        if (user_data?.data) {
+
+                            actions.userToken(customerToken)
+                            user_data.cartID = result?.data
+                            actions.user(user_data?.data)
+                            setImmediate(() => {
+                                this.setState({
+                                    loader: false,
+                                })
+                            })
+                            props.navigation.navigate("HomeScreen")
+                        }
+                    }).catch((err) => {
+                        alert("Network Error Code: (cd1)")
+                        console.log("customer data Api error: ", err?.response)
+                        setImmediate(() => {
+                            this.setState({
+                                loader: false
+                            })
+                        })
+                    })
+                }).catch((err) => {
+                    console.log("Error AddtoCart ID API:", err?.message)
+                    setImmediate(() => {
+                        this.setState({
+                            loader: false
+                        })
+                    })
+                })
+            }
         } else {
             emailFlag == true && alert("Enter Correct Email")
             passwordFlag == true && alert("Enter correct password")
@@ -158,6 +188,42 @@ const width = Dimensions.get("screen").width
             this.setState({
                 secureTextEntry: !this.state.secureTextEntry
             })
+        })
+    }
+
+    componentDidMount = async () => {
+
+        var customerToken = await api.post('integration/customer/token', {
+            "username": "anasrana.ar162@gmail.com",
+            "password": "Knc8761#"
+
+        }).then((res) => {
+
+            console.log("Customer Token", res?.data)
+            //alert("Login Successful!")
+            // this.props.modal()
+            return res?.data
+
+        }).catch((err) => {
+            alert("Network Error Code: (APL1)")
+            console.log("Login Api error: ", err.response)
+            setImmediate(() => {
+                this.setState({
+                    loader: false
+                })
+            })
+        })
+
+        //var token = "eyJraWQiOiIxIiwiYWxnIjoiSFMyNTYifQ.eyJ1aWQiOjM0MjUyOSwidXR5cGlkIjozLCJpYXQiOjE2OTk2MTM5NzAsImV4cCI6MTY5OTYxNzU3MH0.ibyF2bZeRumJJBXoukfjVp-v0gjzxsoz9YswjiT67FM"
+        axios.post('https://aljaberoptical.com/pub/rest/V1/carts/mine', {
+            headers: {
+                Authorization: `Bearer ${customerToken}`,
+            },
+        }).then((result) => {
+            console.log("result CUstomer Token CompDidMount:", result)
+        }).catch((err) => {
+            console.log("Error result CUstomer Token CompDidMount:", err?.message)
+
         })
     }
 
@@ -249,16 +315,16 @@ const styles = StyleSheet.create({
 {/* {---------------redux State ------------} */ }
 const mapStateToProps = state => ({
     userData: state.userData
-  });
-  
-  {/* {---------------redux Actions ------------} */ }
-  
-  const ActionCreators = Object.assign(
+});
+
+{/* {---------------redux Actions ------------} */ }
+
+const ActionCreators = Object.assign(
     {},
     userActions,
-  );
-  const mapDispatchToProps = dispatch => ({
+);
+const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators(ActionCreators, dispatch),
-  });
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(Login);
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

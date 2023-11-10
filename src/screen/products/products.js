@@ -398,7 +398,7 @@ class Products extends Component {
         // console.log("Product From CreateData Function:", product)
         var filterData = []
         var { custom_attributes, product_varients, } = product
-        var { contact_lens_diameter, contact_lens_base_curve, temple_size,bridge_size, gender, temple_material, temple_color, frame_type, polarized, frame_color, frame_shape, frame_material, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
+        var { contact_lens_diameter, contact_lens_base_curve, temple_size, bridge_size, gender, temple_material, temple_color, frame_type, polarized, frame_color, frame_shape, frame_material, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
         if (product_varients !== undefined) {
             for (let pv = 0; pv < product_varients.length; pv++) {
                 for (let ca = 0; ca < product_varients[pv]?.custom_attributes.length; ca++) {
@@ -1363,7 +1363,7 @@ class Products extends Component {
         for (let i = 0; i < products.length; i++) {
             if (products[i]?.price <= parseInt(val)) {
 
-                console.log("products[i]" + i,"   ",products[i])
+                console.log("products[i]" + i, "   ", products[i])
 
                 filtered_products.push(products[i])
             }
@@ -1462,9 +1462,58 @@ class Products extends Component {
         })
     }
 
+    addToCart = (product, index) => {
+
+        var { userData } = this.props
+        console.log("userData", userData?.user?.cartID)
+
+        if (userData?.token !== null) {
+
+    
+                    console.log(" Add to Cart ID : ", result?.data)
+                    if (product?.type_id == "virtual" || product?.type_id == "simple") {
+
+                        if (product?.options.length == 0) {
+
+                            var obj = {
+                                "cartItem": {
+                                    "sku": product?.sku,
+                                    "qty": 1,
+                                    "name": product?.name,
+                                    "price": product?.price,
+                                    "product_type": "simple",
+                                    "quote_id": userData?.user?.cartID,
+                                    "product_option": {}
+                                }
+                            }
+
+                            // addToCart(product, index)
+                        } else {
+                            selectedItem(product, index)
+                        }
+
+                    } else {
+                        selectedItem(product, index)
+                        return alert("Please select a Product varient color!")
+                    }
+
+                }
+          
+         else {
+            alert("Please Login to your account first!")
+            this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+    }
+
+
+
+
+
+
     render() {
         var { item } = this.props?.route?.params;
-        var { contact_lens_diameter, contact_lens_base_curve,temple_size, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
+        var { contact_lens_diameter, contact_lens_base_curve, temple_size, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
 
         return (
             <View style={styles.mainContainer} >
@@ -1500,6 +1549,7 @@ class Products extends Component {
                     sortBY={(key) => this.sortBy(key)}
                     openFilterBoard={() => this.openFilterBoard()}
                     loaderFilter={this.state.loaderFilter}
+                    addToCart={(product, index) => this.addToCart(product, index)}
                 />
 
 
