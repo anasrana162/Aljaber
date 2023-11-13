@@ -6,7 +6,7 @@ import LottieView from 'lottie-react-native';
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoard, loaderFilter, addToCart }) => {
+const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoard, loaderDot, addToCart }) => {
     //  console.log("Products", data)
 
 
@@ -54,7 +54,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
         }
     }
 
-  
+
 
     return (
         <View style={styles?.mainContainer}>
@@ -135,16 +135,19 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
 
                 </View>}
 
-            {/* {loaderFilter &&
-                <LottieView source={require('../../../animations/tab_loader.json')}
-                    autoPlay={true}
-                    loop
-                    style={{
-                        width: "70%",
-                        height: 2,
-                        marginTop: 5
-                    }} />
-            } */}
+            {loaderDot == true &&
+                <View style={{
+                    width: "80%",
+                    height: 150,
+                }} >
+                    < LottieView source={require('../../../animations/dots_load.json')}
+                        autoPlay={true}
+                        resizeMode='cover'
+                        loop
+                    
+                    />
+                </View>
+            }
 
             {/* Products List */}
 

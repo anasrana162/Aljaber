@@ -280,6 +280,7 @@ class Products extends Component {
 
                                                 cfPD.data.brand = data?.data // brand value
                                                 cfPD.data.parent_product_id = prod?.data?.id
+                                                cfPD.data.options=prod?.data?.options
 
                                                 // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
                                                 // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
@@ -347,9 +348,9 @@ class Products extends Component {
 
                     var smallest = sorted[0],
                         largest = sorted[sorted.length - 1];
-                    console.log("")
-                    console.log("highest_price", smallest?.price, largest?.price)
-                    console.log("")
+                    // console.log("")
+                    // console.log("highest_price", smallest?.price, largest?.price)
+                    // console.log("")
                     // setting the products in the state once they are all done 
                     setImmediate(() => {
                         this.setState({
@@ -403,7 +404,7 @@ class Products extends Component {
             for (let pv = 0; pv < product_varients.length; pv++) {
                 for (let ca = 0; ca < product_varients[pv]?.custom_attributes.length; ca++) {
                     if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
-                        console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
+                        // console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
 
                         await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + product_varients[pv]?.custom_attributes[ca]?.value,)
                             .then(async (data) => {
@@ -418,11 +419,11 @@ class Products extends Component {
                                 var check = color?.value.filter((val) => val?.color_name == product_varients[pv].color?.color_name)[0]
                                 // console.log("Check Color Value", check)
                                 if (check?.color_name == product_varients[pv].color?.color_name) {
-                                    console.log("")
-                                    console.log("---------------------")
-                                    console.log("already exists! COLOR")
-                                    console.log("---------------------")
-                                    console.log("")
+                                    // console.log("")
+                                    // console.log("---------------------")
+                                    // console.log("already exists! COLOR")
+                                    // console.log("---------------------")
+                                    // console.log("")
                                     for (let n = 0; n < color?.value.length; n++) {
                                         if (color?.value[n].color_name == product_varients[pv].color?.color_name) {
                                             // console.log("found Value Color",)
@@ -454,18 +455,18 @@ class Products extends Component {
 
             if (custom_attributes[i]?.attribute_code == "contact_lens_diameter") {
                 var value = await this.attributeDetail(custom_attributes[i]?.value)
-                console.log("VAlue for contact_lens_diameter", value)
+                // console.log("VAlue for contact_lens_diameter", value)
                 contact_lens_diameter.count = contact_lens_diameter?.count + 1
                 contact_lens_diameter?.product_ids.push(product?.id)
                 // console.log(contact_lens_diameter?.value)
                 var check = contact_lens_diameter?.value.filter((val) => val?.product_name == value)[0]
 
                 if (check?.product_name == value) {
-                    console.log("")
-                    console.log("---------------------")
-                    console.log("already exists! contact_lens_diameter2")
-                    console.log("---------------------")
-                    console.log("")
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! contact_lens_diameter2")
+                    // console.log("---------------------")
+                    // console.log("")
 
 
                     for (let n = 0; n < contact_lens_diameter?.value.length; n++) {
@@ -802,17 +803,17 @@ class Products extends Component {
                 frame_color.count = frame_color?.count + 1
                 frame_color?.product_ids.push(product?.id)
                 var check = frame_color?.value.filter((val) => val?.color_code == value)[0]
-                console.log("check |||||", check, " ", value)
+                // console.log("check |||||", check, " ", value)
 
                 if (check?.color_code == value) {
-                    console.log("")
-                    console.log("---------------------")
-                    console.log("already exists! color inner func")
-                    console.log("---------------------")
-                    console.log("")
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! color inner func")
+                    // console.log("---------------------")
+                    // console.log("")
                     for (let n = 0; n < frame_color?.value.length; n++) {
                         if (frame_color?.value[n].color_code == value) {
-                            console.log("found Value color",)
+                            // console.log("found Value color",)
                             frame_color?.value[n].product_ids.push(product?.id)
                             // let temp = color?.value[n].product_ids.filter((val,index) => color?.value[n].product_ids.indexOf(val) === index)
                             this.setState({ frame_color })
@@ -847,17 +848,17 @@ class Products extends Component {
                 color.count = color?.count + 1
                 color?.product_ids.push(product?.id)
                 var check = color?.value.filter((val) => val?.color_code == value)[0]
-                console.log("check |||||", check, " ", value)
+                // console.log("check |||||", check, " ", value)
 
                 if (check?.color_code == value) {
-                    console.log("")
-                    console.log("---------------------")
-                    console.log("already exists! color inner func")
-                    console.log("---------------------")
-                    console.log("")
+                    // console.log("")
+                    // console.log("---------------------")
+                    // console.log("already exists! color inner func")
+                    // console.log("---------------------")
+                    // console.log("")
                     for (let n = 0; n < color?.value.length; n++) {
                         if (color?.value[n].color_code == value) {
-                            console.log("found Value color",)
+                            // console.log("found Value color",)
                             color?.value[n].product_ids.push(product?.id)
                             // let temp = color?.value[n].product_ids.filter((val,index) => color?.value[n].product_ids.indexOf(val) === index)
                             this.setState({ color })
@@ -1465,41 +1466,50 @@ class Products extends Component {
     addToCart = (product, index) => {
 
         var { userData } = this.props
-        console.log("userData", userData?.user?.cartID)
+        console.log("userData", userData?.token)
 
-        if (userData?.token !== null) {
+        if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
-    
-                    console.log(" Add to Cart ID : ", result?.data)
-                    if (product?.type_id == "virtual" || product?.type_id == "simple") {
+            if (product?.type_id == "virtual" || product?.type_id == "simple") {
 
-                        if (product?.options.length == 0) {
+                if (product?.options.length == 0) {
 
-                            var obj = {
-                                "cartItem": {
-                                    "sku": product?.sku,
-                                    "qty": 1,
-                                    "name": product?.name,
-                                    "price": product?.price,
-                                    "product_type": "simple",
-                                    "quote_id": userData?.user?.cartID,
-                                    "product_option": {}
-                                }
-                            }
-
-                            // addToCart(product, index)
-                        } else {
-                            selectedItem(product, index)
+                    var obj = {
+                        "cartItem": {
+                            "sku": product?.sku,
+                            "qty": 1,
+                            "name": product?.name,
+                            "price": product?.price,
+                            "product_type": "simple",
+                            "quote_id": userData?.user?.cartID         
                         }
-
-                    } else {
-                        selectedItem(product, index)
-                        return alert("Please select a Product varient color!")
                     }
+                    console.log("this product does not have options", obj)
 
+                    api.post("carts/mine/items", obj, {
+                        headers: {
+                            Authorization: `Bearer ${userData?.token}`,
+                        },
+                    }).then((response)=>{
+                        console.log("Add to cart Item API response : ", response?.data)
+                    }).catch((err)=>{
+                        console.log("Add to cart item api error:  ", err)
+                    })
+
+                } else {
+                    console.log("this product has options")
+                    this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                    return alert("Please select a Product Options!")
                 }
-          
-         else {
+
+            } else {
+                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                return alert("Please select a Product varient color!")
+            }
+
+        }
+
+        else {
             alert("Please Login to your account first!")
             this.props.navigation.navigate("Account", { modal: "open" })
         }

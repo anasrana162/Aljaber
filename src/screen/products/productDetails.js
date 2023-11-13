@@ -42,14 +42,8 @@ class ProductDetails extends Component {
                 "option_type_id": null,
 
             },
-            selectedItemLeftPackage: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
+            finalItemLeftPower: {},
+            finalItemLeftPackage: {},
             selectedItemRightPower: {
                 "title": "Select",
                 "sort_order": 0,
@@ -58,6 +52,8 @@ class ProductDetails extends Component {
                 "option_type_id": null,
 
             },
+            finalItemRightPower: {},
+            finalItemRightPackage: {},
             selectedItemRightPackage: {
                 "title": "Select",
                 "sort_order": 0,
@@ -66,6 +62,23 @@ class ProductDetails extends Component {
                 "option_type_id": null,
 
             },
+            selectedItemLeftPackage: {
+                "title": "Select",
+                "sort_order": 0,
+                "price": 0,
+                "price_type": "",
+                "option_type_id": null,
+
+            },
+            selectedItemPackage: {
+                "title": "Select",
+                "sort_order": 0,
+                "price": 0,
+                "price_type": "",
+                "option_type_id": null,
+
+            },
+            finalItemPackage: [],
             product_varients: null,
             product_varient_selected: null,
             varient_selected: false,
@@ -104,7 +117,7 @@ class ProductDetails extends Component {
                 x = options
         }
 
-    console.log("OPtions For Product", x)
+        console.log("OPtions For Product", x)
 
         if (x.length == 0) {
             return console.log("option are null")
@@ -695,28 +708,60 @@ class ProductDetails extends Component {
     }
 
     selectItem = (item, index, title) => {
+        var { finalItemLeftPower, finalItemRightPower, } = this.state
         console.log(this.state.eyedir)
+
+
         switch (this.state.eyedir) {
             case "leftPA":
                 setImmediate(() => {
-                    this.setState({ selectedItemLeftPackage: item, dropdown: false, })
+                    this.setState({
+                        selectedItemLeftPackage: item, finalItemLeftPackage: {
+                            "option_id": this.state.option_package_size?.option_id,
+                            "option_value": item?.option_type_id
+                        }, dropdown: false,
+                    })
                 })
                 break;
 
             case "leftPO":
+                console.log("leftPO", item)
+                // for (let lp = 0; lp < this.state.leftEyeQuantity; lp++) {
+                // finalItemLeftPower.push()
+                // }
                 setImmediate(() => {
-                    this.setState({ selectedItemLeftPower: item, dropdown: false, })
+                    this.setState({
+                        selectedItemLeftPower: item,
+                        finalItemLeftPower: {
+                            "option_id": this.state.option_power?.option_id,
+                            "option_value": item?.option_type_id
+                        }, dropdown: false,
+                    })
                 })
                 break;
 
             case "rightPA":
                 setImmediate(() => {
-                    this.setState({ selectedItemRightPackage: item, dropdown: false, })
+                    this.setState({
+                        selectedItemRightPackage: item, finalItemRightPackage: {
+                            "option_id": this.state.option_package_size?.option_id,
+                            "option_value": item?.option_type_id
+                        }, dropdown: false,
+                    })
                 })
                 break;
             case "rightPO":
+                // for (let lp = 0; lp < this.state.rigthEyeQuantity; lp++) {
+                // finalItemRightPower.push()
+                // }
                 setImmediate(() => {
-                    this.setState({ selectedItemRightPower: item, dropdown: false, })
+                    this.setState({
+                        selectedItemRightPower: item,
+                        finalItemRightPower: {
+                            "option_id": this.state.option_power?.option_id,
+                            "option_value": item?.option_type_id
+                        }, dropdown: false,
+                    })
                 })
                 break;
 
@@ -724,7 +769,7 @@ class ProductDetails extends Component {
     }
 
     openDropDown = (val, eyedir) => {
-        console.log(eyedir,val)
+        console.log(eyedir, val)
         setImmediate(() => {
             this.setState({ dropdown: !this.state.dropdown, optionSelected: val, eyedir: eyedir })
         })
@@ -764,11 +809,429 @@ class ProductDetails extends Component {
             this.productImages("varient")
         }, 1000)
     }
+    addToCart = (product, index) => {
+
+        var { userData } = this.props
+        console.log("userData", userData?.token)
+
+        // product_varient_selected
+        var productToSend = ''
+        if (this.state.varient_selected == true) {
+            productToSend = this.state.product_varient_selected
+
+        } else {
+            productToSend = product
+        }
+        if (userData?.token !== null || userData?.user?.cartID !== undefined) {
+            console.log("productToSend?.type_id", productToSend?.type_id)
+            if (productToSend?.type_id == "virtual" || productToSend?.type_id == "simple") {
+
+                if (productToSend?.options.length == 0) {
+
+                    let obj = {
+                        "cartItem": {
+                            "sku": productToSend?.sku,
+                            "qty": this.state.quantity,
+                            "name": productToSend?.name,
+                            "price": productToSend?.price,
+                            "product_type": productToSend?.type_id,
+                            "quote_id": userData?.user?.cartID
+                        }
+                    }
+                    console.log("this product does not have options", obj)
+
+                    api.post("carts/mine/items", obj, {
+                        headers: {
+                            Authorization: `Bearer ${userData?.token}`,
+                        },
+                    }).then((response) => {
+                        console.log("Add to cart Item API response : ", response?.data)
+                    }).catch((err) => {
+                        console.log("Add to cart item api error:  ", err)
+                    })
+
+                } else {
+                    console.log("this product has options")
+                    let obj = {}
+                    // if it has same power than merge quantity
+                    if (
+                        this.state.checked == true &&
+                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+                        Object.keys(this.state.finalItemRightPackage).length == 0
+                    ) {
+                        obj = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemLeftPower,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+
+                        console.log("this product does have options Same Power", obj)
+                    }
+
+
+                    // if powers are different
+                    if (this.state.checked == true &&
+                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+                        Object.keys(this.state.finalItemRightPackage).length == 0
+                    ) {
+
+
+                        obj = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.rigthEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": this.state.finalItemRightPower
+                                    }
+                                }
+                            }
+                        }
+
+                        console.log("this product does have options finalItemRightPower", obj)
+
+                        api.post("carts/mine/items", obj, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+
+
+
+                        let obj2 = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.leftEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": this.state.finalItemLeftPower
+                                    }
+                                }
+                            }
+                        }
+
+                        console.log("this product does have options finalItemLeftPower", obj2)
+
+                        api.post("carts/mine/items", obj2, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+                    }
+
+                    // Power and packages both are same
+                    if (this.state.checked == true &&
+                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+                        this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value
+                    ) {
+                        obj = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemLeftPower,
+                                            this.state.finalItemLeftPackage,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+
+                        console.log("this product does have options Same Power ANd Package", obj)
+                    }
+
+                    // Power and packages both are diff
+                    if (this.state.checked == true &&
+                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+                        this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value
+                    ) {
+                        obj = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.leftEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemLeftPower,
+                                            this.state.finalItemLeftPackage,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+                        let obj1 = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.rigthEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemRightPower,
+                                            this.state.finalItemRightPackage,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj1, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+
+                        console.log("this product does not have options Same Power ANd Package", obj, obj1)
+                    }
+
+                    // if both Power same and packages both are diff
+                    if (
+                        this.state.checked == true &&
+                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+                        this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value
+                    ) {
+                        obj = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.leftEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemLeftPower,
+                                            this.state.finalItemLeftPackage,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+                        let obj1 = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.rigthEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemRightPower,
+                                            this.state.finalItemRightPackage,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj1, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+
+                        console.log("this product has Same Power ANd diff Package", obj, obj1)
+                    }
+
+                    // if product has diff power and same packages
+                    if (
+                        this.state.checked == true &&
+                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+                        this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value
+                    ) {
+                        obj = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.leftEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemLeftPower,
+                                            this.state.finalItemLeftPackage,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+                        let obj1 = {
+                            "cartItem": {
+                                "sku": productToSend?.sku,
+                                "qty": this.state.rigthEyeQuantity,
+                                "name": productToSend?.name,
+                                "price": productToSend?.price,
+                                "product_type": productToSend?.type_id,
+                                "quote_id": userData?.user?.cartID,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": [
+                                            this.state.finalItemRightPower,
+                                            this.state.finalItemRightPackage,
+
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+
+                        api.post("carts/mine/items", obj1, {
+                            headers: {
+                                Authorization: `Bearer ${userData?.token}`,
+                            },
+                        }).then((response) => {
+                            console.log("Add to cart Item API response : ", response?.data)
+                        }).catch((err) => {
+                            console.log("Add to cart item api error:  ", err)
+                        })
+
+
+                        console.log("this product has Same Power ANd diff Package", obj, obj1)
+                    }
+
+                }
+
+            } else {
+                // this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                return alert("Please select a Product varient color!")
+            }
+
+        }
+
+        else {
+            alert("Please Login to your account first!")
+            this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+    }
+
 
     render() {
 
         var {
             product_details,
+            product_index,
             product_details: { product_varients, extension_attributes: { stock_item } },
         } = this.props?.route?.params
 
@@ -782,9 +1245,9 @@ class ProductDetails extends Component {
                 alignItems: "center",
                 width: "95%",
                 fontFamily: "Careem-Bold",
-                marginTop:10,
-                textAlign:"justify",
-                alignSelf:"center"
+                marginTop: 10,
+                textAlign: "justify",
+                alignSelf: "center"
             },
             a: {
                 color: "green",
@@ -824,8 +1287,8 @@ class ProductDetails extends Component {
 
 
                     {/* Product Name */}
-                    < Text style={[styles.product_name,{
-                          marginTop:10,
+                    < Text style={[styles.product_name, {
+                        marginTop: 10,
                     }]}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
 
                     {/* Product Description */}
@@ -875,6 +1338,7 @@ class ProductDetails extends Component {
 
                             {/* Add to Cart */}
                             <TouchableOpacity
+                                onPress={() => this.addToCart(product_details, product_index)}
                                 style={styles.add_to_cart}
                             >
                                 <Text style={styles.add_to_cart_text}>AddToCart</Text>
@@ -956,7 +1420,7 @@ class ProductDetails extends Component {
                     />
                 </Modal>
 
-                {this.state.optionSelected  !== null &&
+                {this.state.optionSelected !== null &&
                     <Modal
                         animationType="slide"
                         transparent={true}
@@ -1016,7 +1480,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: "600",
         color: "#020621",
-      
+
     },
     row_cont: {
         width: "100%",

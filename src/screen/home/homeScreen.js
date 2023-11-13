@@ -87,6 +87,7 @@ class HomeScreen extends Component {
         this.state = {
             defaultCategories: null,
             loader: false,
+            loaderDot: false,
             categoryApiCounter: 0,
             network: true,
             defaultCategories1: null,
@@ -400,6 +401,7 @@ class HomeScreen extends Component {
         // console.log("Top Categories:", arr[0]?.children_data)
         setImmediate(() => {
             this.setState({
+                loader: false,
                 topCategoryData: arr
             })
         })
@@ -410,7 +412,10 @@ class HomeScreen extends Component {
         var { userData } = this.props
         var sku_arr = []
         var temp_sku_arr = []
-        var check = false
+
+        setImmediate(() => {
+            this.setState({ loaderDot: true })
+        })
 
         // Fetch all Products
         await api.get('/products?fields=items[id,sku,name,type_id]&searchCriteria=all', {
@@ -502,7 +507,7 @@ class HomeScreen extends Component {
             actions?.allProducts(temp_sku_arr)
             this.setState(
                 {
-                    loader: false,
+                    loaderDot: false,
                     randomProducts: store_product
                 }
             )
@@ -535,12 +540,12 @@ class HomeScreen extends Component {
                         firstSubItem={this.state.firstSubItem}
                     />}
 
-                    {this.state.randomProducts !== null && <ProductList
+                    <ProductList
                         screenName="Home"
                         data={this.state.randomProducts}
-                        loader={this.state.loader}
+                        loaderDot={this.state.loaderDot}
                         navProps={this.props.navigation}
-                    />}
+                    />
 
 
                     {/** Categories like men, women etc */}

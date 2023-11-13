@@ -121,8 +121,8 @@ class Login extends Component {
             })
             console.log("customerToken", customerToken)
             if (customerToken !== "") {
-                const res = await axios.post(
-                    "https://aljaberoptical.com/pub/rest/V1/carts/mine",
+                const res = await api.post(
+                    "carts/mine",
                     {},
                     {
                         headers: {
@@ -145,7 +145,7 @@ class Login extends Component {
                         if (user_data?.data) {
 
                             actions.userToken(customerToken)
-                            user_data.cartID = result?.data
+                            user_data.data.cartID = result?.data
                             actions.user(user_data?.data)
                             setImmediate(() => {
                                 this.setState({

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View ,NativeModules,Dimensions} from 'react-native'
+import { StyleSheet, Text, View ,NativeModules,Dimensions, Image} from 'react-native'
 import React from 'react'
 import LottieView from 'lottie-react-native';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
@@ -11,7 +11,8 @@ const Loading = ({ loading }) => {
             <View style={styles.loader_main_cont}>
             </View>
             <View style={styles.loader_main_inner_cont}>
-                <LottieView source={require('../animations/animation_lmfwxavv.json')} autoPlay={true} loop style={{ width: 230, height: 230, position: "absolute", zIndex: 300 }} />
+                <Image source={require('../../assets/giflogo.gif')} style={{ width: 230, height: 230, position: "absolute", zIndex: 300 }}/>
+                {/* <LottieView source={require('../animations/animation_lmfwxavv.json')} autoPlay={true} loop style={{ width: 230, height: 230, position: "absolute", zIndex: 300 }} /> */}
             </View>
         </>
     )

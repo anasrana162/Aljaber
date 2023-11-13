@@ -51,7 +51,7 @@ const Options = ({
 
             </View>}
 
-            {console.log("product varients in options", product_varients)}
+
 
             {(product_varients == null || product_varients == undefined) ?
                 <>
@@ -109,7 +109,7 @@ const Options = ({
                                 {/* white container */}
                                 <View style={styles.pre_type_cont}>
 
-                                    {/* <View style={[styles.pre_inner_type_cont, { width: "40%" }]}>
+                                    {option_package_size !== null && <View style={[styles.pre_inner_type_cont, { width: "45%" }]}>
 
                                         <View style={styles.pres_conts}>
                                             <Text style={styles.grid_text}>{option_package_size?.title}</Text>
@@ -141,8 +141,8 @@ const Options = ({
 
                                             </View>
                                         </View>
-                                    </View> */}
-                                    <View style={[styles.pre_inner_type_cont, { width: "60%" }]}>
+                                    </View>}
+                                    <View style={[styles.pre_inner_type_cont, { width: option_package_size !== null ? "30%" : "60%" }]}>
 
                                         <View style={styles.pres_conts}>
                                             <Text style={styles.grid_text}>{option_power?.title}</Text>
@@ -172,7 +172,7 @@ const Options = ({
                                             </View>
                                         </View>
                                     </View>
-                                    <View style={[styles.pre_inner_type_cont, { width: "40%" }]}>
+                                    <View style={[styles.pre_inner_type_cont, { width: option_package_size !== null ? "25%" : "40%" }]}>
 
                                         <View style={styles.pres_conts}>
                                             <Text style={styles.grid_text}>QTY</Text>
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     },
     selectedItem_text: {
         marginLeft: 10,
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: "500",
         color: "#020621",
     },
