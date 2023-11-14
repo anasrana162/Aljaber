@@ -11,7 +11,7 @@ const Loading = ({ loading }) => {
             <View style={styles.loader_main_cont}>
             </View>
             <View style={styles.loader_main_inner_cont}>
-                <Image source={require('../../assets/giflogo.gif')} style={{ width: 230, height: 230, position: "absolute", zIndex: 300 }}/>
+                <Image source={require('../../assets/giflogo.gif')} style={{ width: 400, height: 400, position: "absolute", zIndex: 300 }}/>
                 {/* <LottieView source={require('../animations/animation_lmfwxavv.json')} autoPlay={true} loop style={{ width: 230, height: 230, position: "absolute", zIndex: 300 }} /> */}
             </View>
         </>
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
         width: width,
         height: height,
         backgroundColor: "#fff",
-        opacity: 0.5,
+        opacity: 0.9,
         position: "absolute",
         zIndex: 200,
         justifyContent: "center",

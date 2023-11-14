@@ -144,7 +144,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                         autoPlay={true}
                         resizeMode='cover'
                         loop
-                    
+
                     />
                 </View>
             }
@@ -259,60 +259,64 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                                     key={String(index)}
                                 >
                                     <>
-                                        {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true) && <TouchableOpacity
-                                            onPress={() => selectedItem(products, index)}
-                                            onPressIn={() => OnTouchIn(products?.media_gallery_entries, index)}
-                                            onPressOut={() => { setImageSelected(null); setImageSelectedIndex(null) }}
-                                            style={styles.product_Cont}
-                                            activeOpacity={0.8}
-                                        >
-                                            <View style={styles.product_inner_Cont}>
-                                                {(imageSelected !== null && imageSelectedIndex == index) ?
-                                                    <>
+                                        {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true) &&
+                                            <TouchableOpacity
+                                                onPress={() => selectedItem(products, index)}
+                                                onPressIn={() => OnTouchIn(products?.media_gallery_entries, index)}
+                                                onPressOut={() => { setImageSelected(null); setImageSelectedIndex(null) }}
+                                                style={[styles.product_Cont, {
+                                                    borderWidth:  imageSelectedIndex !== index ? 0.2 : 2,
+                                                    borderRadius:10,
+                                                }]}
+                                                activeOpacity={0.8}
+                                            >
+                                                <View style={styles.product_inner_Cont}>
+                                                    {(imageSelected !== null && imageSelectedIndex == index) ?
+                                                        <>
+                                                            <Image
+                                                                resizeMode='stretch'
+                                                                // 91596cb40167486f0a253bd4173ab8c2
+                                                                source={{ uri: imageUrl + imageSelected }}
+                                                                style={{ width: "70%", height: 80, borderRadius: 10 }}
+                                                            />
+                                                            <View style={{
+                                                                position: "absolute",
+                                                                width: "100%",
+                                                                height: 95,
+                                                                justifyContent: "center",
+                                                                alignItems: "center",
+                                                                borderTopLeftRadius: 10,
+                                                                borderTopRightRadius: 10,
+                                                                top: 0,
+                                                                backgroundColor: "rgba(52,52,52,0.4)",
+                                                                zIndex: 200
+                                                            }}>
+                                                            </View>
+                                                        </>
+                                                        :
+
                                                         <Image
                                                             resizeMode='stretch'
-                                                            // 91596cb40167486f0a253bd4173ab8c2
-                                                            source={{ uri: imageUrl + imageSelected }}
+                                                            source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
                                                             style={{ width: "70%", height: 80, borderRadius: 10 }}
                                                         />
-                                                        <View style={{
-                                                            position: "absolute",
-                                                            width: "100%",
-                                                            height: 85,
-                                                            justifyContent: "center",
-                                                            alignItems: "center",
-                                                            borderTopLeftRadius: 10,
-                                                            borderTopRightRadius: 10,
-                                                            top: 0,
-                                                            backgroundColor: "rgba(52,52,52,0.4)",
-                                                            zIndex: 200
-                                                        }}>
-                                                        </View>
-                                                    </>
-                                                    :
-
-                                                    <Image
-                                                        resizeMode='stretch'
-                                                        source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
-                                                        style={{ width: "70%", height: 80, borderRadius: 10 }}
-                                                    />
-                                                }
+                                                    }
 
 
-                                                <Text numberOfLines={2} style={styles.product_Name}>{products?.brand}</Text>
-                                                <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.name}</Text>
-                                                <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
+                                                    <Text numberOfLines={2} style={styles.product_Name}>{products?.brand}</Text>
+                                                    <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.name}</Text>
+                                                    <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
 
-                                                <TouchableOpacity
-                                                    onPress={() => addToCart(products, index)}
-                                                    style={styles?.addToCart_Cont}>
-                                                    <Text style={styles.addToCart}>Add to Cart</Text>
-                                                </TouchableOpacity>
-                                            </View>
+                                                    <TouchableOpacity
+                                                        onPress={() => addToCart(products, index)}
+                                                        style={styles?.addToCart_Cont}>
+                                                        <Text style={styles.addToCart}>Add to Cart</Text>
+                                                    </TouchableOpacity>
+                                                </View>
 
 
 
-                                        </TouchableOpacity>}
+                                            </TouchableOpacity>}
                                     </>
                                 </View>
                             )
@@ -321,7 +325,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                 </View>}
             </ScrollView >
 
-            {screenName == "Home" && <Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30, marginTop: -20 }} />}
+            {/* {screenName == "Home" && <Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30, marginTop: -20 }} />} */}
 
         </View >
     )
@@ -401,6 +405,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fffff",
         // marginBottom: 50,
         alignItems: "center",
+    
 
     },
     product_inner_Cont: {

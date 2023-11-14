@@ -4,8 +4,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 const width = Dimensions.get("screen").width;
 
-const OptionDropdown = ({ title, data, style, checked, style1, }) => {
-
+const OptionDropdown = ({ title, data, style, checked, style1, setWholeItemSelected }) => {
+    
     const [selectedItem, setSelectedItem] = useState({
         "title": "--Please Select--",
         "sort_order": 0,
@@ -15,7 +15,9 @@ const OptionDropdown = ({ title, data, style, checked, style1, }) => {
     })
     const [dropdown, setDropdown] = useState(false)
 
-    const selectItem = (item, index) => {
+    const selectItem = (item, key,) => {
+        console.log("item", item)
+        setWholeItemSelected(item, key)
         setSelectedItem(item)
     }
 
@@ -31,7 +33,7 @@ const OptionDropdown = ({ title, data, style, checked, style1, }) => {
             {dropdown &&
                 <View style={[styles?.dropDown_style, {
                     position: checked == false ? null : "absolute",
-                    zIndex:200,
+                    zIndex: 200,
                     height: data?.values?.length >= 5 ? 150 : null,
                 }]}>
                     <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
@@ -40,7 +42,7 @@ const OptionDropdown = ({ title, data, style, checked, style1, }) => {
                                 return (
                                     <TouchableOpacity
                                         key={String(index)}
-                                        onPress={() => selectItem(item, index)}
+                                        onPress={() => selectItem(item, title)}
                                         style={styles?.dropDown_item_style}>
                                         {selectedItem?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />}
                                         {selectedItem?.title == item?.title && <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />}
