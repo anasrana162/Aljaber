@@ -7,6 +7,7 @@ const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
 export default class HomeHeader extends Component {
     render() {
+        var { navProps } = this.props
         return (
             <View style={styles.mainContainer}>
                 {/* <View style={styles.colorView}></View> */}
@@ -31,8 +32,11 @@ export default class HomeHeader extends Component {
                     <TouchableOpacity style={styles.favourateIcon}>
                         <Ionicons name="heart-outline" size={30} color="#020621" />
                     </TouchableOpacity>
-                    {/** Favourate icon Button */}
-                    <TouchableOpacity style={styles.cartIcon}>
+
+                    {/** Cart icon Button */}
+                    <TouchableOpacity
+                        onPress={() => navProps.navigate("Cart")}
+                        style={styles.cartIcon}>
                         <Ionicons name="cart-outline" size={30} color="#020621" />
                     </TouchableOpacity>
                 </View>

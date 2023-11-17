@@ -117,7 +117,7 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
                     })
                 }
             </View>
-            <Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30 }} />
+            {/* <Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30 }} /> */}
         </View>
     )
 }

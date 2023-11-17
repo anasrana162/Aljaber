@@ -1,7 +1,8 @@
 import {
-    LANGUAGE, TOKEN, USER, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS
-    //  MISSING_DATA, SELECTED_PROGRAM,
-    // SHOPS, ORDER_ADDRESS, ITEM_DETAILS, ORDER_DETAILS, SELECTED_VARIENT, PLAN_DETAILS, MENU_DETAILS, PRICE_DETAILS, SUBSCRIPTIONS
+    LANGUAGE, TOKEN, USER, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS,
+    // SUb Categories
+    CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
+    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES
 } from '../constants';
 
 const initialState = {
@@ -12,17 +13,25 @@ const initialState = {
     defaultcategory: null,
     createddefaultcategory: null,
     allproducts: null,
-    // missing_data: false,
-    // selected_program: {},
-    // selected_varient: {},
-    // shops: null,
-    // order_address: null,
-    // item_details: null,
-    // order_details: null,
-    // plan_details: null,
-    // menu_details: null,
-    // price_details: null,
-    // subscriptions: null,
+    clearpres: [],
+    color: [],
+    toric: [],
+    pres: [],
+    lenssol: [],
+    cgadults: [],
+    cgkids: [],
+    egmen: [],
+    egwomen: [],
+    egkids: [],
+    sgmen: [],
+    sgwomen: [],
+    sgkids: [],
+    cords: [],
+    spraycleaner: [],
+    cases: [],
+    giftcards: [],
+    safetyglasses: [],
+    swimgoggles: [],
 };
 
 const userReducer = (state = initialState, action) => {
@@ -63,61 +72,110 @@ const userReducer = (state = initialState, action) => {
                 ...state,
                 allproducts: action.payload
             }
-        // case MISSING_DATA:
-        //     return {
-        //         ...state,
-        //         missing_data: action.payload
-        //     };
-        // case SELECTED_PROGRAM:
-        //     return {
-        //         ...state,
-        //         selected_program: action.payload
-        //     };
-        // case SELECTED_VARIENT:
-        //     return {
-        //         ...state,
-        //         selected_varient: action.payload
-        //     };
-        // case SHOPS:
-        //     return {
-        //         ...state,
-        //         shops: action.payload
-        //     };
-        // case ORDER_ADDRESS:
-        //     return {
-        //         ...state,
-        //         order_address: action.payload
-        //     };
-        // case ORDER_DETAILS:
-        //     return {
-        //         ...state,
-        //         order_details: action.payload
-        //     };
-        // case ITEM_DETAILS:
-        //     return {
-        //         ...state,
-        //         item_details: action.payload
-        //     };
-        // case PLAN_DETAILS:
-        //     return {
-        //         ...state,
-        //         plan_details: action.payload
-        //     };
-        // case PRICE_DETAILS:
-        //     return {
-        //         ...state,
-        //         price_details: action.payload
-        //     };
-        // case MENU_DETAILS:
-        //     return {
-        //         ...state,
-        //         menu_details: action.payload
-        //     };
-        // case SUBSCRIPTIONS:
-        //     return {
-        //         ...state,
-        //         subscriptions: action.payload
-        //     };
+        case RANDOMPRODUCTS:
+            return {
+                ...state,
+                randomproducts: action.payload
+            }
+
+        // SUB CATEGORIES
+
+        case CLEARPRES:
+            return {
+                ...state,
+                clearpres: action.payload
+            };
+        case COLOR:
+            return {
+                ...state,
+                color: action.payload
+            };
+        case TORIC:
+            return {
+                ...state,
+                toric: action.payload
+            };
+
+        case PRESBYOPIA:
+            return {
+                ...state,
+                pres: action.payload
+            }
+        case LENSSOL:
+            return {
+                ...state,
+                lenssol: action.payload
+            }
+        case CGADULTS:
+            return {
+                ...state,
+                cgadults: action.payload
+            }
+        case CGKIDS:
+            return {
+                ...state,
+                cgkids: action.payload
+            }
+        case EGMEN:
+            return {
+                ...state,
+                egmen: action.payload
+            }
+        case EGWOMEN:
+            return {
+                ...state,
+                egwomen: action.payload
+            }
+        case EGKIDS:
+            return {
+                ...state,
+                egkids: action.payload
+            }
+        case SGMEN:
+            return {
+                ...state,
+                sgmen: action.payload
+            }
+        case SGWOMEN:
+            return {
+                ...state,
+                sgwomen: action.payload
+            }
+        case SGKIDS:
+            return {
+                ...state,
+                sgkids: action.payload
+            }
+        case CORDS:
+            return {
+                ...state,
+                cords: action.payload
+            }
+        case SPRAYCLEANER:
+            return {
+                ...state,
+                spraycleaner: action.payload
+            }
+        case CASES:
+            return {
+                ...state,
+                cases: action.payload
+            }
+        case GIFTCARDS:
+            return {
+                ...state,
+                giftcards: action.payload
+            }
+        case SAFETYGLASSES:
+            return {
+                ...state,
+                safetyglasses: action.payload
+            }
+        case SWIMMIMINGGOGGLES:
+            return {
+                ...state,
+                swimgoggles: action.payload
+            }
 
         default:
             return state;

@@ -16,6 +16,7 @@ import StoreFeatures from './components/storeFeatures';
 import DetailsTabNav from './detailsTabNav';
 import api from '../../api/api';
 import axios from 'axios';
+import Loading from '../../components_reusable/loading';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -26,6 +27,7 @@ class ProductDetails extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            product_details: '',
             images: [],
             description: '',
             main_info_temp: null,
@@ -178,15 +180,172 @@ class ProductDetails extends Component {
     }
 
     componentDidMount = () => {
-        this.getDescription('prop')
-        this.checkOptions('prop')
-        this.getMain_Info('prop')
-        this.checkVarients('prop')
-        this.productImages("prop")
+        this.getProductDetails()
+
+    }
+
+    getProductDetails = async () => {
+        var { product_details: { sku } } = this.props.route.params
+        var { userData: { admintoken, allproducts } } = this.props
+        console.log("product_details", sku)
+
+        tempPRoducts = []
+
+        setImmediate(() => {
+            this.setState({
+                loader: true,
+            })
+        })
+
+        await api.get('/products/' + sku, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            },
+        }).then(async (prod) => {
+
+            // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
+            // on the screen as it is not in the main body of the object
+
+            for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
+
+                // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
+
+                if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
+
+                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
+                        prod.data.brand = data?.data
+
+                        // Condition for fetching products with type_id:"simple"
+
+                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
+
+                            setImmediate(() => {
+                                this.setState({
+                                    product_details: prod?.data
+                                })
+                            })
+
+                        }
+
+                        // Condition for fetching products with type_id:"Configurable"
+
+                        if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
+
+                            // Checking value of configurable_product_links (product Varients)
+
+                            for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
+
+                                // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
+
+                                const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
+
+                                // Condition
+
+                                if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
+
+                                    // if id's match then the value "sku" is picked up from the matching product object and then we run an api
+                                    // to fetch details for the varient because they are not in the products object from all products api
+
+                                    var check = false
+
+                                    // Api for fetching product details
+
+                                    await api.get('/products/' + selected_products?.sku, {
+                                        headers: {
+                                            Authorization: `Bearer ${admintoken}`,
+                                        },
+                                    }).then(async (cfPD) => {
+
+                                        // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
+                                        // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
+                                        // long process already done above to save time while fetching for its main version of product
+
+                                        cfPD.data.brand = data?.data // brand value
+                                        cfPD.data.parent_product_id = prod?.data?.id
+                                        cfPD.data.options = prod?.data?.options
+
+                                        // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
+                                        // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
+                                        // together
+
+                                        tempPRoducts.push(cfPD?.data)
+
+                                        // here's the condition once the configurable_product_links array reach its end
+                                        if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
+
+                                            //we also change the value of price of the main product because products with type_id have "0" price
+                                            // so we take a price from its varient overwrite (Note price of all vareints are same)
+                                            prod.data.price = cfPD.data?.price
+
+                                            // then we create an of product_varients and push into main product's object to show and display the varients in
+                                            // product details screen
+                                            prod.data.product_varients = tempPRoducts
+
+                                            // then we push this product into main products array with all of these things so it can be displayed
+                                            // in the Products Detail screen
+
+                                            setImmediate(() => {
+                                                this.setState({
+                                                    product_details: prod?.data
+                                                })
+                                            })
+
+                                            // Emptying the temporary array that we pushed products varients so the varients of other products
+                                            // dont get added in the other products
+                                            tempPRoducts = []
+
+                                            // setting value of check to true from false to break the loop once it reaches its end
+                                            check = true
+                                        }
+
+                                    }).catch((err) => {
+                                        console.log("Configurable Product Details Api Error", err)
+                                    })
+
+                                    // this condition break the loop from further adding more products
+                                    if (check == true) {
+                                        break;
+                                    }
+                                } else {
+                                }
+                            }
+                        }
+                    }).catch((err) => {
+                        console.log("DAta for Brands Api errr", err)
+                    })
+                    break;
+                }
+            }
+
+            console.log("Product DEtails STate:", this.state.product_details)
+
+            // this is for loader skeleton 
+
+
+
+
+            this.getDescription('prop')
+            this.checkOptions('prop')
+            this.getMain_Info('prop')
+            this.checkVarients('prop')
+            this.productImages("prop")
+
+        }).catch((err) => {
+            console.log("Product Detail Api error on:  ", sku)
+            return setImmediate(() => {
+                this.setState({
+                    loader: false
+                })
+
+            })
+
+        })
+
+
     }
 
     checkOptions = (key) => {
-        var { product_details: { options } } = this.props.route.params
+        var { product_details: { options } } = this.state
         console.log("OPtions For Product", options)
 
         var x = [];
@@ -230,11 +389,16 @@ class ProductDetails extends Component {
     }
 
     checkVarients = async () => {
-        var { product_details: { product_varients } } = this.props?.route?.params
+        var { product_details: { product_varients } } = this.state
         // console.log("product_details Images Length", media_gallery_entries.length)
         // console.log("Product Varients", product_varients)
 
         if (product_varients?.length == 0) {
+            setImmediate(() => {
+                this.setState({
+                    loader: false,
+                })
+            })
             return console.log("no varients")
         }
 
@@ -259,7 +423,7 @@ class ProductDetails extends Component {
         }
 
         setImmediate(() => {
-            this.setState({ product_varients: product_varients })
+            this.setState({ product_varients: product_varients, loader: false })
         })
 
         // console.log("PRoduct Varients Item", product_varients[1]?.color, "   ", product_varients[1]?.name)
@@ -267,7 +431,7 @@ class ProductDetails extends Component {
     }
 
     productImages = (key) => {
-        var { product_details: { media_gallery_entries, } } = this.props?.route?.params
+        var { product_details: { media_gallery_entries, } } = this.state
 
         // console.log("media_gallery_entries", this.state.product_varient_selected?.media_gallery_entries)
 
@@ -293,7 +457,7 @@ class ProductDetails extends Component {
     }
 
     getDescription = (key) => {
-        var { product_details: { custom_attributes, product_varients } } = this.props?.route?.params
+        var { product_details: { custom_attributes, } } = this.state
         // console.log("product_details Images Length", media_gallery_entries.length)
         // console.log("product_details description", this.state.product_varient_selected)
 
@@ -322,8 +486,8 @@ class ProductDetails extends Component {
     }
 
     getMain_Info = async (key) => {
-        var { product_details: { custom_attributes } } = this.props?.route?.params
-        const { userData: { admintoken }, actions, userData } = this.props
+        var { product_details: { custom_attributes } } = this.state
+        const { userData: { admintoken }, } = this.props
 
         var { main_info_temp } = this.state
         var x = '';
@@ -741,8 +905,7 @@ class ProductDetails extends Component {
     }
 
     plusOne = () => {
-        var { product_details: { extension_attributes: { stock_item } } } = this.props.route.params
-        var { quantity } = this.state
+        var { product_details: { extension_attributes: { stock_item }, quantity } } = this.state
         var qty = stock_item?.qty
 
         if (quantity <= qty) {
@@ -1030,7 +1193,11 @@ class ProductDetails extends Component {
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemRightPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0  // because lower condition was running of Power and ADDITION
+                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because lower condition was running of Power and ADDITION
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1053,6 +1220,26 @@ class ProductDetails extends Component {
 
                         this.addToCartApi(obj)
 
+                        // let obj2 = {
+                        //     "cartItem": {
+                        //         "sku": productToSend?.sku,
+                        //         "qty": this.state.rightEyeQuantity,
+                        //         "name": productToSend?.name,
+                        //         "price": productToSend?.price,
+                        //         "product_type": productToSend?.type_id,
+                        //         "quote_id": userData?.user?.cartID,
+                        //         "product_option": {
+                        //             "extension_attributes": {
+                        //                 "custom_options": this.state.finalItemRightPower
+                        //             }
+                        //         }
+                        //     }
+                        // }
+
+                        // console.log("this product does have options finalItemLeftPower", obj2)
+
+                        // this.addToCartApi(obj2)
+
                         console.log("this product does have options Same Power", obj)
                     }
 
@@ -1066,7 +1253,11 @@ class ProductDetails extends Component {
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemRightPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0  // because lower condition was running of Power and ADDITION
+                        Object.keys(this.state.finalItemRightADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
 
 
@@ -1114,9 +1305,15 @@ class ProductDetails extends Component {
                     // Power and packages both are same
                     if (this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
                         this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightADDITION).length == 0 &&  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1147,8 +1344,14 @@ class ProductDetails extends Component {
                     if (this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
                         this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value &&
+                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1202,8 +1405,14 @@ class ProductDetails extends Component {
                         this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
                         this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value &&
+                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1258,8 +1467,14 @@ class ProductDetails extends Component {
                         this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
                         this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value &&
+                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1315,8 +1530,14 @@ class ProductDetails extends Component {
                     if (this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
                         this.state.finalItemLeftADDITION?.option_value == this.state.finalItemRightADDITION?.option_value &&
+                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightPackage).length == 0 && // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1347,8 +1568,14 @@ class ProductDetails extends Component {
                     if (this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
                         this.state.finalItemLeftADDITION?.option_value !== this.state.finalItemRightADDITION?.option_value &&
+                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightPackage).length == 0 && // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1402,8 +1629,14 @@ class ProductDetails extends Component {
                         this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
                         this.state.finalItemLeftADDITION?.option_value !== this.state.finalItemRightADDITION?.option_value &&
+                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightPackage).length == 0 &&  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1458,8 +1691,14 @@ class ProductDetails extends Component {
                         this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
                         this.state.finalItemLeftADDITION?.option_value == this.state.finalItemRightADDITION?.option_value &&
+                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemRightPackage).length == 0 &&  // because upper condition was running of Power and Packages
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         obj = {
                             "cartItem": {
@@ -1527,6 +1766,10 @@ class ProductDetails extends Component {
                         this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
                         this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0
                     ) {
@@ -1584,6 +1827,10 @@ class ProductDetails extends Component {
                         this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
                         this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
                         this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0
                     ) {
@@ -1619,6 +1866,10 @@ class ProductDetails extends Component {
                         this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
                         this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0
                     ) {
@@ -1677,6 +1928,10 @@ class ProductDetails extends Component {
                         this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
                         this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0
                     ) {
@@ -1733,6 +1988,10 @@ class ProductDetails extends Component {
                         this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
                         this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
                         this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0
                     ) {
@@ -1788,6 +2047,10 @@ class ProductDetails extends Component {
                         this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
                         this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0
                     ) {
@@ -1844,6 +2107,10 @@ class ProductDetails extends Component {
                         this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
                         this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
                         this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
                         Object.keys(this.state.finalItemLeftPackage).length == 0 &&
                         Object.keys(this.state.finalItemLeftADDITION).length == 0
                     ) {
@@ -2134,10 +2401,20 @@ class ProductDetails extends Component {
                     // when all conditions are null
                     if (
                         Object.keys(this.state.finalItemPower).length == 0 &&
+                        Object.keys(this.state.finalItemLeftPower).length == 0 &&
+                        Object.keys(this.state.finalItemRightPower).length == 0 &&
                         Object.keys(this.state.finalItemADDITION).length == 0 &&
+                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&
+                        Object.keys(this.state.finalItemRightADDITION).length == 0 &&
                         Object.keys(this.state.finalItemPackage).length == 0 &&
+                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+                        Object.keys(this.state.finalItemRightPackage).length == 0 &&
                         Object.keys(this.state.finalItemAXES).length == 0 &&
-                        Object.keys(this.state.finalItemCYL).length == 0
+                        Object.keys(this.state.finalItemCYL).length == 0 &&
+                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
+                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+                        Object.keys(this.state.finalItemRightCYL).length == 0
                     ) {
                         setImmediate(() => {
                             this.setState({
@@ -2184,7 +2461,7 @@ class ProductDetails extends Component {
             })
 
         }).catch((err) => {
-            alert("Failed to add product to cart!")
+            alert("Failed to add product to cart! Try logging into your account again!")
             console.log("Add to cart item api error:  ", err.response)
             setImmediate(() => {
                 this.setState({
@@ -2261,12 +2538,13 @@ class ProductDetails extends Component {
         var {
             product_details,
             product_index,
-            product_details: { product_varients, extension_attributes: { stock_item } },
+
         } = this.props?.route?.params
 
         var {
             product_varient_selected,
             media_gallery_entries,
+            product_details: { },
         } = this.state
         const tagsStyles = {
             body: {
@@ -2283,231 +2561,233 @@ class ProductDetails extends Component {
             },
         };
         return (
-            <View style={styles.mainContainer}>
 
-                {/* Header */}
-                <HomeHeader />
+                <View style={styles.mainContainer}>
+                    {this.state.loader && <Loading />}
+                    {/* Header */}
+                    <HomeHeader />
 
-                <ScrollView
-                    showsVerticalScrollIndicator={false}
-                    style={{ width: width - 20, }}>
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        style={{ width: width - 20, }}>
 
-                    <ImageCarousel
-                        usage="openModal"
-                        key={String(this.state.imageKey)}
-                        data={media_gallery_entries}
-                        onImagePress={(selected) => this.onImagePress(selected)}
-                        varient_selected={this.state.varient_selected}
-                        fisrtImage={this.state.product_varient_selected == null ?
-                            {
-                                id: product_details?.media_gallery_entries[0]?.id,
-                                url: product_details?.media_gallery_entries[0]?.file,
-                                index: 0,
-                            }
-                            :
-                            {
-                                id: this.state.product_varient_selected?.media_gallery_entries[0].id,
-                                url: this.state.product_varient_selected?.media_gallery_entries[0]?.file,
-                                index: 0,
-                            }}
-                    />
-
-
-
-
-                    {/* Product Name */}
-                    < Text style={[styles.product_name, {
-                        marginTop: 10,
-                    }]}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
-
-                    {/* Product Description */}
-                    {this.state.description !== '' &&
-                        <RenderHtml
-                            tagsStyles={tagsStyles}
-                            contentWidth={width}
-                            source={{
-                                html: `${this.state.description}`,
-                            }}
-                        />}
-
-                    {/* Price , quantity, add to cart */}
-                    <View style={styles.row_cont}>
-                        {/* Price */}
-                        <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_varient_selected !== null ? product_varient_selected?.price : product_details?.price}</Text>
-
-                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-
-                            {/* Quantity */}
-                            {this.state.checked == false &&
-                                <>
-                                    <View style={styles?.row_quantity}>
-
-                                        {/* Plus Button */}
-                                        <TouchableOpacity
-                                            onPress={() => this.plusOne()}
-                                            style={styles.quantityBox}>
-                                            <AntDesign name="plus" size={18} color="#020621" />
-                                        </TouchableOpacity>
-
-                                        {/* Quantity Number */}
-                                        <View
-                                            style={styles.quantityBox}>
-                                            <Text style={styles.product_name}>{this.state.quantity}</Text>
-                                        </View>
-
-                                        {/* Minus Button */}
-                                        <TouchableOpacity
-                                            onPress={() => this.minusOne()}
-                                            style={styles.quantityBox}>
-                                            <AntDesign name="minus" size={18} color="#020621" />
-                                        </TouchableOpacity>
-                                    </View>
-                                </>
-                            }
-
-                            {/* Add to Cart */}
-                            <TouchableOpacity
-                                onPress={() => this.addToCart(product_details, product_index)}
-                                style={styles.add_to_cart}
-                            >
+                        <ImageCarousel
+                            usage="openModal"
+                            key={String(this.state.imageKey)}
+                            data={media_gallery_entries}
+                            onImagePress={(selected) => this.onImagePress(selected)}
+                            varient_selected={this.state.varient_selected}
+                            fisrtImage={this.state.product_varient_selected == null ?
                                 {
-                                    this.state.cartLoader == true ?
-                                        <ActivityIndicator size={"small"} color={'#ffffff'} />
-                                        :
-                                        <Text style={styles.add_to_cart_text}>AddToCart</Text>
+                                    id: product_details?.media_gallery_entries[0]?.id,
+                                    url: product_details?.media_gallery_entries[0]?.file,
+                                    index: 0,
+                                }
+                                :
+                                {
+                                    id: this.state.product_varient_selected?.media_gallery_entries[0].id,
+                                    url: this.state.product_varient_selected?.media_gallery_entries[0]?.file,
+                                    index: 0,
+                                }}
+                        />
+
+
+
+
+                        {/* Product Name */}
+                        < Text style={[styles.product_name, {
+                            marginTop: 10,
+                        }]}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
+
+                        {/* Product Description */}
+                        {this.state.description !== '' &&
+                            <RenderHtml
+                                tagsStyles={tagsStyles}
+                                contentWidth={width}
+                                source={{
+                                    html: `${this.state.description}`,
+                                }}
+                            />}
+
+                        {/* Price , quantity, add to cart */}
+                        <View style={styles.row_cont}>
+                            {/* Price */}
+                            <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_varient_selected !== null ? product_varient_selected?.price : product_details?.price}</Text>
+
+                            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+
+                                {/* Quantity */}
+                                {this.state.checked == false &&
+                                    <>
+                                        <View style={styles?.row_quantity}>
+
+                                            {/* Plus Button */}
+                                            <TouchableOpacity
+                                                onPress={() => this.plusOne()}
+                                                style={styles.quantityBox}>
+                                                <AntDesign name="plus" size={18} color="#020621" />
+                                            </TouchableOpacity>
+
+                                            {/* Quantity Number */}
+                                            <View
+                                                style={styles.quantityBox}>
+                                                <Text style={styles.product_name}>{this.state.quantity}</Text>
+                                            </View>
+
+                                            {/* Minus Button */}
+                                            <TouchableOpacity
+                                                onPress={() => this.minusOne()}
+                                                style={styles.quantityBox}>
+                                                <AntDesign name="minus" size={18} color="#020621" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </>
                                 }
 
-                            </TouchableOpacity>
+                                {/* Add to Cart */}
+                                <TouchableOpacity
+                                    onPress={() => this.addToCart(product_details, product_index)}
+                                    style={styles.add_to_cart}
+                                >
+                                    {
+                                        this.state.cartLoader == true ?
+                                            <ActivityIndicator size={"small"} color={'#ffffff'} />
+                                            :
+                                            <Text style={styles.add_to_cart_text}>AddToCart</Text>
+                                    }
+
+                                </TouchableOpacity>
+
+                            </View>
 
                         </View>
 
-                    </View>
-
-                    {/* Availabilty */}
-                    <Text style={[styles.product_name, {
-                        marginTop: 10,
-                        fontSize: 12,
-                        fontWeight: "400"
-                    }]}>
-                        AVAILABILTY:
+                        {/* Availabilty */}
                         <Text style={[styles.product_name, {
+                            marginTop: 10,
                             fontSize: 12,
-                            color: stock_item?.is_in_stock == true ? "#020621" : "red"
+                            fontWeight: "400"
                         }]}>
-                            {stock_item?.is_in_stock == true ? " IN STOCK" : " OUT OF STOCK"}
+                            AVAILABILTY:
+                            <Text style={[styles.product_name, {
+                                fontSize: 12,
+                                color: this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? "#020621" : "red"
+                            }]}>
+                                {this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? " IN STOCK" : " OUT OF STOCK"}
+                            </Text>
                         </Text>
-                    </Text>
 
-                    {/* Options */}
-                    <Options
-                        option_package_size={this.state.option_package_size}
-                        option_power={this.state.option_power}
-                        option_cyl={this.state.option_cyl}
-                        option_axes={this.state.option_axes}
-                        option_addition={this.state.option_addition}
-                        selectedVarient={(data, index) => this.selectedVarient(data, index)}
-                        product_varients={this.state.product_varients}
-                        dropdown={this.state.dropdown}
-                        checkMarked={(val) => this.checkMarked(val)}
-                        selectedItemLeftPower={this.state.selectedItemLeftPower}
-                        selectedItemLeftPackage={this.state.selectedItemLeftPackage}
-                        selectedItemRightPower={this.state.selectedItemRightPower}
-                        selectedItemRightPackage={this.state.selectedItemRightPackage}
-                        selectedItemRightADDITION={this.state.selectedItemRightADDITION}
-                        selectedItemLeftADDITION={this.state.selectedItemLeftADDITION}
-                        selectedItemRightCYL={this.state.selectedItemRightCYL}
-                        selectedItemLeftCYL={this.state.selectedItemLeftCYL}
-                        selectedItemRightAXES={this.state.selectedItemRightAXES}
-                        selectedItemLeftAXES={this.state.selectedItemLeftAXES}
-                        openDropDown={(val, eyedir) => this.openDropDown(val, eyedir)}
-                        onChangeText={(val, key) => this.onQuantityChange(val, key)}
-                        leftEyeQuantity={this.state.leftEyeQuantity}
-                        rigthEyeQuantity={this.state.rigthEyeQuantity}
-                        setWholeItemSelected={(item, key) => this.setWholeItemSelected(item, key)}
-                    />
+                        {/* Options */}
+                        <Options
+                            option_package_size={this.state.option_package_size}
+                            option_power={this.state.option_power}
+                            option_cyl={this.state.option_cyl}
+                            option_axes={this.state.option_axes}
+                            option_addition={this.state.option_addition}
+                            selectedVarient={(data, index) => this.selectedVarient(data, index)}
+                            product_varients={this.state.product_varients}
+                            dropdown={this.state.dropdown}
+                            checkMarked={(val) => this.checkMarked(val)}
+                            selectedItemLeftPower={this.state.selectedItemLeftPower}
+                            selectedItemLeftPackage={this.state.selectedItemLeftPackage}
+                            selectedItemRightPower={this.state.selectedItemRightPower}
+                            selectedItemRightPackage={this.state.selectedItemRightPackage}
+                            selectedItemRightADDITION={this.state.selectedItemRightADDITION}
+                            selectedItemLeftADDITION={this.state.selectedItemLeftADDITION}
+                            selectedItemRightCYL={this.state.selectedItemRightCYL}
+                            selectedItemLeftCYL={this.state.selectedItemLeftCYL}
+                            selectedItemRightAXES={this.state.selectedItemRightAXES}
+                            selectedItemLeftAXES={this.state.selectedItemLeftAXES}
+                            openDropDown={(val, eyedir) => this.openDropDown(val, eyedir)}
+                            onChangeText={(val, key) => this.onQuantityChange(val, key)}
+                            leftEyeQuantity={this.state.leftEyeQuantity}
+                            rigthEyeQuantity={this.state.rigthEyeQuantity}
+                            setWholeItemSelected={(item, key) => this.setWholeItemSelected(item, key)}
+                        />
 
-                    {/* Store Features */}
-                    <StoreFeatures />
+                        {/* Store Features */}
+                        <StoreFeatures />
 
-                    {/* DetailsNav */}
-                    <DetailsTabNav
-                        navProps={this.props.navigation}
-                        details_tab={this.state.description}
-                        ProductName={product_details?.name}
-                        main_infor={this.state.main_info_temp}
-                    />
+                        {/* DetailsNav */}
+                        <DetailsTabNav
+                            navProps={this.props.navigation}
+                            details_tab={this.state.description}
+                            ProductName={product_details?.name}
+                            main_infor={this.state.main_info_temp}
+                        />
 
-                </ScrollView>
+                    </ScrollView>
 
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={this.state.openBigImageModal}
-                    onDismiss={() => this.dismissModal("image")}
-                >
-                    <TouchableOpacity
-                        onPress={() => this.dismissModal("image")}
-                        style={{
-                            width: width,
-                            height: Dimensions.get("screen").height,
-                            backgroundColor: "rgba(52,52,52,0.8)",
-                            justifyContent: "center",
-                            alignItems: "center"
-                        }}>
-
-                    </TouchableOpacity>
-                    <ImageCarousel
-                        usage="open"
-                        data={product_details?.media_gallery_entries}
-                        onImagePress={(selected) => this.onImagePress(selected)}
-                        fisrtImage={this.state.bigImage}
-                        style={{ position: "absolute", zIndex: 400, marginTop: height / 4.2, marginLeft: 5 }}
-                    />
-                </Modal>
-
-                {this.state.optionSelected !== null &&
                     <Modal
                         animationType="slide"
                         transparent={true}
-                        visible={this.state.dropdown}
-                        onDismiss={() => this.dismissModal("eye")}
+                        visible={this.state.openBigImageModal}
+                        onDismiss={() => this.dismissModal("image")}
                     >
                         <TouchableOpacity
-                            onPress={() => this.dismissModal("eye")}
+                            onPress={() => this.dismissModal("image")}
                             style={{
                                 width: width,
                                 height: Dimensions.get("screen").height,
                                 backgroundColor: "rgba(52,52,52,0.8)",
                                 justifyContent: "center",
                                 alignItems: "center"
-
                             }}>
 
-                            <View style={[styles?.dropDown_style, {
-                                zIndex: 300,
-                                width: width - 30,
-                                height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
-                            }]}>
-                                <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
-                                    {
-
-                                        this.state.optionSelected?.values?.map((item, index) => {
-                                            return (
-                                                <TouchableOpacity
-                                                    key={String(index)}
-                                                    onPress={() => this.selectItem(item, index, item?.title)}
-                                                    style={styles?.dropDown_item_style}>
-
-                                                    < Text style={styles.dropDown_item_text}>{item?.title}</Text>
-                                                </TouchableOpacity>
-                                            )
-                                        })
-                                    }
-                                </ScrollView>
-                            </View>
                         </TouchableOpacity>
-                    </Modal>}
-            </View>
+                        <ImageCarousel
+                            usage="open"
+                            data={product_details?.media_gallery_entries}
+                            onImagePress={(selected) => this.onImagePress(selected)}
+                            fisrtImage={this.state.bigImage}
+                            style={{ position: "absolute", zIndex: 400, marginTop: height / 4.2, marginLeft: 5 }}
+                        />
+                    </Modal>
+
+                    {this.state.optionSelected !== null &&
+                        <Modal
+                            animationType="slide"
+                            transparent={true}
+                            visible={this.state.dropdown}
+                            onDismiss={() => this.dismissModal("eye")}
+                        >
+                            <TouchableOpacity
+                                onPress={() => this.dismissModal("eye")}
+                                style={{
+                                    width: width,
+                                    height: Dimensions.get("screen").height,
+                                    backgroundColor: "rgba(52,52,52,0.8)",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+
+                                }}>
+
+                                <View style={[styles?.dropDown_style, {
+                                    zIndex: 300,
+                                    width: width - 30,
+                                    height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
+                                }]}>
+                                    <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
+                                        {
+
+                                            this.state.optionSelected?.values?.map((item, index) => {
+                                                return (
+                                                    <TouchableOpacity
+                                                        key={String(index)}
+                                                        onPress={() => this.selectItem(item, index, item?.title)}
+                                                        style={styles?.dropDown_item_style}>
+
+                                                        < Text style={styles.dropDown_item_text}>{item?.title}</Text>
+                                                    </TouchableOpacity>
+                                                )
+                                            })
+                                        }
+                                    </ScrollView>
+                                </View>
+                            </TouchableOpacity>
+                        </Modal>}
+                </View>
+
         )
     }
 }

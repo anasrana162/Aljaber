@@ -427,15 +427,9 @@ class HomeScreen extends Component {
             if (res?.data) {
                 console.log("Response All Products API", res?.data?.items)
                 for (let r = 0; r < res?.data?.items?.length; r++) {
-
-                    // console.log("Index of Loop", r)
                     // store only that have type_id simple
                     temp_sku_arr?.push(res?.data?.items[r])
                     if (res?.data?.items[r]?.type_id == "simple") {
-                        // if (r == res?.data.length - 1) {
-                        //   console.log("Check condition Working")
-                        //     check = true
-                        // }
                         sku_arr.push(res?.data?.items[r])
 
                     }
@@ -489,7 +483,7 @@ class HomeScreen extends Component {
                         store_product.push(res?.data)
                     } else {
                         console.log(" adding Index 1")
-                        index = index + 1
+                        // index = index + 1
                     }
 
                 }
@@ -505,6 +499,7 @@ class HomeScreen extends Component {
         setImmediate(() => {
             var { actions } = this.props
             actions?.allProducts(temp_sku_arr)
+            actions?.randomProducts(store_product)
             this.setState(
                 {
                     loaderDot: false,
@@ -519,7 +514,58 @@ class HomeScreen extends Component {
 
     }
 
+    addToCart = (product, index) => {
 
+        var { userData } = this.props
+        console.log("userData", userData?.token)
+
+        if (userData?.token !== null || userData?.user?.cartID !== undefined) {
+
+            if (product?.type_id == "virtual" || product?.type_id == "simple") {
+
+                if (product?.options.length == 0) {
+
+                    var obj = {
+                        "cartItem": {
+                            "sku": product?.sku,
+                            "qty": 1,
+                            "name": product?.name,
+                            "price": product?.price,
+                            "product_type": "simple",
+                            "quote_id": userData?.user?.cartID
+                        }
+                    }
+                    console.log("this product does not have options", obj)
+
+                    api.post("carts/mine/items", obj, {
+                        headers: {
+                            Authorization: `Bearer ${userData?.token}`,
+                        },
+                    }).then((response) => {
+                        console.log("Add to cart Item API response : ", response?.data)
+                    }).catch((err) => {
+                        console.log("Add to cart item api error:  ", err)
+                    })
+
+                } else {
+                    console.log("this product has options")
+                    this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                    return alert("Please select a Product Options!")
+                }
+
+            } else {
+                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                return alert("Please select a Product varient color!")
+            }
+
+        }
+
+        else {
+            alert("Please Login to your account first!")
+            this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+    }
 
     render() {
         // console.log("random Produuct", this.state.randomProducts)
@@ -527,7 +573,7 @@ class HomeScreen extends Component {
             <View style={styles.mainContainer}>
 
                 {/** Header for Home Screen */}
-                <HomeHeader />
+                <HomeHeader navProps={this.props.navigation} />
 
                 <ScrollView>
                     {/** Swiper below header */}
@@ -545,6 +591,7 @@ class HomeScreen extends Component {
                         data={this.state.randomProducts}
                         loaderDot={this.state.loaderDot}
                         navProps={this.props.navigation}
+                        addToCart={(product, index) => this.addToCart(product, index)}
                     />
 
 

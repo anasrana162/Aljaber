@@ -9,7 +9,7 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
     selectedItems = (item, index, key) => {
 
         // console.log("Selected Item: ", this.state.selectedCat)
-        navProps.navigate("Products", { item, mainCat_selected: data?.position })
+        navProps.navigate("Products", { item, mainCat_selected: data?.position,sub_category_id: item?.id, })
 
     }
 

@@ -1,8 +1,9 @@
-import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import LottieView from 'lottie-react-native';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
@@ -72,7 +73,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                             onPress={() => setOpenSort(!openSort)}
                             style={[styles.filterBox, { width: "100%", position: "absolute", zIndex: 200 }]}>
                             <Text style={styles?.filterBox_Text}>SORT BY</Text>
-                            <MaterialIcons size={25} name="keyboard-arrow-down" color="#020621" />
+                            <MaterialIcons size={25} name="keyboard-arrow-down" color="white" />
 
                         </TouchableOpacity>
                         {openSort &&
@@ -135,6 +136,8 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
 
                 </View>}
 
+                
+
             {loaderDot == true &&
                 <View style={{
                     width: "80%",
@@ -150,17 +153,17 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
             }
 
             {/* Products List */}
-
+            {/* <ActivityIndicator size="large" color="black" style={{position:"absolute", bottom:10 ,zIndex:200}} /> */}
             <ScrollView
-                horizontal={screenName == "Home" ? true : false}
+                horizontal={(screenName == "Home" || screenName == "Cart") ? true : false}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
                 style={{ width: width }}
             >
                 {loader == true &&
                     <View style={[styles.productList_cont, {
-                        flexWrap: screenName == "Home" ? null : "wrap",
-                        marginBottom: screenName == "Home" ? 20 : 320,
+                        flexWrap: (screenName == "Home" || screenName == "Cart")? null : "wrap",
+                        marginBottom: (screenName == "Home" || screenName == "Cart") ? 20 : 320,
                     }]}>
 
                         <View style={styles.product_Cont}>
@@ -247,26 +250,25 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                 }
 
                 {data != null && <View style={[styles.productList_cont, {
-                    flexWrap: screenName == "Home" ? null : "wrap",
-                    marginBottom: screenName == "Home" ? 60 : 320,
+                    flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
+                    marginBottom: (screenName == "Home" || screenName == "Cart") ? 60 : 320,
                 }]}>
                     {
                         data.map((products, index) => {
-
                             //  console.log("products?.media_gallery_entries[0]?.file", products.price ,"  ",products.visibility)
                             return (
                                 <View
                                     key={String(index)}
                                 >
                                     <>
-                                        {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true) &&
-                                            <TouchableOpacity
+                                        {/* {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true) && */}
+                                            <Pressable
                                                 onPress={() => selectedItem(products, index)}
                                                 onPressIn={() => OnTouchIn(products?.media_gallery_entries, index)}
                                                 onPressOut={() => { setImageSelected(null); setImageSelectedIndex(null) }}
                                                 style={[styles.product_Cont, {
-                                                    borderWidth:  imageSelectedIndex !== index ? 0.2 : 2,
-                                                    borderRadius:10,
+                                                    borderWidth: imageSelectedIndex !== index ? 0.2 : 1.5,
+                                                    borderRadius: 3,
                                                 }]}
                                                 activeOpacity={0.8}
                                             >
@@ -277,7 +279,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                                                                 resizeMode='stretch'
                                                                 // 91596cb40167486f0a253bd4173ab8c2
                                                                 source={{ uri: imageUrl + imageSelected }}
-                                                                style={{ width: "70%", height: 80, borderRadius: 10 }}
+                                                                style={{ width: "70%", height: 80, borderRadius: 3 }}
                                                             />
                                                             <View style={{
                                                                 position: "absolute",
@@ -285,8 +287,8 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                                                                 height: 95,
                                                                 justifyContent: "center",
                                                                 alignItems: "center",
-                                                                borderTopLeftRadius: 10,
-                                                                borderTopRightRadius: 10,
+                                                                borderTopLeftRadius: 3,
+                                                                borderTopRightRadius: 3,
                                                                 top: 0,
                                                                 backgroundColor: "rgba(52,52,52,0.4)",
                                                                 zIndex: 200
@@ -307,16 +309,20 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                                                     <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.name}</Text>
                                                     <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
 
-                                                    <TouchableOpacity
-                                                        onPress={() => addToCart(products, index)}
-                                                        style={styles?.addToCart_Cont}>
-                                                        <Text style={styles.addToCart}>Add to Cart</Text>
-                                                    </TouchableOpacity>
+                                                    <View style={styles.addToCart_Outer_Cont}>
+                                                        <TouchableOpacity style={styles.wishlist_button}>
+                                                            <MaterialCommunityIcons name="cards-heart-outline" size={20} color="black" />
+                                                        </TouchableOpacity>
+                                                        <TouchableOpacity
+                                                            onPress={() => addToCart(products, index)}
+                                                            style={styles?.addToCart_Cont}>
+                                                            <MaterialCommunityIcons name="shopping-outline" size={18} color="white" style={{ marginRight: 5 }} />
+                                                            <Text style={styles.addToCart}>Add to Cart</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
                                                 </View>
-
-
-
-                                            </TouchableOpacity>}
+                                            </Pressable>
+                                            {/* } */}
                                     </>
                                 </View>
                             )
@@ -324,6 +330,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
                     }
                 </View>}
             </ScrollView >
+
 
             {/* {screenName == "Home" && <Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30, marginTop: -20 }} />} */}
 
@@ -354,7 +361,7 @@ const styles = StyleSheet.create({
     filterBox: {
         width: width / 2 - 50,
         height: 40,
-        backgroundColor: "#f0f0f0",
+        backgroundColor: "#222529",
         borderRadius: 5,
         flexDirection: "row",
         justifyContent: "center",
@@ -364,7 +371,7 @@ const styles = StyleSheet.create({
     filterBox_Text: {
         fontSize: 14,
         fontWeight: '700',
-        color: "#020621",
+        color: "#ffffff",
     },
 
     sort_dropdown_main_cont: {
@@ -405,7 +412,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#fffff",
         // marginBottom: 50,
         alignItems: "center",
-    
+
 
     },
     product_inner_Cont: {
@@ -434,17 +441,37 @@ const styles = StyleSheet.create({
     addToCart: {
         fontSize: 12,
         fontWeight: "600",
-        color: "#020621",
+        color: "#ffff",
         textAlign: "center",
     },
     addToCart_Cont: {
-        width: 80,
+        width: 105,
         height: 30,
-        marginTop: 10,
-        backgroundColor: "#f0f0f0",
+        flexDirection: "row",
+        backgroundColor: "#222529",
         justifyContent: "center",
         alignItems: "center",
-        borderRadius: 5
+        borderTopRightRadius: 3,
+        borderBottomRightRadius: 3,
+    },
+    addToCart_Outer_Cont: {
+        flexDirection: "row",
+        width: "100%",
+        height: 30,
+        marginTop: 10,
+        justifyContent: "center",
+        alignItems: "center",
+
+    },
+    wishlist_button: {
+        width: 30,
+        height: 30,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "white",
+        borderWidth: 0.5,
+        borderTopLeftRadius: 3,
+        borderBottomLeftRadius: 3,
     }
 
 

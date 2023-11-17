@@ -36,11 +36,11 @@ const TabNavigator = ({ navProps, screenName }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-                // onPress={() => navigateT0("homeScreen")}
+                onPress={() => navigateT0("Cart",navProps)}
                 activeOpacity={0.4}
-                disabled={screenName == "cart" ? true : false}
+                disabled={screenName == "Cart" ? true : false}
                 style={styles.iconContainer} >
-                {screenName == "cart" && <View style={styles.activeBar} />}
+                {screenName == "Cart" && <View style={styles.activeBar} />}
                 <Ionicons name="cart-outline" size={25} color="white" />
                 <Text style={styles.iconText}>Cart</Text>
             </TouchableOpacity>

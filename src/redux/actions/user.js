@@ -1,7 +1,8 @@
 import {
-    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT,CREATEDDEFAULTCAT,ALLPRODUCTS
-    //  MISSING_DATA, SELECTED_PROGRAM,
-    // SHOPS, ORDER_ADDRESS, ITEM_DETAILS, ORDER_DETAILS, SELECTED_VARIENT, PLAN_DETAILS, MENU_DETAILS, PRICE_DETAILS, SUBSCRIPTIONS
+    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS,
+    // SUb Categories
+    CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
+    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES
 } from '../constants';
 
 export function userToken(token) {
@@ -46,6 +47,128 @@ export function allProducts(allproducts) {
         type: ALLPRODUCTS,
         payload: allproducts
     }
+}
+export function randomProducts(randomproducts) {
+    return {
+        type: RANDOMPRODUCTS,
+        payload: randomproducts
+    }
+}
+
+export function savedProducts(category_id, savedproducts) {
+    switch (category_id) {
+
+        // Category Contact Lenses
+        case "29":
+            return {
+                type: CLEARPRES,
+                payload: savedproducts,
+            }
+        case "30":
+            return {
+                type: COLOR,
+                payload: savedproducts
+            }
+        case "31":
+            return {
+                type: TORIC,
+                payload: savedproducts
+            }
+        case "32":
+            return {
+                type: PRESBYOPIA,
+                payload: savedproducts
+            }
+        case "33":
+            return {
+                type: LENSSOL,
+                payload: savedproducts
+            }
+
+        // Category Computer Glasses
+        case "27":
+            return {
+                type: CGADULTS,
+                payload: savedproducts
+            }
+        case "28":
+            return {
+                type: CGKIDS,
+                payload: savedproducts
+            }
+        // case "81":
+        //     return {
+        //         type: LENSSOL,
+        //         payload: savedproducts
+        //     }
+
+        // Category Eyeglasses
+        case "34":
+            return {
+                type: EGMEN,
+                payload: savedproducts
+            }
+        case "103":
+            return {
+                type: EGWOMEN,
+                payload: savedproducts
+            }
+        case "104":
+            return {
+                type: EGKIDS,
+                payload: savedproducts
+            }
+
+        // Category Sunglasses
+        case "42":
+            return {
+                type: SGMEN,
+                payload: savedproducts
+            }
+        case "43":
+            return {
+                type: SGWOMEN,
+                payload: savedproducts
+            }
+        case "44":
+            return {
+                type: SGKIDS,
+                payload: savedproducts
+            }
+        // Category Accessories
+        case "122":
+            return {
+                type: CORDS ,
+                payload: savedproducts
+            }
+        case "123":
+            return {
+                type: SPRAYCLEANER,
+                payload: savedproducts
+            }
+        case "124":
+            return {
+                type: CASES,
+                payload: savedproducts
+            }
+        case "125":
+            return {
+                type: GIFTCARDS ,
+                payload: savedproducts
+            }
+        case "126":
+            return {
+                type: SAFETYGLASSES,
+                payload: savedproducts
+            }
+        case "127":
+            return {
+                type: SWIMMIMINGGOGGLES,
+                payload: savedproducts
+            }
+
+    }
+
 }
 
 // export function missingData(flag) {
