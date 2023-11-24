@@ -10,7 +10,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
     const [selected, setSelected] = useState('')
 
     const selectImage = (obj) => {
-        console.log("OBJ selected:", obj)
+        // console.log("OBJ selected:", obj)
         setSelected(obj)
     }
 
@@ -20,7 +20,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
 
     const onNext = () => {
         if (data[selected?.index + 1] == undefined) {
-            console.log("reset working")
+            // console.log("reset working")
             setSelected(fisrtImage)
         } else {
             setSelected({
@@ -63,7 +63,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
         }
     }
 
-    console.log("adata ", fisrtImage)
+    // console.log("adata ", fisrtImage)
     return (
         <GestureHandlerRootView style={[styles.mainContainer, style]}>
 
@@ -143,6 +143,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
 
                     {
                         data.map((image, index) => {
+                            console.log("Image in Image Carousal")
                             return (
                                 <TouchableOpacity
                                     onPress={() => selectImage({ id: image?.id, url: image.file, index: index })}

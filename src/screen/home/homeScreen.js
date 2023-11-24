@@ -392,13 +392,38 @@ class HomeScreen extends Component {
     });
 
     topCatData = (array) => {
+        var { userData: { admintoken } } = this.props
         let arr = []
+        console.log("Array Top Cats", array)
         for (let ar = 0; ar < array.length; ar++) {
             if (array[ar]?.id == 26) {
+
+                // for (let p = 0; p < array[ar]?.children_data.length; p++) {
+                //     console.log("Top Cats", array[ar]?.children_data[p])
+
+                //     api.get("categories/" + array[ar]?.children_data[p]?.id, {
+                //         headers: {
+                //             Authorization: `Bearer ${admintoken}`,
+                //         }
+                //     }).then((res) => {
+                //         for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+                            
+                //             if (res?.data?.custom_attributes[r].attribute_code == "image") {
+                //                 console.log("Cat detail response:", res?.data.custom_attributes[r])
+                //                 array[ar].children_data.imageLink = 'https://aljaberoptical.com/' + res?.data?.custom_attributes[r]?.value
+                //                 arr.push(array[ar])
+                //                 break;
+                //             }
+                //         }
+                //     })
+                // }
                 arr.push(array[ar])
+
+
             }
         }
         // console.log("Top Categories:", arr[0]?.children_data)
+        // for(let p=0;arr)
         setImmediate(() => {
             this.setState({
                 loader: false,
@@ -425,7 +450,7 @@ class HomeScreen extends Component {
         }).then((res) => {
 
             if (res?.data) {
-                console.log("Response All Products API", res?.data?.items)
+                // console.log("Response All Products API", res?.data?.items)
                 for (let r = 0; r < res?.data?.items?.length; r++) {
                     // store only that have type_id simple
                     temp_sku_arr?.push(res?.data?.items[r])

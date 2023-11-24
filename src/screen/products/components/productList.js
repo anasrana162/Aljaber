@@ -1,5 +1,5 @@
-import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import { Text, StyleSheet, Image, View, Dimensions, TouchableOpacity, ScrollView, ActivityIndicator, Pressable, FlatList } from 'react-native'
+import React, { useCallback, useState } from 'react'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import LottieView from 'lottie-react-native';
@@ -7,18 +7,38 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
 
-const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoard, loaderDot, addToCart }) => {
+const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatListEnd, navProps, sortBY, openFilterBoard, loaderDot, addToCart }) => {
     //  console.log("Products", data)
-
-
-    const selectedItem = (item, index) => {
-        // console.log("Item Product Slected:", item)
-        navProps.navigate("ProductDetails", { product_details: item, product_index: index })
-    }
 
     const [openSort, setOpenSort] = useState(false)
     const [imageSelected, setImageSelected] = useState(null)
     const [imageSelectedIndex, setImageSelectedIndex] = useState(null)
+    // const [dataLength, setDataLenght] = useState(data?.length)
+    const [slicedLength, setSlicedLenght] = useState(20)
+    const [slicedLoader, setSlicedLoader] = useState(false)
+
+    const selectedItem = (item, index) => {
+        // console.log("Item Product Slected:", item)
+       
+        navProps.navigate("ProductDetails", { product_details:  item, product_index: index })
+    }
+
+    const onEndReached = () => {
+        setSlicedLoader(true)
+        console.log("END Reached")
+        console.log("Data length", data?.length)
+
+        if (data?.length <= slicedLength) {
+            console.log("no data to reload")
+            setSlicedLoader(false)
+        }
+        if (data?.length > slicedLength) {
+            setSlicedLenght(slicedLength + 10)
+            setSlicedLoader(false)
+        }
+
+    }
+
     const sort = [
         {
             id: 1,
@@ -136,7 +156,7 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
 
                 </View>}
 
-                
+
 
             {loaderDot == true &&
                 <View style={{
@@ -154,182 +174,184 @@ const ProductList = ({ data, loader, screenName, navProps, sortBY, openFilterBoa
 
             {/* Products List */}
             {/* <ActivityIndicator size="large" color="black" style={{position:"absolute", bottom:10 ,zIndex:200}} /> */}
-            <ScrollView
+            {/* <ScrollView
                 horizontal={(screenName == "Home" || screenName == "Cart") ? true : false}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
+                // onScrollEndDrag={()=>{console.log("On ENd SCrool")}}
                 style={{ width: width }}
-            >
-                {loader == true &&
-                    <View style={[styles.productList_cont, {
-                        flexWrap: (screenName == "Home" || screenName == "Cart")? null : "wrap",
-                        marginBottom: (screenName == "Home" || screenName == "Cart") ? 20 : 320,
-                    }]}>
+            > */}
+            {loader == true &&
+                <View style={[styles.productList_cont, {
+                    flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
+                    marginBottom: (screenName == "Home" || screenName == "Cart") ? 20 : 320,
+                    flexDirection: "row",
+                }]}>
 
-                        <View style={styles.product_Cont}>
+                    <View style={styles.product_Cont}>
 
-                            <SkeletonPlaceholder  >
-                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+                        <SkeletonPlaceholder  >
+                            <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
 
-                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+                                <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
 
-                                    </SkeletonPlaceholder.Item>
+                                </SkeletonPlaceholder.Item>
 
-                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+                                <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
 
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
 
-                                </View>
-                            </SkeletonPlaceholder>
-                        </View>
-
-                        <View style={styles.product_Cont}>
-                            <SkeletonPlaceholder >
-                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
-                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-
-                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-
-                                </View>
-                            </SkeletonPlaceholder>
-                        </View>
-
-                        <View style={styles.product_Cont}>
-
-                            <SkeletonPlaceholder  >
-                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
-
-                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
-
-                                    </SkeletonPlaceholder.Item>
-
-                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
-
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-
-                                </View>
-                            </SkeletonPlaceholder>
-                        </View>
-
-                        <View style={styles.product_Cont}>
-
-                            <SkeletonPlaceholder  >
-                                <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
-
-                                    <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
-
-                                    </SkeletonPlaceholder.Item>
-
-                                    <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
-
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-                                    <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
-                                    </SkeletonPlaceholder.Item>
-
-                                </View>
-                            </SkeletonPlaceholder>
-                        </View>
-
+                            </View>
+                        </SkeletonPlaceholder>
                     </View>
-                }
 
-                {data != null && <View style={[styles.productList_cont, {
+                    <View style={styles.product_Cont}>
+                        <SkeletonPlaceholder >
+                            <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+                                <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+
+                                <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+
+                            </View>
+                        </SkeletonPlaceholder>
+                    </View>
+
+                    <View style={styles.product_Cont}>
+
+                        <SkeletonPlaceholder  >
+                            <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+
+                                <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+
+                                </SkeletonPlaceholder.Item>
+
+                                <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+
+                            </View>
+                        </SkeletonPlaceholder>
+                    </View>
+
+                    <View style={styles.product_Cont}>
+
+                        <SkeletonPlaceholder  >
+                            <View style={{ justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+
+                                <SkeletonPlaceholder.Item width={width / 2 - 30} height={110} borderRadius={10}  >
+
+                                </SkeletonPlaceholder.Item>
+
+                                <SkeletonPlaceholder.Item width={110} height={10} borderRadius={10} marginTop={10}  >
+
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={90} height={15} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+                                <SkeletonPlaceholder.Item width={80} height={25} borderRadius={10} marginTop={10}  >
+                                </SkeletonPlaceholder.Item>
+
+                            </View>
+                        </SkeletonPlaceholder>
+                    </View>
+
+                </View>
+            }
+
+            {/* {data != null && <View style={[styles.productList_cont, {
                     flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
                     marginBottom: (screenName == "Home" || screenName == "Cart") ? 60 : 320,
-                }]}>
-                    {
-                        data.map((products, index) => {
-                            //  console.log("products?.media_gallery_entries[0]?.file", products.price ,"  ",products.visibility)
-                            return (
-                                <View
-                                    key={String(index)}
-                                >
-                                    <>
-                                        {/* {(products?.price > 0 && products?.visibility == 4 && products?.extension_attributes?.stock_item?.is_in_stock == true) && */}
-                                            <Pressable
-                                                onPress={() => selectedItem(products, index)}
-                                                onPressIn={() => OnTouchIn(products?.media_gallery_entries, index)}
-                                                onPressOut={() => { setImageSelected(null); setImageSelectedIndex(null) }}
-                                                style={[styles.product_Cont, {
-                                                    borderWidth: imageSelectedIndex !== index ? 0.2 : 1.5,
-                                                    borderRadius: 3,
-                                                }]}
-                                                activeOpacity={0.8}
-                                            >
-                                                <View style={styles.product_inner_Cont}>
-                                                    {(imageSelected !== null && imageSelectedIndex == index) ?
-                                                        <>
-                                                            <Image
-                                                                resizeMode='stretch'
-                                                                // 91596cb40167486f0a253bd4173ab8c2
-                                                                source={{ uri: imageUrl + imageSelected }}
-                                                                style={{ width: "70%", height: 80, borderRadius: 3 }}
-                                                            />
-                                                            <View style={{
-                                                                position: "absolute",
-                                                                width: "100%",
-                                                                height: 95,
-                                                                justifyContent: "center",
-                                                                alignItems: "center",
-                                                                borderTopLeftRadius: 3,
-                                                                borderTopRightRadius: 3,
-                                                                top: 0,
-                                                                backgroundColor: "rgba(52,52,52,0.4)",
-                                                                zIndex: 200
-                                                            }}>
-                                                            </View>
-                                                        </>
-                                                        :
+                }]}> */}
+            {data != null &&
 
-                                                        <Image
-                                                            resizeMode='stretch'
-                                                            source={{ uri: imageUrl + products?.media_gallery_entries[0]?.file }}
-                                                            style={{ width: "70%", height: 80, borderRadius: 10 }}
-                                                        />
-                                                    }
+                <FlatList
+                    data={data.slice(0, slicedLength)}
+                    keyExtractor={(item) => `${item?.id}`}
+                    numColumns={(screenName == "Home" || screenName == "Cart") ? null : 2}
+                    horizontal={(screenName == "Home" || screenName == "Cart") ? true : false}
+                    initialNumToRender={20}
+                    contentContainerStyle={[styles.productList_cont, {
+                        width: (screenName == "Home" || screenName == "Cart") ? null : width,
+                        flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
+                        // marginBottom: (screenName == "Home" || screenName == "Cart") ? 60 : 320,
+                        // paddingLeft: (screenName == "Home" || screenName == "Cart") ? "80%" :null ,
+                        paddingBottom: (screenName == "Home" || screenName == "Cart") ? null : "80%",
+                    }]}
+                    onEndReached={onEndReached}
+                    ListFooterComponent={() => {
+                        return (<>{
+                            slicedLoader &&
+                            <View style={{ backgroundColor: "#f0f0f0", width: width, height: 60, justifyContent: "center", alignItems: "center" }}>
+
+                                <ActivityIndicator size="small" color="black" />
+                            </View>}</>)
+                    }}
+                    renderItem={(products) => {
+                        // console.log("products", products?.item)
+                        var imageLink = ""
+                        if (screenName == "Home" || screenName == "Cart") {
+                            imageLink = products?.item?.media_gallery_entries[0]?.file
+                        } else {
+                            imageLink = products?.item?.image
+                        }
+                        return (
+                            <Pressable
+                                onPress={() => selectedItem(products?.item, products?.index)}
+                                // onPressIn={() => OnTouchIn(products?.item?.media_gallery_entries, products?.index)}
+                                // onPressOut={() => { setImageSelected(null); setImageSelectedIndex(null) }}
+                                style={[styles.product_Cont, {
+                                    borderWidth: imageSelectedIndex !== products?.index ? 0.2 : 1.5,
+                                    borderRadius: 3,
+                                }]}
+                                activeOpacity={0.8}
+
+                            >
+                                <View style={styles.product_inner_Cont}>
 
 
-                                                    <Text numberOfLines={2} style={styles.product_Name}>{products?.brand}</Text>
-                                                    <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.name}</Text>
-                                                    <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.price}</Text>
+                                    <Image
+                                        resizeMode='stretch'
+                                        source={{ uri: imageUrl + imageLink }}
+                                        style={{ width: "70%", height: 80, borderRadius: 10 }}
+                                    />
 
-                                                    <View style={styles.addToCart_Outer_Cont}>
-                                                        <TouchableOpacity style={styles.wishlist_button}>
-                                                            <MaterialCommunityIcons name="cards-heart-outline" size={20} color="black" />
-                                                        </TouchableOpacity>
-                                                        <TouchableOpacity
-                                                            onPress={() => addToCart(products, index)}
-                                                            style={styles?.addToCart_Cont}>
-                                                            <MaterialCommunityIcons name="shopping-outline" size={18} color="white" style={{ marginRight: 5 }} />
-                                                            <Text style={styles.addToCart}>Add to Cart</Text>
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                </View>
-                                            </Pressable>
-                                            {/* } */}
-                                    </>
+
+                                    <Text numberOfLines={2} style={styles.product_Name}>{products?.item?.brand}</Text>
+                                    <Text numberOfLines={2} style={[styles.product_Name, { marginTop: 5, width: 160 }]}>{products?.item?.name}</Text>
+                                    <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.item?.price}</Text>
+
+                                    <View style={styles.addToCart_Outer_Cont}>
+                                        <TouchableOpacity style={styles.wishlist_button}>
+                                            <MaterialCommunityIcons name="cards-heart-outline" size={20} color="black" />
+                                        </TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => addToCart(products?.item, index)}
+                                            style={styles?.addToCart_Cont}>
+                                            <MaterialCommunityIcons name="shopping-outline" size={18} color="white" style={{ marginRight: 5 }} />
+                                            <Text style={styles.addToCart}>Add to Cart</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
-                            )
-                        })
-                    }
-                </View>}
-            </ScrollView >
+                            </Pressable>
+                        )
+                    }}
+                />}
+
+            {/* // </View>} */}
+            {/* </ScrollView > */}
 
 
             {/* {screenName == "Home" && <Image source={require('../../../../assets/separator-1.png')} style={{ width: width - 220, height: 18, marginBottom: 30, marginTop: -20 }} />} */}
@@ -396,13 +418,13 @@ const styles = StyleSheet.create({
 
     productList_cont: {
         width: "100%",
-        height: "90%",
-        flexDirection: "row",
-        flexWrap: "wrap",
+        // height: "90%",
+        // flexDirection: "row",
+        // flexWrap: "wrap",
         justifyContent: "flex-start",
         alignItems: "center",
         marginTop: 10,
-        marginBottom: 320,
+        // marginBottom: 320,
     },
     product_Cont: {
         marginVertical: 10,

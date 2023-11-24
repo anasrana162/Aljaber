@@ -79,7 +79,7 @@ const Options = ({
                     >
                         {
                             product_varients?.map((data, index) => {
-                                console.log("data", data?.color?.toLowerCase())
+                                // console.log("data", data?.color?.toLowerCase())
                                 return (
                                     <TouchableOpacity
                                         onPress={() => selectedVarient(data, index)}

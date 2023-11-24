@@ -50,7 +50,7 @@ class Categories extends Component {
 
             case 'sub':
                 // console.log("Selected Item: ", this.state.selectedCat)
-                this.props.navigation.navigate("Products", { item, sub_category_id: item?.id, defaultCategories: this.state.defaultCategories, mainCat_selected: this.state.selectedCat?.position })
+                this.props.navigation.navigate("Products", { item, sub_category_id: item?.id, defaultCategories: this.state.defaultCategories, mainCat_selected: this.state.selectedCat?.position,imageLinkMain: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" })
         }
     }
 

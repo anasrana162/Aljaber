@@ -53,7 +53,7 @@ const FBListCont = ({ filterData, checkBox, filteredPrice, highest_price, lowest
                     {
 
                         filterData?.value?.map((data, index) => {
-                            console.log(" filterData?.value", filterData)
+                            // console.log(" filterData?.value", filterData)
                             return (
                                 <TouchableOpacity
                                     key={String(index)}

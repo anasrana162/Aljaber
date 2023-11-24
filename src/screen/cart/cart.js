@@ -363,7 +363,7 @@ class Cart extends Component {
                     fontSize: 20,
                     alignSelf: "flex-start",
                     marginTop: 20,
-                    marginBottom: -40,
+                    marginBottom: -20,
                     marginLeft: 10,
                 }]}>Recommended for you</Text>
                 {/* Recommended Products */}

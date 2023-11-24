@@ -9,7 +9,7 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
     selectedItems = (item, index, key) => {
 
         // console.log("Selected Item: ", this.state.selectedCat)
-        navProps.navigate("Products", { item, mainCat_selected: data?.position,sub_category_id: item?.id, })
+        navProps.navigate("Products", { item, mainCat_selected: data?.position,sub_category_id: item?.id,imageLinkMain: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" })
 
     }
 

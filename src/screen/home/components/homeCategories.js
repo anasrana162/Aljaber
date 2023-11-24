@@ -14,7 +14,7 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
     const selectedItems = (item, index,) => {
 
         // console.log("Selected Item: ", this.state.selectedCat)
-        navProps.navigate("Products", { item, mainCat_selected: mainCatPos })
+        navProps.navigate("Products", { item, mainCat_selected: mainCatPos,sub_category_id: item?.id, })
 
     }
 
@@ -79,6 +79,7 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
 
                 {
                     data.map((item, index) => {
+                        console.log("item",item.id)
                         return (
 
                             <View

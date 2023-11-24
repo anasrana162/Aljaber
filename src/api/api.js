@@ -12,6 +12,8 @@ export default axios.create({
 
 });
 
+export const custom_api_url = "https://aljaberoptical.com/pub/script/custom_api.php?"
+
 // admin credentials
 // "username": "manager",
 // "password": "Pakistan2023"

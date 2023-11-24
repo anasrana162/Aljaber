@@ -17,6 +17,7 @@ import DetailsTabNav from './detailsTabNav';
 import api from '../../api/api';
 import axios from 'axios';
 import Loading from '../../components_reusable/loading';
+import products from './products';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -187,7 +188,7 @@ class ProductDetails extends Component {
     getProductDetails = async () => {
         var { product_details: { sku } } = this.props.route.params
         var { userData: { admintoken, allproducts } } = this.props
-        console.log("product_details", sku)
+        // console.log("product_details", sku)
 
         tempPRoducts = []
 
@@ -263,7 +264,7 @@ class ProductDetails extends Component {
                                         cfPD.data.brand = data?.data // brand value
                                         cfPD.data.parent_product_id = prod?.data?.id
                                         cfPD.data.options = prod?.data?.options
-
+                                        cfPD.data.type_id = prod?.data?.type_id
                                         // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
                                         // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
                                         // together
@@ -317,7 +318,7 @@ class ProductDetails extends Component {
                 }
             }
 
-            console.log("Product DEtails STate:", this.state.product_details)
+            // console.log("Product DEtails STate:", this.state.product_details)
 
             // this is for loader skeleton 
 
@@ -346,7 +347,7 @@ class ProductDetails extends Component {
 
     checkOptions = (key) => {
         var { product_details: { options } } = this.state
-        console.log("OPtions For Product", options)
+        // console.log("OPtions For Product", options)
 
         var x = [];
 
@@ -360,7 +361,7 @@ class ProductDetails extends Component {
                 x = options
         }
 
-        console.log("OPtions For Product", x)
+        // console.log("OPtions For Product", x)
 
         if (x.length == 0) {
             return console.log("option are null")
@@ -368,7 +369,7 @@ class ProductDetails extends Component {
 
         for (let i = 0; i < x.length; i++) {
 
-            console.log("CHeck TItle Options", x[i]?.title)
+            // console.log("CHeck TItle Options", x[i]?.title)
             if (x[i]?.title == "PACKAGE SIZE") {
                 this.setState({ option_package_size: x[i] })
             }
@@ -431,9 +432,9 @@ class ProductDetails extends Component {
     }
 
     productImages = (key) => {
-        var { product_details: { media_gallery_entries, } } = this.state
+        var { product_details: { media_gallery_entries } } = this.state
 
-        // console.log("media_gallery_entries", this.state.product_varient_selected?.media_gallery_entries)
+        console.log("media_gallery_entries", media_gallery_entries)
 
         switch (key) {
             case "prop":
@@ -479,7 +480,7 @@ class ProductDetails extends Component {
                 setImmediate(() => {
                     this.setState({ description: x[i]?.value })
                 })
-                console.log("description", x[i]?.value)
+                // console.log("description", x[i]?.value)
                 break;
             }
         }
@@ -1051,6 +1052,7 @@ class ProductDetails extends Component {
                 break;
 
             case "rightPO":
+                console.log("rightPO", item)
                 setImmediate(() => {
                     this.setState({
                         selectedItemRightPower: item,
@@ -1164,10 +1166,10 @@ class ProductDetails extends Component {
             productToSend = product
         }
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
-            console.log("productToSend?.type_id", productToSend?.type_id)
-            if (productToSend?.type_id == "virtual" || productToSend?.type_id == "simple") {
+            console.log("productToSend?.type_id", productToSend)
+            if (productToSend?.type_id == "configurable" || productToSend?.type_id == "simple") {
 
-                if (productToSend?.options.length == 0) {
+                if (productToSend?.options?.length == 0) {
 
                     let obj = {
                         "cartItem": {
@@ -1243,8 +1245,6 @@ class ProductDetails extends Component {
                         console.log("this product does have options Same Power", obj)
                     }
 
-                    // POWER AND PACKAGES
-
                     // if powers are different
                     if (this.state.checked == true &&
                         this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
@@ -1265,7 +1265,7 @@ class ProductDetails extends Component {
                             "cartItem": {
                                 "sku": productToSend?.sku,
                                 "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
+                                "name": this.state.product_details?.name,
                                 "price": productToSend?.price,
                                 "product_type": productToSend?.type_id,
                                 "quote_id": userData?.user?.cartID,
@@ -1276,16 +1276,25 @@ class ProductDetails extends Component {
                                 }
                             }
                         }
-
+                        console.log("")
+                        console.log('')
+                        console.log("---------------------------------------")
+                        console.log("Before Going to API")
+                        console.log("")
                         console.log("this product does have options finalItemRightPower", obj)
-
+                        console.log("")
+                        console.log("this product does have options finalItemRightPower ProductOption", obj?.cartItem?.product_option?.extension_attributes)
+                        console.log("")
+                        console.log("---------------------------------------")
+                        console.log("")
+                        console.log('')
                         this.addToCartApi(obj)
 
                         let obj2 = {
                             "cartItem": {
                                 "sku": productToSend?.sku,
                                 "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
+                                "name": this.state.product_details?.name,
                                 "price": productToSend?.price,
                                 "product_type": productToSend?.type_id,
                                 "quote_id": userData?.user?.cartID,
@@ -1296,11 +1305,23 @@ class ProductDetails extends Component {
                                 }
                             }
                         }
-
+                        console.log("")
+                        console.log('')
+                        console.log("---------------------------------------")
+                        console.log("Before Going to API")
+                        console.log("")
                         console.log("this product does have options finalItemLeftPower", obj2)
-
+                        console.log("")
+                        console.log("this product does have options finalItemLeftPower ProductOption", obj2?.cartItem?.product_option?.extension_attributes)
+                        console.log("")
+                        console.log("---------------------------------------")
+                        console.log("")
+                        console.log('')
                         this.addToCartApi(obj2)
                     }
+
+                    // POWER AND PACKAGES
+
 
                     // Power and packages both are same
                     if (this.state.checked == true &&
@@ -2427,6 +2448,11 @@ class ProductDetails extends Component {
                 }
 
             } else {
+                setImmediate(() => {
+                    this.setState({
+                        cartLoader: false
+                    })
+                })
                 // this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                 return alert("Please select a Product varient color!")
             }
@@ -2446,6 +2472,18 @@ class ProductDetails extends Component {
     }
 
     addToCartApi = async (obj) => {
+        console.log("")
+        console.log('')
+        console.log("---------------------------------------")
+        console.log("Before Going to API in FUnc")
+        console.log("")
+        console.log("this product does have options finalItemLeftPower", obj)
+        console.log("")
+        console.log("this product does have options finalItemLeftPower ProductOption", obj?.cartItem?.product_option?.extension_attributes)
+        console.log("")
+        console.log("---------------------------------------")
+        console.log("")
+        console.log('')
         var { userData } = this.props
         await api.post("carts/mine/items", obj, {
             headers: {
@@ -2453,7 +2491,16 @@ class ProductDetails extends Component {
             },
         }).then((response) => {
             alert("Product Added to Cart")
+            console.log("")
+            console.log("---------------------------------------")
+            console.log("")
+            console.log("API RESPONSE")
+            console.log('')
             console.log("Add to cart Item API response : ", response?.data)
+            console.log("")
+            console.log("---------------------------------------")
+            console.log("")
+            console.log('')
             setImmediate(() => {
                 this.setState({
                     cartLoader: false
@@ -2544,7 +2591,7 @@ class ProductDetails extends Component {
         var {
             product_varient_selected,
             media_gallery_entries,
-            product_details: { },
+            // product_details: { },
         } = this.state
         const tagsStyles = {
             body: {
@@ -2562,231 +2609,233 @@ class ProductDetails extends Component {
         };
         return (
 
-                <View style={styles.mainContainer}>
-                    {this.state.loader && <Loading />}
-                    {/* Header */}
-                    <HomeHeader />
+            <View style={styles.mainContainer}>
+                {this.state.loader && <Loading />}
+                {/* Header */}
+                <HomeHeader />
 
-                    <ScrollView
-                        showsVerticalScrollIndicator={false}
-                        style={{ width: width - 20, }}>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    style={{ width: width - 20, }}>
 
-                        <ImageCarousel
-                            usage="openModal"
-                            key={String(this.state.imageKey)}
-                            data={media_gallery_entries}
-                            onImagePress={(selected) => this.onImagePress(selected)}
-                            varient_selected={this.state.varient_selected}
-                            fisrtImage={this.state.product_varient_selected == null ?
-                                {
-                                    id: product_details?.media_gallery_entries[0]?.id,
-                                    url: product_details?.media_gallery_entries[0]?.file,
-                                    index: 0,
-                                }
-                                :
-                                {
-                                    id: this.state.product_varient_selected?.media_gallery_entries[0].id,
-                                    url: this.state.product_varient_selected?.media_gallery_entries[0]?.file,
-                                    index: 0,
-                                }}
-                        />
+                    {/* {console.log(" product_details?.media_gallery_entries", product_details)} */}
+
+                    <ImageCarousel
+                        usage="openModal"
+                        key={String(this.state.imageKey)}
+                        data={media_gallery_entries}
+                        onImagePress={(selected) => this.onImagePress(selected)}
+                        varient_selected={this.state.varient_selected}
+                        fisrtImage={this.state.product_varient_selected == null ?
+                            {
+                                id: 1,
+                                url: product_details?.media_gallery_entries == undefined ? product_details?.image : product_details?.media_gallery_entries[0]?.file,
+                                index: 0,
+                            }
+                            :
+                            {
+                                id: this.state.product_varient_selected?.media_gallery_entries[0].id,
+                                url: this.state.product_varient_selected?.media_gallery_entries[0]?.file,
+                                index: 0,
+                            }}
+                    />
 
 
 
 
-                        {/* Product Name */}
-                        < Text style={[styles.product_name, {
-                            marginTop: 10,
-                        }]}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
+                    {/* Product Name */}
+                    < Text style={[styles.product_name, {
+                        marginTop: 10,
+                    }]}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
 
-                        {/* Product Description */}
-                        {this.state.description !== '' &&
-                            <RenderHtml
-                                tagsStyles={tagsStyles}
-                                contentWidth={width}
-                                source={{
-                                    html: `${this.state.description}`,
-                                }}
-                            />}
+                    {/* Product Description */}
+                    {this.state.description !== '' &&
+                        <RenderHtml
+                            tagsStyles={tagsStyles}
+                            contentWidth={width}
+                            source={{
+                                html: `${this.state.description}`,
+                            }}
+                        />}
 
-                        {/* Price , quantity, add to cart */}
-                        <View style={styles.row_cont}>
-                            {/* Price */}
-                            <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_varient_selected !== null ? product_varient_selected?.price : product_details?.price}</Text>
+                    {/* Price , quantity, add to cart */}
+                    <View style={styles.row_cont}>
+                        {/* Price */}
+                        <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_varient_selected !== null ? product_varient_selected?.price : product_details?.price}</Text>
 
-                            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
 
-                                {/* Quantity */}
-                                {this.state.checked == false &&
-                                    <>
-                                        <View style={styles?.row_quantity}>
+                            {/* Quantity */}
+                            {this.state.checked == false &&
+                                <>
+                                    <View style={styles?.row_quantity}>
 
-                                            {/* Plus Button */}
-                                            <TouchableOpacity
-                                                onPress={() => this.plusOne()}
-                                                style={styles.quantityBox}>
-                                                <AntDesign name="plus" size={18} color="#020621" />
-                                            </TouchableOpacity>
+                                        {/* Plus Button */}
+                                        <TouchableOpacity
+                                            onPress={() => this.plusOne()}
+                                            style={styles.quantityBox}>
+                                            <AntDesign name="plus" size={18} color="#020621" />
+                                        </TouchableOpacity>
 
-                                            {/* Quantity Number */}
-                                            <View
-                                                style={styles.quantityBox}>
-                                                <Text style={styles.product_name}>{this.state.quantity}</Text>
-                                            </View>
-
-                                            {/* Minus Button */}
-                                            <TouchableOpacity
-                                                onPress={() => this.minusOne()}
-                                                style={styles.quantityBox}>
-                                                <AntDesign name="minus" size={18} color="#020621" />
-                                            </TouchableOpacity>
+                                        {/* Quantity Number */}
+                                        <View
+                                            style={styles.quantityBox}>
+                                            <Text style={styles.product_name}>{this.state.quantity}</Text>
                                         </View>
-                                    </>
+
+                                        {/* Minus Button */}
+                                        <TouchableOpacity
+                                            onPress={() => this.minusOne()}
+                                            style={styles.quantityBox}>
+                                            <AntDesign name="minus" size={18} color="#020621" />
+                                        </TouchableOpacity>
+                                    </View>
+                                </>
+                            }
+
+                            {/* Add to Cart */}
+                            <TouchableOpacity
+                                onPress={() => this.addToCart(product_details, product_index)}
+                                style={styles.add_to_cart}
+                            >
+                                {
+                                    this.state.cartLoader == true ?
+                                        <ActivityIndicator size={"small"} color={'#ffffff'} />
+                                        :
+                                        <Text style={styles.add_to_cart_text}>AddToCart</Text>
                                 }
 
-                                {/* Add to Cart */}
-                                <TouchableOpacity
-                                    onPress={() => this.addToCart(product_details, product_index)}
-                                    style={styles.add_to_cart}
-                                >
-                                    {
-                                        this.state.cartLoader == true ?
-                                            <ActivityIndicator size={"small"} color={'#ffffff'} />
-                                            :
-                                            <Text style={styles.add_to_cart_text}>AddToCart</Text>
-                                    }
-
-                                </TouchableOpacity>
-
-                            </View>
+                            </TouchableOpacity>
 
                         </View>
 
-                        {/* Availabilty */}
+                    </View>
+
+                    {/* Availabilty */}
+                    <Text style={[styles.product_name, {
+                        marginTop: 10,
+                        fontSize: 12,
+                        fontWeight: "400"
+                    }]}>
+                        AVAILABILTY:
                         <Text style={[styles.product_name, {
-                            marginTop: 10,
                             fontSize: 12,
-                            fontWeight: "400"
+                            color: this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? "#020621" : "red"
                         }]}>
-                            AVAILABILTY:
-                            <Text style={[styles.product_name, {
-                                fontSize: 12,
-                                color: this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? "#020621" : "red"
-                            }]}>
-                                {this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? " IN STOCK" : " OUT OF STOCK"}
-                            </Text>
+                            {this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? " IN STOCK" : " OUT OF STOCK"}
                         </Text>
+                    </Text>
 
-                        {/* Options */}
-                        <Options
-                            option_package_size={this.state.option_package_size}
-                            option_power={this.state.option_power}
-                            option_cyl={this.state.option_cyl}
-                            option_axes={this.state.option_axes}
-                            option_addition={this.state.option_addition}
-                            selectedVarient={(data, index) => this.selectedVarient(data, index)}
-                            product_varients={this.state.product_varients}
-                            dropdown={this.state.dropdown}
-                            checkMarked={(val) => this.checkMarked(val)}
-                            selectedItemLeftPower={this.state.selectedItemLeftPower}
-                            selectedItemLeftPackage={this.state.selectedItemLeftPackage}
-                            selectedItemRightPower={this.state.selectedItemRightPower}
-                            selectedItemRightPackage={this.state.selectedItemRightPackage}
-                            selectedItemRightADDITION={this.state.selectedItemRightADDITION}
-                            selectedItemLeftADDITION={this.state.selectedItemLeftADDITION}
-                            selectedItemRightCYL={this.state.selectedItemRightCYL}
-                            selectedItemLeftCYL={this.state.selectedItemLeftCYL}
-                            selectedItemRightAXES={this.state.selectedItemRightAXES}
-                            selectedItemLeftAXES={this.state.selectedItemLeftAXES}
-                            openDropDown={(val, eyedir) => this.openDropDown(val, eyedir)}
-                            onChangeText={(val, key) => this.onQuantityChange(val, key)}
-                            leftEyeQuantity={this.state.leftEyeQuantity}
-                            rigthEyeQuantity={this.state.rigthEyeQuantity}
-                            setWholeItemSelected={(item, key) => this.setWholeItemSelected(item, key)}
-                        />
+                    {/* Options */}
+                    <Options
+                        option_package_size={this.state.option_package_size}
+                        option_power={this.state.option_power}
+                        option_cyl={this.state.option_cyl}
+                        option_axes={this.state.option_axes}
+                        option_addition={this.state.option_addition}
+                        selectedVarient={(data, index) => this.selectedVarient(data, index)}
+                        product_varients={this.state.product_varients}
+                        dropdown={this.state.dropdown}
+                        checkMarked={(val) => this.checkMarked(val)}
+                        selectedItemLeftPower={this.state.selectedItemLeftPower}
+                        selectedItemLeftPackage={this.state.selectedItemLeftPackage}
+                        selectedItemRightPower={this.state.selectedItemRightPower}
+                        selectedItemRightPackage={this.state.selectedItemRightPackage}
+                        selectedItemRightADDITION={this.state.selectedItemRightADDITION}
+                        selectedItemLeftADDITION={this.state.selectedItemLeftADDITION}
+                        selectedItemRightCYL={this.state.selectedItemRightCYL}
+                        selectedItemLeftCYL={this.state.selectedItemLeftCYL}
+                        selectedItemRightAXES={this.state.selectedItemRightAXES}
+                        selectedItemLeftAXES={this.state.selectedItemLeftAXES}
+                        openDropDown={(val, eyedir) => this.openDropDown(val, eyedir)}
+                        onChangeText={(val, key) => this.onQuantityChange(val, key)}
+                        leftEyeQuantity={this.state.leftEyeQuantity}
+                        rigthEyeQuantity={this.state.rigthEyeQuantity}
+                        setWholeItemSelected={(item, key) => this.setWholeItemSelected(item, key)}
+                    />
 
-                        {/* Store Features */}
-                        <StoreFeatures />
+                    {/* Store Features */}
+                    <StoreFeatures />
 
-                        {/* DetailsNav */}
-                        <DetailsTabNav
-                            navProps={this.props.navigation}
-                            details_tab={this.state.description}
-                            ProductName={product_details?.name}
-                            main_infor={this.state.main_info_temp}
-                        />
+                    {/* DetailsNav */}
+                    <DetailsTabNav
+                        navProps={this.props.navigation}
+                        details_tab={this.state.description}
+                        ProductName={product_details?.name}
+                        main_infor={this.state.main_info_temp}
+                    />
 
-                    </ScrollView>
+                </ScrollView>
 
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={this.state.openBigImageModal}
+                    onDismiss={() => this.dismissModal("image")}
+                >
+                    <TouchableOpacity
+                        onPress={() => this.dismissModal("image")}
+                        style={{
+                            width: width,
+                            height: Dimensions.get("screen").height,
+                            backgroundColor: "rgba(52,52,52,0.8)",
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}>
+
+                    </TouchableOpacity>
+                    <ImageCarousel
+                        usage="open"
+                        data={product_details?.media_gallery_entries}
+                        onImagePress={(selected) => this.onImagePress(selected)}
+                        fisrtImage={this.state.bigImage}
+                        style={{ position: "absolute", zIndex: 400, marginTop: height / 4.2, marginLeft: 5 }}
+                    />
+                </Modal>
+
+                {this.state.optionSelected !== null &&
                     <Modal
                         animationType="slide"
                         transparent={true}
-                        visible={this.state.openBigImageModal}
-                        onDismiss={() => this.dismissModal("image")}
+                        visible={this.state.dropdown}
+                        onDismiss={() => this.dismissModal("eye")}
                     >
                         <TouchableOpacity
-                            onPress={() => this.dismissModal("image")}
+                            onPress={() => this.dismissModal("eye")}
                             style={{
                                 width: width,
                                 height: Dimensions.get("screen").height,
                                 backgroundColor: "rgba(52,52,52,0.8)",
                                 justifyContent: "center",
                                 alignItems: "center"
+
                             }}>
 
+                            <View style={[styles?.dropDown_style, {
+                                zIndex: 300,
+                                width: width - 30,
+                                height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
+                            }]}>
+                                <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
+                                    {
+
+                                        this.state.optionSelected?.values?.map((item, index) => {
+                                            return (
+                                                <TouchableOpacity
+                                                    key={String(index)}
+                                                    onPress={() => this.selectItem(item, index, item?.title)}
+                                                    style={styles?.dropDown_item_style}>
+
+                                                    < Text style={styles.dropDown_item_text}>{item?.title}</Text>
+                                                </TouchableOpacity>
+                                            )
+                                        })
+                                    }
+                                </ScrollView>
+                            </View>
                         </TouchableOpacity>
-                        <ImageCarousel
-                            usage="open"
-                            data={product_details?.media_gallery_entries}
-                            onImagePress={(selected) => this.onImagePress(selected)}
-                            fisrtImage={this.state.bigImage}
-                            style={{ position: "absolute", zIndex: 400, marginTop: height / 4.2, marginLeft: 5 }}
-                        />
-                    </Modal>
-
-                    {this.state.optionSelected !== null &&
-                        <Modal
-                            animationType="slide"
-                            transparent={true}
-                            visible={this.state.dropdown}
-                            onDismiss={() => this.dismissModal("eye")}
-                        >
-                            <TouchableOpacity
-                                onPress={() => this.dismissModal("eye")}
-                                style={{
-                                    width: width,
-                                    height: Dimensions.get("screen").height,
-                                    backgroundColor: "rgba(52,52,52,0.8)",
-                                    justifyContent: "center",
-                                    alignItems: "center"
-
-                                }}>
-
-                                <View style={[styles?.dropDown_style, {
-                                    zIndex: 300,
-                                    width: width - 30,
-                                    height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
-                                }]}>
-                                    <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
-                                        {
-
-                                            this.state.optionSelected?.values?.map((item, index) => {
-                                                return (
-                                                    <TouchableOpacity
-                                                        key={String(index)}
-                                                        onPress={() => this.selectItem(item, index, item?.title)}
-                                                        style={styles?.dropDown_item_style}>
-
-                                                        < Text style={styles.dropDown_item_text}>{item?.title}</Text>
-                                                    </TouchableOpacity>
-                                                )
-                                            })
-                                        }
-                                    </ScrollView>
-                                </View>
-                            </TouchableOpacity>
-                        </Modal>}
-                </View>
+                    </Modal>}
+            </View>
 
         )
     }
