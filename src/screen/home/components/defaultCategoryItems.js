@@ -1,16 +1,39 @@
 import { Text, StyleSheet, View, Dimensions, FlatList, NativeModules, TouchableOpacity, Platform, Image, ScrollView } from 'react-native'
 import React, { Component, PureComponent, memo } from 'react'
 import AntDesign from 'react-native-vector-icons/AntDesign'
+import api from '../../../api/api'
 const width = Dimensions.get("screen").width
 
-const DefaultCategoryItems = ({ data, navProps, onNextPress }) => {
+const DefaultCategoryItems = ({ data, navProps, onNextPress,admintoken }) => {
     // console.log("DefaultCategoryItems:;;;;; ", data?.children_data)
 
-    selectedItems = (item, index, key) => {
+    selectedItems = async (item, index, key) => {
 
         // console.log("Selected Item: ", this.state.selectedCat)
-        navProps.navigate("Products", { item, mainCat_selected: data?.position,sub_category_id: item?.id,imageLinkMain: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" })
+        var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
+        await api.get("categories/" + item?.id, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            }
+        }).then((res) => {
+            // console.log("Response for Top Category API:", res?.data)
+            for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+                if (res?.data?.custom_attributes[r].attribute_code == "image") {
+                    image = res?.data?.custom_attributes[r]?.value
+                    break;
+                }
 
+            }
+        }).catch((err) => {
+            console.log("Err Fetching image in DefaultCategoryItems: ", err)
+        })
+
+        navProps.navigate("Products", {
+            item,
+            mainCat_selected: data?.position, sub_category_id: item?.id,
+            imageLinkMain: image,
+
+        })
     }
 
     return (

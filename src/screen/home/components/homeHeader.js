@@ -14,9 +14,9 @@ export default class HomeHeader extends Component {
                 <View style={styles.inner_mainContainer}>
 
                     {/** Menu Icon Button */}
-                    <TouchableOpacity style={styles.menuIcon}>
+                    {/* <TouchableOpacity style={styles.menuIcon}>
                         <Ionicons name="menu" size={35} color="#020621" />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     {/**logo */}
                     <Image source={require('../../../../assets/Al-Jabir-name.png')}
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     },
     logo: {
         position: "absolute",
-        left: 60,
+        left: 10,
         width: 70,
         height: 50
     },

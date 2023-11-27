@@ -285,7 +285,7 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
                     initialNumToRender={20}
                     contentContainerStyle={[styles.productList_cont, {
                         width: (screenName == "Home" || screenName == "Cart") ? null : width,
-                        flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
+                        // flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
                         // marginBottom: (screenName == "Home" || screenName == "Cart") ? 60 : 320,
                         // paddingLeft: (screenName == "Home" || screenName == "Cart") ? "80%" :null ,
                         paddingBottom: (screenName == "Home" || screenName == "Cart") ? null : "80%",
@@ -338,7 +338,7 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
                                             <MaterialCommunityIcons name="cards-heart-outline" size={20} color="black" />
                                         </TouchableOpacity>
                                         <TouchableOpacity
-                                            onPress={() => addToCart(products?.item, index)}
+                                            onPress={() => addToCart(products?.item, products?.index)}
                                             style={styles?.addToCart_Cont}>
                                             <MaterialCommunityIcons name="shopping-outline" size={18} color="white" style={{ marginRight: 5 }} />
                                             <Text style={styles.addToCart}>Add to Cart</Text>

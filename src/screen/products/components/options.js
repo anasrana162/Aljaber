@@ -30,6 +30,8 @@ const Options = ({
     rigthEyeQuantity,
     selectedVarient,
     setWholeItemSelected,
+    configurable_product_options,
+    selectedCPO
 }) => {
 
     const [checked, setChecked] = useState(false)
@@ -67,35 +69,37 @@ const Options = ({
                 <>
                 </>
                 :
-                <View style={styles.colorFlatlist}>
+                <>
+                    {checked == false && <View style={styles.colorFlatlist}>
 
-                    {/* Title */}
-                    < Text style={styles.title}>Colors: </Text>
+                        {/* Title */}
+                        < Text style={styles.title}>Colors: </Text>
 
-                    {/* List */}
-                    <ScrollView
-                        horizontal
-                        style={{ width: "100%" }}
-                    >
-                        {
-                            product_varients?.map((data, index) => {
-                                // console.log("data", data?.color?.toLowerCase())
-                                return (
-                                    <TouchableOpacity
-                                        onPress={() => selectedVarient(data, index)}
-                                        key={String(index)}
-                                        style={[styles.color_cont, {
-                                            backgroundColor: data?.color?.toLowerCase()
-                                        }]}>
+                        {/* List */}
+                        <ScrollView
+                            horizontal
+                            style={{ width: "100%" }}
+                        >
+                            {
+                                product_varients?.map((data, index) => {
+                                    // console.log("data", data?.color?.toLowerCase())
+                                    return (
+                                        <TouchableOpacity
+                                            onPress={() => selectedVarient(data, index)}
+                                            key={String(index)}
+                                            style={[styles.color_cont, {
+                                                backgroundColor: data?.color?.toLowerCase()
+                                            }]}>
 
-                                    </TouchableOpacity>
-                                )
+                                        </TouchableOpacity>
+                                    )
 
-                            })
-                        }
+                                })
+                            }
 
-                    </ScrollView>
-                </View>
+                        </ScrollView>
+                    </View>}
+                </>
             }
 
             {
@@ -103,7 +107,16 @@ const Options = ({
                     <>
                         <View style={styles.checkBox_option}>
                             <Text style={styles.prescription_text}>ENTER YOUR PRESCRIPTION</Text>
+                           {configurable_product_options !== <View style={[styles?.option_cont, { width: "95%", marginTop: 0, marginBottom: 10,marginLeft:10, borderRadius: 5, overflow: "hidden" }]}>
 
+                                <TouchableOpacity
+                                    onPress={() => openDropDown(configurable_product_options, "CPO")}
+                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                    <Text style={[styles.selectedItem_text, { fontSize: 14 }]}>{selectedCPO?.title}</Text>
+                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
+                                </TouchableOpacity>
+
+                            </View>}
                             <View style={styles.blue_cont}>
 
                                 <View style={styles.eye_cont}>
@@ -287,36 +300,36 @@ const Options = ({
 
                                     {/* Power Option With CYL and AXES */}
                                     {(option_power !== null && option_axes !== null && option_cyl !== null) &&
-                                     <View style={[styles.pre_inner_type_cont, { width: "27%" }]}>
+                                        <View style={[styles.pre_inner_type_cont, { width: "27%" }]}>
 
-                                        <View style={styles.pres_conts}>
-                                            <Text style={styles.grid_text}>{option_power?.title}</Text>
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_power, "leftPO")}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemLeftPower?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 0 }} />
-                                                </TouchableOpacity>
-
+                                            <View style={styles.pres_conts}>
+                                                <Text style={styles.grid_text}>{option_power?.title}</Text>
                                             </View>
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                            <View style={styles.pres_conts}>
+                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
 
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_power, "rightPO")}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemRightPower?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        onPress={() => openDropDown(option_power, "leftPO")}
+                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemLeftPower?.title}</Text>
+                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 0 }} />
+                                                    </TouchableOpacity>
 
+                                                </View>
                                             </View>
-                                        </View>
-                                    </View>}
+                                            <View style={styles.pres_conts}>
+                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+
+                                                    <TouchableOpacity
+                                                        onPress={() => openDropDown(option_power, "rightPO")}
+                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemRightPower?.title}</Text>
+                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
+                                                    </TouchableOpacity>
+
+                                                </View>
+                                            </View>
+                                        </View>}
 
                                     {/* Quantity with CYL and AXES */}
                                     {(option_power !== null && option_axes !== null && option_cyl !== null) &&

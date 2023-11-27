@@ -5,6 +5,7 @@ import TabNavigator from '../../components_reusable/TabNavigator';
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
+import api from '../../api/api';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -39,7 +40,8 @@ class Categories extends Component {
         })
     }
 
-    selectedItems = (item, index, key) => {
+    selectedItems = async (item, index, key) => {
+        const { userData: { admintoken } } = this.props
         switch (key) {
             case 'main':
                 // console.log("Selected Item: ", item)
@@ -50,7 +52,32 @@ class Categories extends Component {
 
             case 'sub':
                 // console.log("Selected Item: ", this.state.selectedCat)
-                this.props.navigation.navigate("Products", { item, sub_category_id: item?.id, defaultCategories: this.state.defaultCategories, mainCat_selected: this.state.selectedCat?.position,imageLinkMain: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" })
+
+                var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
+                await api.get("categories/" + item?.id, {
+                    headers: {
+                        Authorization: `Bearer ${admintoken}`,
+                    }
+                }).then((res) => {
+                    // console.log("Response for Top Category API:", res?.data)
+                    for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+                        if (res?.data?.custom_attributes[r].attribute_code == "image") {
+                            image = res?.data?.custom_attributes[r]?.value
+                            break;
+                        }
+
+                    }
+                }).catch((err) => {
+                    console.log("Err Fetching image in DefaultCategoryItems: ", err)
+                })
+
+                this.props.navigation.navigate("Products", {
+                    item,
+                    sub_category_id: item?.id,
+                    defaultCategories: this.state.defaultCategories,
+                    mainCat_selected: this.state.selectedCat?.position,
+                    imageLinkMain: image
+                })
         }
     }
 

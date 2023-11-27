@@ -4,7 +4,7 @@ import DefaultCategoryItems from './defaultCategoryItems'
 
 const width = Dimensions.get("screen").width
 
-const DefaultCategories = ({ data, navProps, firstSubItem }) => {
+const DefaultCategories = ({ data, navProps, firstSubItem,admintoken }) => {
     // console.log("")
     // console.log("Default CAtegories:::::; ", firstSubItem)
 
@@ -23,18 +23,7 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
 
 
     const onNextPress = () => {
-        // console.log("DATA ON NEXT PRESS", data?.length - 1)
 
-        // if (data[selectedItemIndex + 1]?.is_active == "true") {
-
-        //     setSelectedItem(data[selectedItemIndex + 1])
-        //     setSelectedItemIndex(selectedItemIndex + 1)
-        // } else {
-        //     setSelectedItem(data[selectedItemIndex + 3])
-        //     setSelectedItemIndex(selectedItemIndex + 3)
-        // }
-        // console.log("selectedItemIndex", selectedItemIndex + 1)
-        // console.log("Next Data", data[selectedItemIndex + 1])
         if (data[selectedItemIndex + 1] == undefined) {
             setSelectedItem(firstSubItem)
             setSelectedItemIndex(0)
@@ -67,20 +56,7 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
                                     <TouchableOpacity
                                         onPress={() => selectedItems(item, index)}
                                         activeOpacity={0.9}
-
                                         style={styles.flatList_Cont}>
-
-                                        {/* <View style={{
-
-                                        }}> */}
-
-                                        {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                        {/* <Image
-                                            resizeMode='cover'
-                                            source={require(`../../../../assets/Category_Images/102.jpg`)} style={[styles.image_cont, { borderWidth: item?.id == selectedItem?.id ? 3 : 0, }]} /> */}
-                                        {/* {item?.placeHolder == "false" && <Image  source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />}
-                                            {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={[styles.image_cont,{  borderWidth: item?.id == selectedItem?.id ? 3 : 0,}]} />} */}
-                                        {/* </View> */}
                                         <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={[styles.image_cont, { borderWidth: item?.id == selectedItem?.id ? 3 : 0, }]} />
                                         <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
                                         <View style={{
@@ -104,6 +80,7 @@ const DefaultCategories = ({ data, navProps, firstSubItem }) => {
                 mainCats={data}
                 navProps={navProps}
                 onNextPress={() => onNextPress()}
+                admintoken={admintoken}
             />
         </View>
     )

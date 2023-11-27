@@ -14,7 +14,7 @@ import ImageCarousel from './components/imageCarousel';
 import Options from './components/options';
 import StoreFeatures from './components/storeFeatures';
 import DetailsTabNav from './detailsTabNav';
-import api from '../../api/api';
+import api, { custom_api_url } from '../../api/api';
 import axios from 'axios';
 import Loading from '../../components_reusable/loading';
 import products from './products';
@@ -40,7 +40,8 @@ class ProductDetails extends Component {
             option_addition: null,
             bigImage: "",
             openBigImageModal: false,
-
+            configurable_product_options: null,
+            selectedCPO: { "title": "Blue", "value_index": 7 },
             //Power Options
             // Left Power
             selectedItemLeftPower: {
@@ -330,6 +331,7 @@ class ProductDetails extends Component {
             this.getMain_Info('prop')
             this.checkVarients('prop')
             this.productImages("prop")
+            this.check_Configurable_Product_Options()
 
         }).catch((err) => {
             console.log("Product Detail Api error on:  ", sku)
@@ -343,6 +345,28 @@ class ProductDetails extends Component {
         })
 
 
+    }
+
+    check_Configurable_Product_Options = async () => {
+        var { product_details: { extension_attributes } } = this.state
+        if (extension_attributes?.configurable_product_options == undefined || extension_attributes?.configurable_product_options.length == 0) {
+            return console.log("No options for color custom options")
+        } else {
+            var { configurable_product_options } = extension_attributes
+            var label_color = configurable_product_options.filter((value) => value.label == "Color")[0]
+            console.log("label Color", label_color)
+            for (let i = 0; i < label_color.values.length; i++) {
+                console.log("label_color.values", label_color.values[i])
+                var color_name = await axios.get(custom_api_url + "func=option_label&id=" + label_color.values[i].value_index)
+                label_color.values[i].title = color_name.data
+            }
+            console.log("label Color", label_color)
+            setImmediate(() => {
+                this.setState({
+                    configurable_product_options: label_color
+                })
+            })
+        }
     }
 
     checkOptions = (key) => {
@@ -434,7 +458,7 @@ class ProductDetails extends Component {
     productImages = (key) => {
         var { product_details: { media_gallery_entries } } = this.state
 
-        console.log("media_gallery_entries", media_gallery_entries)
+        // console.log("media_gallery_entries", media_gallery_entries)
 
         switch (key) {
             case "prop":
@@ -981,6 +1005,21 @@ class ProductDetails extends Component {
                     })
                 })
                 break;
+            case "CPO":
+                setImmediate(() => {
+                    this.setState({
+                        // selectedItemLeftPackage: item,
+                        selectedCPO_AddToCart: {
+                            "option_id": this.state.configurable_product_options?.attribute_id,
+                            "option_value": item?.value_index,
+                        },
+                        selectedCPO: {
+                            "title": item?.title,
+                            "value_index": item?.value_index,
+                        }, dropdown: false,
+                    })
+                })
+                break;
 
             case "leftPO":
                 console.log("leftPO", item)
@@ -1141,9 +1180,9 @@ class ProductDetails extends Component {
         })
         setTimeout(() => {
 
-            this.getDescription("varient")
+            // this.getDescription("varient")
             this.getMain_Info("varient")
-            this.checkOptions("varient")
+            // this.checkOptions("varient")
             this.productImages("varient")
         }, 1000)
     }
@@ -1159,15 +1198,15 @@ class ProductDetails extends Component {
 
         // product_varient_selected
         var productToSend = ''
-        if (this.state.varient_selected == true) {
-            productToSend = this.state.product_varient_selected
+        // if (this.state.varient_selected == true) {
+        //     productToSend = this.state.product_varient_selected
 
-        } else {
-            productToSend = product
-        }
+        // } else {
+        productToSend = product
+        // }
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
             console.log("productToSend?.type_id", productToSend)
-            if (productToSend?.type_id == "configurable" || productToSend?.type_id == "simple") {
+            if (productToSend?.type == "configurable" || productToSend?.type == "simple") {
 
                 if (productToSend?.options?.length == 0) {
 
@@ -1207,18 +1246,23 @@ class ProductDetails extends Component {
                                 "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
                                 "name": productToSend?.name,
                                 "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
+                                "product_type": productToSend?.type,
                                 "quote_id": userData?.user?.cartID,
                                 "product_option": {
                                     "extension_attributes": {
                                         "custom_options": [
                                             this.state.finalItemLeftPower,
 
+                                        ],
+                                        "configurable_item_options": [
+                                            this.state.selectedCPO_AddToCart,
                                         ]
                                     }
                                 }
                             }
                         }
+
+                        console.log("Only Powers and same powers", this.state.selectedCPO_AddToCart)
 
                         this.addToCartApi(obj)
 
@@ -1267,11 +1311,16 @@ class ProductDetails extends Component {
                                 "qty": this.state.rigthEyeQuantity,
                                 "name": this.state.product_details?.name,
                                 "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
+                                "product_type": productToSend?.type,
                                 "quote_id": userData?.user?.cartID,
                                 "product_option": {
                                     "extension_attributes": {
-                                        "custom_options": [this.state.finalItemRightPower]
+                                        "custom_options": [
+                                            this.state.finalItemRightPower
+                                        ],
+                                        "configurable_item_options": [
+                                            this.state.selectedCPO_AddToCart,
+                                        ]
                                     }
                                 }
                             }
@@ -1296,11 +1345,16 @@ class ProductDetails extends Component {
                                 "qty": this.state.leftEyeQuantity,
                                 "name": this.state.product_details?.name,
                                 "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
+                                "product_type": productToSend?.type,
                                 "quote_id": userData?.user?.cartID,
                                 "product_option": {
                                     "extension_attributes": {
-                                        "custom_options": this.state.finalItemLeftPower
+                                        "custom_options": [
+                                            this.state.finalItemLeftPower
+                                        ],
+                                        "configurable_item_options": [
+                                            this.state.selectedCPO_AddToCart,
+                                        ]
                                     }
                                 }
                             }
@@ -2646,7 +2700,7 @@ class ProductDetails extends Component {
                     {/* Product Name */}
                     < Text style={[styles.product_name, {
                         marginTop: 10,
-                    }]}>{product_varient_selected !== null ? product_varient_selected?.name : product_details?.name}</Text>
+                    }]}>{product_details?.name}</Text>
 
                     {/* Product Description */}
                     {this.state.description !== '' &&
@@ -2747,6 +2801,8 @@ class ProductDetails extends Component {
                         selectedItemLeftCYL={this.state.selectedItemLeftCYL}
                         selectedItemRightAXES={this.state.selectedItemRightAXES}
                         selectedItemLeftAXES={this.state.selectedItemLeftAXES}
+                        configurable_product_options={this.state.configurable_product_options}
+                        selectedCPO={this.state.selectedCPO}
                         openDropDown={(val, eyedir) => this.openDropDown(val, eyedir)}
                         onChangeText={(val, key) => this.onQuantityChange(val, key)}
                         leftEyeQuantity={this.state.leftEyeQuantity}

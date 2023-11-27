@@ -81,6 +81,54 @@ var category = [
     },
 ]
 
+var topCategory = [
+    {
+        "id": 42,
+        "parent_id": 26,
+        "name": "Men",
+        "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/man-cat.jpg",
+        "is_active": true,
+        "position": 1,
+        "level": 3,
+        "product_count": 175,
+        "children_data": []
+    },
+    {
+        "id": 43,
+        "parent_id": 26,
+        "name": "Women",
+        "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/women-cat.jpg",
+        "is_active": true,
+        "position": 2,
+        "level": 3,
+        "product_count": 209,
+        "children_data": []
+    },
+    {
+        "id": 44,
+        "parent_id": 26,
+        "name": "Kids",
+        "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/kid-cat.jpg",
+        "is_active": true,
+        "position": 3,
+        "level": 3,
+        "product_count": 97,
+        "children_data": []
+    },
+    {
+        "id": 122,
+        "parent_id": 102,
+        "name": "Acessories",
+        "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/sunglasses-cat.jpg",
+        "is_active": true,
+        "image": "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
+        "position": 1,
+        "level": 3,
+        "product_count": 41,
+        "children_data": []
+    },
+]
+
 class HomeScreen extends Component {
     constructor(props) {
         super(props);
@@ -96,14 +144,16 @@ class HomeScreen extends Component {
             tempArray: [],
             firstSubItem: null,
             randomProducts: null,
-            topCategoryData: null,
+            topCategoryData: [],
         };
     }
 
     componentDidMount = () => {
         this.props.navigation.addListener('focus', async () => this.adminApi());
+        // this.adminApi()
         this.getDefaultCategories()
         this.unsubscribe()
+        // 
     }
 
     adminApi = async () => {
@@ -148,27 +198,29 @@ class HomeScreen extends Component {
     getDefaultCategories = async () => {
 
         const { actions, userData } = this.props
-        var { categoryApiCounter } = this.state
+        var { categoryApiCounter,adminToken } = this.state
+        setImmediate(() => {
+            this.setState({ loader: true })
+        })
         if (this.state.network == true) {
 
-            if (userData?.admintoken == null) {
-                console.log("Admin Token is null");
-                // alert("Network error check your connection")
-                this.adminApi()
-                setImmediate(() => {
-                    this.setState({ loader: true })
-                })
-                setTimeout(() => {
-                    this.setState({ loader: false })
-                    this.getDefaultCategories()
-                }, 5000);
-            } else {
-                setImmediate(() => {
-                    this.setState({ loader: true })
-                })
+            // if (userData?.admintoken == null) {
+            //     setImmediate(() => {
+            //         this.setState({ loader: true })
+            //     })
+            //     console.log("Admin Token is null");
+            //     // alert("Network error check your connection")
+            //     this.adminApi()
+
+            //     setTimeout(() => {
+            //         this.setState({ loader: false })
+            //         this.getDefaultCategories()
+            //     }, 5000);
+            // } else {
+             
                 await api.get('categories', {
                     headers: {
-                        Authorization: `Bearer ${userData?.admintoken}`,
+                        Authorization: `Bearer ${adminToken}`,
                     },
                 }).then((res) => {
                     //console.log("User Data:", res?.data)
@@ -202,141 +254,19 @@ class HomeScreen extends Component {
                             this.getDefaultCategories()
                         }
                     }, 3000);
-                    setImmediate(() => {
-                        this.setState({
-                            loader: false
-                        })
-                    })
+                    // setImmediate(() => {
+                    //     this.setState({
+                    //         // loader: false
+                    //     })
+                    // })
                 })
             }
-        }
+        // }
     }
 
     defaultCategories = () => {
         const { actions, userData: { defaultcategory, admintoken } } = this.props
-        // if (Object.keys(defaultcategory).length !== 0) {
-        //     //console.log("working")
-        //     var { children_data } = defaultcategory
-        //     var obj = {}
-        //     var tempArray1 = [];
 
-        //     for (let i = 0; i < children_data.length; i++) {
-        //         // console.log(children_data[i]?.children_data.length)
-        //         for (let j = 0; j < ImageArray.length; j++) {
-
-        //             if (ImageArray[j]?.id == children_data[i]?.id) {
-        //                 var obj = {
-        //                     "id": children_data[i]?.id,
-        //                     "parent_id": children_data[i]?.parent_id,
-        //                     "name": children_data[i]?.name,
-        //                     "is_active": ImageArray[j]?.is_active,
-        //                     "position": children_data[i]?.position,
-        //                     "level": children_data[i]?.level,
-        //                     "product_count": children_data[i]?.product_count,
-        //                     "img": ImageArray[j]?.img,
-        //                     "placeHolder": ImageArray[j]?.placeHolder,
-        //                     "children_data": []
-        //                 };
-        //                 tempArray1.push(obj)
-
-        //                 break;
-
-        //             }
-        //             if (ImageArray[i]?.id == undefined) {
-        //                 var obj = {
-        //                     "id": children_data[i]?.id,
-        //                     "parent_id": children_data[i]?.parent_id,
-        //                     "name": children_data[i]?.name,
-        //                     "is_active": children_data[i]?.is_active,
-        //                     "position": children_data[i]?.position,
-        //                     "level": children_data[i]?.level,
-        //                     "product_count": children_data[i]?.product_count,
-        //                     "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-        //                     "placeHolder": true,
-        //                     "children_data": []
-        //                 };
-        //                 // tempArray1.push(obj)
-        //                 // break;
-
-        //                 for (let tA = 0; tA < tempArray1.length; tA++) {
-        //                     if (tempArray1[tA]?.length == children_data[i]?.length) {
-        //                         break;
-        //                     } else {
-
-        //                         tempArray1[tA]?.push(obj)
-        //                     }
-
-        //                 }
-
-        //             }
-        //         }
-
-        //         for (let j = 0; j < ImageArray.length; j++) {
-        //             // console.log(" ImageArray[j]?.children_data.length)", ImageArray[j]?.children_data.length)
-        //             //  Sub Cat
-        //             if (children_data[i]?.children_data.length !== 0) {
-
-        //                 for (let ccl = 0; ccl < children_data[i]?.children_data.length; ccl++) {
-
-
-        //                     for (let iA = 0; iA < ImageArray[j]?.children_data?.length; iA++) {
-
-        //                         // console.log(ImageArray[j]?.children_data[iA])
-        //                         var obj2 = {}
-        //                         if (ImageArray[j]?.children_data[iA]?.id == children_data[i]?.children_data[ccl]?.id) {
-
-
-        //                             obj2 = {
-        //                                 "id": children_data[i]?.children_data[ccl]?.id,
-        //                                 "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
-        //                                 "name": children_data[i]?.children_data[ccl]?.name,
-        //                                 "is_active": children_data[i]?.children_data[ccl]?.is_active,
-        //                                 "position": children_data[i]?.children_data[ccl]?.position,
-        //                                 "level": children_data[i]?.children_data[ccl]?.level,
-        //                                 "product_count": children_data[i]?.children_data[ccl]?.product_count,
-        //                                 "img": ImageArray[j]?.children_data[iA]?.img,
-        //                                 "placeHolder": ImageArray[j]?.children_data[iA]?.placeHolder,
-        //                                 "children_data": []
-        //                             };
-
-        //                             for (let tA = 0; tA < tempArray1.length; tA++) {
-        //                                 if (children_data[i]?.id == tempArray1[tA]?.id) {
-        //                                     tempArray1[tA]?.children_data.push(obj2)
-        //                                     break;
-        //                                 }
-        //                             }
-        //                         }
-        //                     }
-        //                     if (ImageArray[i]?.children_data[ccl]?.id == undefined) {
-        //                         var obj2 = {
-        //                             "id": children_data[i]?.children_data[ccl]?.id,
-        //                             "parent_id": children_data[i]?.children_data[ccl]?.parent_id,
-        //                             "name": children_data[i]?.children_data[ccl]?.name,
-        //                             "is_active": children_data[i]?.children_data[ccl]?.is_active,
-        //                             "position": children_data[i]?.children_data[ccl]?.position,
-        //                             "level": children_data[i]?.level,
-        //                             "product_count": children_data[i]?.children_data[ccl]?.product_count,
-        //                             "img": "https://www.pulsecarshalton.co.uk/wp-content/uploads/2016/08/jk-placeholder-image.jpg",
-        //                             "placeHolder": true,
-        //                             "children_data": []
-        //                         };
-
-        //                         for (let tA = 0; tA < tempArray1.length; tA++) {
-        //                             if (tempArray1[tA]?.children_data.length == children_data[i]?.children_data.length) {
-        //                                 break;
-        //                             } else {
-
-        //                                 tempArray1[tA]?.children_data.push(obj2)
-        //                             }
-
-        //                         }
-
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
         var { children_data } = defaultcategory
         // console.log("tempArray1", children_data)
         actions?.createdDefaultCategories(children_data)
@@ -368,7 +298,8 @@ class HomeScreen extends Component {
             defaultCategories1: tempArr,
             firstSubItem: tempArr[0]
         });
-        this.topCatData(tempArr)
+        // this.topCatData(tempArr)
+        this.topCategoryData()
     }
 
     unsubscribe = NetInfo.addEventListener(state => {
@@ -391,47 +322,83 @@ class HomeScreen extends Component {
         }
     });
 
-    topCatData = (array) => {
+    topCategoryData = async () => {
         var { userData: { admintoken } } = this.props
-        let arr = []
-        console.log("Array Top Cats", array)
-        for (let ar = 0; ar < array.length; ar++) {
-            if (array[ar]?.id == 26) {
-
-                // for (let p = 0; p < array[ar]?.children_data.length; p++) {
-                //     console.log("Top Cats", array[ar]?.children_data[p])
-
-                //     api.get("categories/" + array[ar]?.children_data[p]?.id, {
-                //         headers: {
-                //             Authorization: `Bearer ${admintoken}`,
-                //         }
-                //     }).then((res) => {
-                //         for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
-                            
-                //             if (res?.data?.custom_attributes[r].attribute_code == "image") {
-                //                 console.log("Cat detail response:", res?.data.custom_attributes[r])
-                //                 array[ar].children_data.imageLink = 'https://aljaberoptical.com/' + res?.data?.custom_attributes[r]?.value
-                //                 arr.push(array[ar])
-                //                 break;
-                //             }
-                //         }
-                //     })
-                // }
-                arr.push(array[ar])
-
-
-            }
+        var { topCategoryData } = this.state
+        for (let i = 0; i < topCategory.length; i++) {
+            // this api is being used for taking out image link for product screen top image
+            await api.get("categories/" + topCategory[i]?.id, {
+                headers: {
+                    Authorization: `Bearer ${admintoken}`,
+                }
+            }).then((res) => {
+                for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+                    if (res?.data?.custom_attributes[r].attribute_code == "image") {
+                        topCategory[i].image = res?.data?.custom_attributes[r].value
+                        topCategoryData.push(topCategory[i])
+                        break;
+                    }
+                    // this cndition is for Acessories because it doenst have a attribute code "image" so there is no image link and
+                    // thats why in the array imagelink is manually given so it is also pushed in the array
+                    // as it is without any modification like above rest which have attribute code image
+                    if (topCategory[i]?.id == 122) {
+                        topCategoryData.push(topCategory[i])
+                        break;
+                    }
+                }
+            }).catch((err) => {
+                console.log("fetching Image link api error Homescreen ", err)
+            })
         }
-        // console.log("Top Categories:", arr[0]?.children_data)
-        // for(let p=0;arr)
         setImmediate(() => {
             this.setState({
                 loader: false,
-                topCategoryData: arr
+                topCategoryData
             })
         })
-
     }
+
+    // topCatData = (array) => {
+    //     var { userData: { admintoken } } = this.props
+    //     let arr = []
+    //     console.log("Array Top Cats", array)
+    //     for (let ar = 0; ar < array.length; ar++) {
+    //         if (array[ar]?.id == 26) {
+
+    //             for (let p = 0; p < array[ar]?.children_data.length; p++) {
+    //                 console.log("Top Cats", array[ar]?.children_data[p])
+
+    //                 api.get("categories/" + array[ar]?.children_data[p]?.id, {
+    //                     headers: {
+    //                         Authorization: `Bearer ${admintoken}`,
+    //                     }
+    //                 }).then((res) => {
+    //                     for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+
+    //                         if (res?.data?.custom_attributes[r].attribute_code == "image") {
+    //                             console.log("Cat detail response:", res?.data.custom_attributes[r])
+    //                             array[ar].children_data.imageLink = 'https://aljaberoptical.com/' + res?.data?.custom_attributes[r]?.value
+    //                             arr.push(array[ar])
+    //                             break;
+    //                         }
+    //                     }
+    //                 })
+    //             }
+    //             arr.push(array[ar])
+
+
+    //         }
+    //     }
+    //     // console.log("Top Categories:", arr[0]?.children_data)
+    //     // for(let p=0;arr)
+    //     setImmediate(() => {
+    //         this.setState({
+    //             loader: false,
+    //             topCategoryData: arr
+    //         })
+    //     })
+
+    // }
 
     randomProducts = async () => {
         var { userData } = this.props
@@ -568,6 +535,7 @@ class HomeScreen extends Component {
                         },
                     }).then((response) => {
                         console.log("Add to cart Item API response : ", response?.data)
+                        alert("Product Added to Cart!")
                     }).catch((err) => {
                         console.log("Add to cart item api error:  ", err)
                     })
@@ -609,6 +577,7 @@ class HomeScreen extends Component {
                         data={this.state.defaultCategories1}
                         navProps={this.props.navigation}
                         firstSubItem={this.state.firstSubItem}
+                        admintoken={this.props.userData.admintoken}
                     />}
 
                     <ProductList
@@ -622,7 +591,8 @@ class HomeScreen extends Component {
 
                     {/** Categories like men, women etc */}
                     <HomeCategories
-                        data={this.state.topCategoryData == null ? [] : this.state.topCategoryData[0]?.children_data}
+                        // data={this.state.topCategoryData == null ? [] : this.state.topCategoryData[0]?.children_data}
+                        data={this.state.topCategoryData}
                         mainCatPos={this.state.topCategoryData == null ? null : this.state.topCategoryData[0]?.position}
                         navProps={this.props.navigation}
                     />

@@ -543,13 +543,13 @@ const FilterBoard = ({
                                         openFilterDataCont={() => setmodel_no_open(!model_no_open)}
                                     />
                                 }
-
+                                {/* {console.log("lowest_price", lowest_price)} */}
                                 <FBListCont
                                     filterData_Cont_Open={price_open}
                                     // checkBox={wcc_check}
                                     isPrice={true}
-                                    lowest_price={lowest_price}
-                                    highest_price={highest_price}
+                                    lowest_price={parseInt(lowest_price)}
+                                    highest_price={parseInt(highest_price)}
                                     filteredPrice={price}
                                     // checkBoxID={checkBox_model_no}
                                     openCheckBox={(id, code, val) => openCheckBox(id, code, val)}

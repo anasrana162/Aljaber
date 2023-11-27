@@ -33,7 +33,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
 
     const onBack = () => {
         if (data[selected?.index - 1] == undefined) {
-            console.log("reset working")
+            // console.log("reset working")
             setSelected(fisrtImage)
         } else {
             setSelected({
@@ -143,7 +143,6 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
 
                     {
                         data.map((image, index) => {
-                            console.log("Image in Image Carousal")
                             return (
                                 <TouchableOpacity
                                     onPress={() => selectImage({ id: image?.id, url: image.file, index: index })}

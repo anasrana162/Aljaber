@@ -444,7 +444,7 @@ class Products extends Component {
 
         } else {
 
-            console.log("Saved Condition WOrking", savedProducts)
+            // console.log("Saved Condition WOrking", savedProducts)
             var sorted = savedProducts.slice().sort(function (a, b) {
                 return a.price - b.price;
             });
@@ -469,484 +469,6 @@ class Products extends Component {
 
     }
 
-    // fetch data from single category products api
-    // then send its sku from the data to Single Product Detail API with loop
-    // then add that data to an array
-
-    // testing
-    // createData = async (savedProducts, load) => {
-    //     var { item, productApiCounter } = this.state;
-    //     const { userData: { admintoken, }, actions, route: { params: { sub_category_id } } } = this.props
-
-    //     setImmediate(() => {
-    //         this.setState({
-    //             loader: true,
-    //             loaderFilter: true
-
-    //         })
-    //     })
-
-    //     let products = []
-    //     var tempSKU = []
-
-    //     // Api to fetch  Array of products sku's of category selected
-
-    //     await api.get('/categories/' + item.id + '/products', {
-    //         headers: {
-    //             Authorization: `Bearer ${admintoken}`,
-    //         },
-    //     }).then(async (res) => {
-    //         var temp = res?.data
-
-    //         setImmediate(() => {
-    //             this.setState({
-    //                 productSkuLength: temp.length,
-    //             })
-    //         })
-
-    //         // once the Array of sku is fetched we use it in a loop to fetch every product detail in the array
-
-    //         if (savedProducts.length == 0 || savedProducts == null || savedProducts == undefined) {
-
-
-    //             let itemsToLoad = load
-
-    //             console.log("itemsToLoad", load)
-
-    //             // if (load < temp.length) {
-    //             //     itemsToLoad = temp.length
-    //             // }
-
-
-
-    //             for (let p = 0; p < itemsToLoad + 1; p++) {
-    //                 await api.get('/products/' + temp[p]?.sku, {
-    //                     headers: {
-    //                         Authorization: `Bearer ${admintoken}`,
-    //                     },
-    //                 }).then(async (prod) => {
-
-    //                     if (p == itemsToLoad) {
-    //                         setImmediate(() => {
-    //                             this.setState({
-    //                                 loaderFilter: false,
-    //                                 loader: false,
-    //                             })
-    //                         })
-    //                     }
-    //                     // console.log("res?.data?.category_id", temp)
-
-    //                     prod.data.category_id = temp[p]?.category_id;
-    //                     prod.data.position = temp[p]?.position;
-
-    //                     // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
-    //                     // on the screen as it is not in the main body of the object
-
-    //                     for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
-
-    //                         // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
-
-    //                         if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
-    //                             await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-    //                                 prod.data.brand = data?.data
-
-    //                                 // Condition for fetching products with type_id:"simple"
-
-    //                                 if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-    //                                     let obj = {
-    //                                         "id": prod?.data?.id,
-    //                                         "sku": prod?.data?.sku,
-    //                                         "name": prod?.data?.name,
-    //                                         "brand": data?.data,
-    //                                         "price": prod?.data?.price,
-    //                                         "type_id": "simple",
-    //                                         "media_gallery_entries": prod?.data?.media_gallery_entries,
-    //                                         "weight": prod?.data?.weight,
-    //                                     }
-    //                                     products.push(obj)
-    //                                     savedProducts.push(prod?.data)
-    //                                     actions.savedProducts(sub_category_id.toString(), savedProducts)
-    //                                     this.createFilterData(prod?.data)
-    //                                     // prod = null
-    //                                 }
-
-    //                                 // Condition for fetching products with type_id:"Configurable"
-
-    //                                 if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-
-    //                                     var getprice = await axios.post("https://aljaberoptical.com/pub/script/custom_api.php?func=configurable_price&id=" + prod?.data?.id).then((price_api) => {
-    //                                         return price_api?.data
-    //                                     }).catch((err) => {
-    //                                         console.log("Error caught in custom Price fetch API PRoduct Details screen")
-    //                                     })
-
-    //                                     console.log("Price from APi:", getprice)
-
-    //                                     prod.data.price = getprice
-    //                                     prod.data.brand = data?.data
-
-    //                                     let obj = {
-    //                                         "id": prod?.data?.id,
-    //                                         "sku": prod?.data?.sku,
-    //                                         "name": prod?.data?.name,
-    //                                         "brand": data?.data,
-    //                                         "price": getprice,
-    //                                         "type_id": "configurable",
-    //                                         "media_gallery_entries": prod?.data?.media_gallery_entries,
-    //                                         "weight": prod?.data?.weight,
-    //                                     }
-    //                                     products.push(obj)
-    //                                     savedProducts.push(prod?.data)
-    //                                     actions.savedProducts(sub_category_id.toString(), savedProducts)
-    //                                     this.createFilterData(prod?.data)
-
-
-
-    //                                 }
-    //                             }).catch((err) => {
-    //                                 console.log("DAta for Brands Api errr", err)
-    //                             })
-    //                             break;
-    //                         }
-    //                     }
-
-    //                     // if (products?.length >= itemsToLoad - 1) {
-    //                     //     // console.log("Products length in cond",products?.length)
-    //                     //     setImmediate(() => {
-    //                     //         this.setState({
-    //                     //             loader: false,
-    //                     //             loaderFilter: false,
-    //                     //         })
-    //                     //     })
-    //                     // }
-
-
-    //                     var sorted = products.slice().sort(function (a, b) {
-    //                         return a.price - b.price;
-    //                     });
-
-    //                     var smallest = sorted[0],
-    //                         largest = sorted[sorted.length - 1];
-
-    //                     // setting the products in the state once they are all done 
-    //                     setImmediate(() => {
-    //                         this.setState({
-    //                             highest_price: largest?.price,
-    //                             lowest_price: smallest?.price,
-    //                             products: products,
-    //                             original: products,
-    //                             lastFetchedProductLength: itemsToLoad + 1,
-    //                         })
-    //                     })
-
-
-
-    //                 }).catch((err) => {
-    //                     console.log("Product Detail Api error on:  ", temp[p]?.sku)
-    //                     itemsToLoad = itemsToLoad + 1
-    //                     return setImmediate(() => {
-    //                         // this.setState({
-    //                         //     loader: false
-    //                         // })
-
-    //                     })
-
-    //                 })
-
-    //                 if (this.state.breakLoop == "break") {
-    //                     console.log("")
-    //                     console.log("")
-    //                     console.log("----------||||||||||---------------")
-    //                     console.log("Loop Broken")
-    //                     console.log("----------||||||||||---------------")
-    //                     console.log("")
-    //                     console.log("")
-    //                     break;
-    //                 }
-
-
-    //             }
-
-
-    //         } else {
-
-    //             for (let sp = 0; sp < savedProducts.length; sp++) {
-    //                 let obj = {
-    //                     "id": savedProducts[sp].id,
-    //                     "sku": savedProducts[sp].sku,
-    //                     "name": savedProducts[sp].name,
-    //                     "brand": savedProducts[sp].brand,
-    //                     "price": savedProducts[sp].price,
-    //                     "type_id": savedProducts[sp]?.type_id,
-    //                     "media_gallery_entries": savedProducts[sp].media_gallery_entries,
-    //                     "weight": savedProducts[sp].weight,
-    //                 }
-    //                 // console.log("savedProducts[sp]?.category_id", savedProducts[sp]?.category_id)
-    //                 let obj1 = { "category_id": savedProducts[sp]?.category_id, "position": savedProducts[sp]?.position, "sku": savedProducts[sp]?.sku }
-    //                 if (obj1.category_id !== undefined) {
-    //                     // console.log("Pushing")
-    //                     tempSKU.push(obj1)
-    //                     products.push(obj)
-    //                 }
-
-    //                 this.createFilterData(savedProducts[sp])
-    //                 // console.log("--------")
-    //                 // console.log("--------")
-    //                 // console.log("INDEX", sp)
-    //                 // console.log("--------")
-    //                 // console.log("--------")
-
-
-    //             }
-    //             var sorted = products.slice().sort(function (a, b) {
-    //                 return a.price - b.price;
-    //             });
-
-    //             var smallest = sorted[0],
-    //                 largest = sorted[sorted.length - 1];
-    //             setImmediate(() => {
-    //                 this.setState({
-    //                     highest_price: largest?.price,
-    //                     lowest_price: smallest?.price,
-    //                     products: products,
-    //                     original: products,
-    //                     loaderFilter: false,
-    //                     loader: false,
-    //                     lastFetchedProductLength: savedProducts.length,
-    //                 })
-    //             })
-    //             // setImmediate(() => {
-    //             //     this.setState({
-    //             //         loaderFilter: false,
-
-
-    //             //     })
-    //             // })
-
-    //             // var { item, mainCat_selected } = this.props?.route?.params;
-
-    //             // var categoryLength = await api.get('/categories/' + item.id + '/products', {
-    //             //     headers: {
-    //             //         Authorization: `Bearer ${admintoken}`,
-    //             //     },
-    //             // }).then(async (res) => {
-    //             //     return await res?.data.length
-    //             // }).catch((err) => {
-    //             //     console.log("Cannot fetch categories LEngth")
-    //             // })
-
-    //             // // if products length are equal to api data length no need to add new products
-    //             // if (products.length >= categoryLength) {
-    //             //     var sorted = products.slice().sort(function (a, b) {
-    //             //         return a.price - b.price;
-    //             //     });
-
-    //             //     var smallest = sorted[0],
-    //             //         largest = sorted[sorted.length - 1];
-
-    //             //     // setting the products in the state once they are all done 
-    //             //     return setImmediate(() => {
-    //             //         this.setState({
-    //             //             highest_price: largest?.price,
-    //             //             lowest_price: smallest?.price,
-    //             //             products: products,
-    //             //             original: products,
-    //             //             loaderFilter: false,
-    //             //             loader: false,
-    //             //         })
-    //             //     })
-    //             // }
-
-    //             // var temp_left = temp
-    //             // for (let t = 0; t < temp.length; t++) {
-    //             //     console.log("TEMP check by index", temp[t])
-    //             //     for (let check = 0; check < tempSKU.length; check++) {
-    //             //         if (tempSKU[check].sku == temp[t]?.sku) {
-    //             //             var spliced = temp.splice(t, 1);
-    //             //             // console.log("SPliced:", spliced, "LEft:", temp)
-    //             //         }
-
-    //             //     }
-    //             // }
-
-    //             // console.log("     temp_left.length:", temp_left.length)
-
-
-    //             // // for (let p = 0; p < temp_left.length; p++) {
-    //             // //     // console.log("TEMP check by index", temp_left[p])
-    //             // // }
-
-
-    //             // let itemsToLoad = load
-
-    //             // console.log("itemsToLoad", load)
-
-    //             // for (let p = 0; p < itemsToLoad + 1; p++) {
-    //             //     await api.get('/products/' + temp_left[p]?.sku, {
-    //             //         headers: {
-    //             //             Authorization: `Bearer ${admintoken}`,
-    //             //         },
-    //             //     }).then(async (prod) => {
-
-    //             //         prod.data.category_id = temp_left[p]?.category_id;
-    //             //         prod.data.position = temp_left[p]?.position;
-    //             //         // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
-    //             //         // on the screen as it is not in the main body of the object
-
-    //             //         for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
-
-    //             //             // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
-
-    //             //             if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
-    //             //                 await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-    //             //                     prod.data.brand = data?.data
-
-    //             //                     // Condition for fetching products with type_id:"simple"
-
-    //             //                     if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-    //             //                         let obj = {
-    //             //                             "id": prod?.data?.id,
-    //             //                             "sku": prod?.data?.sku,
-    //             //                             "name": prod?.data?.name,
-    //             //                             "brand": data?.data,
-    //             //                             "price": prod?.data?.price,
-    //             //                             "type_id": "simple",
-    //             //                             "media_gallery_entries": prod?.data?.media_gallery_entries,
-    //             //                             "weight": prod?.data?.weight,
-    //             //                         }
-    //             //                         products.push(obj)
-    //             //                         savedProducts.push(prod?.data)
-    //             //                         actions.savedProducts(sub_category_id.toString(), savedProducts)
-    //             //                         this.createFilterData(prod?.data)
-
-    //             //                     }
-
-    //             //                     // Condition for fetching products with type_id:"Configurable"
-
-    //             //                     if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-
-    //             //                         var getprice = await axios.post("https://aljaberoptical.com/pub/script/custom_api.php?func=configurable_price&id=" + prod?.data?.id).then((price_api) => {
-    //             //                             return price_api?.data
-    //             //                         }).catch((err) => {
-    //             //                             console.log("Error caught in custom Price fetch API PRoduct Details screen")
-    //             //                         })
-
-    //             //                         console.log("Price from APi:", getprice)
-
-    //             //                         prod.data.price = getprice
-    //             //                         prod.data.brand = data?.data
-
-    //             //                         let obj = {
-    //             //                             "id": prod?.data?.id,
-    //             //                             "sku": prod?.data?.sku,
-    //             //                             "name": prod?.data?.name,
-    //             //                             "brand": data?.data,
-    //             //                             "price": getprice,
-    //             //                             "type_id": "configurable",
-    //             //                             "media_gallery_entries": prod?.data?.media_gallery_entries,
-    //             //                             "weight": prod?.data?.weight,
-    //             //                         }
-    //             //                         products.push(obj)
-    //             //                         savedProducts.push(prod?.data)
-    //             //                         actions.savedProducts(sub_category_id.toString(), savedProducts)
-    //             //                         this.createFilterData(prod?.data)
-    //             //                     }
-    //             //                 }).catch((err) => {
-    //             //                     console.log("DAta for Brands Api errr", err)
-    //             //                 })
-    //             //                 break;
-    //             //             }
-    //             //         }
-    //             //         if (products.length >= itemsToLoad - 1) {
-    //             //             setImmediate(() => {
-    //             //                 this.setState({
-    //             //                     loader: false,
-    //             //                 })
-    //             //             })
-    //             //         }
-
-
-
-    //             //         var sorted = products.slice().sort(function (a, b) {
-    //             //             return a.price - b.price;
-    //             //         });
-
-    //             //         var smallest = sorted[0],
-    //             //             largest = sorted[sorted.length - 1];
-
-    //             //         // setting the products in the state once they are all done 
-
-
-    //             //         setImmediate(() => {
-    //             //             this.setState({
-    //             //                 highest_price: largest?.price,
-    //             //                 lowest_price: smallest?.price,
-    //             //                 products: products,
-    //             //                 original: products,
-    //             //             })
-    //             //         })
-    //             //     }).catch((err) => {
-    //             //         console.log("Product Detail Api error on:  ", temp_left[p]?.sku)
-    //             //         itemsToLoad = itemsToLoad + 1
-    //             //         // return setImmediate(() => {
-    //             //         //     this.setState({
-    //             //         //         loader: false
-    //             //         //     })
-
-    //             //         // })
-    //             //     })
-
-    //             //     if (this.state.breakLoop == "break") {
-    //             //         console.log("")
-    //             //         console.log("")
-    //             //         console.log("----------||||||||||---------------")
-    //             //         console.log("Loop Broken")
-    //             //         console.log("----------||||||||||---------------")
-    //             //         console.log("")
-    //             //         console.log("")
-    //             //         break;
-    //             //     }
-
-    //             //     // loops end here main one
-    //             // }
-
-
-
-
-    //         }
-
-
-    //     }).catch((err) => {
-    //         //alert("Network Error Code: (CAT#1)")
-    //         if (productApiCounter <= 3) {
-
-    //             productApiCounter = productApiCounter + 1
-    //             console.log("Product Api error: ", err)
-    //             setImmediate(() => {
-    //                 this.setState({
-    //                     loader: false
-    //                 })
-    //             })
-    //             this.createData()
-    //         }
-    //         else {
-    //             alert("Network Error")
-    //             // this.props.navigation.goBack();
-
-
-    //         }
-    //     })
-    //     // this is for loader skeleton 
-
-
-    //     // var highest_price = Math.max(...products)
-
-
-
-    // }
-
     onMomentumScrollEnd = async (savedProducts, load) => {
         console.log("")
         console.log("")
@@ -966,24 +488,10 @@ class Products extends Component {
 
 
         for (let sp = 0; sp < products.length; sp++) {
-            // let obj = {
-            //     "id": products[sp].id,
-            //     "sku": products[sp].sku,
-            //     "name": products[sp].name,
-            //     "brand": products[sp].brand,
-            //     "price": products[sp].price,
-            //     "type_id": products[sp]?.type_id,
-            //     "media_gallery_entries": products[sp].media_gallery_entries,
-            //     "weight": products[sp].weight,
-            // }
-            // console.log("savedProducts[sp]?.category_id", savedProducts[sp]?.category_id)
             let obj1 = { "category_id": products[sp]?.products, "position": products[sp]?.position, "sku": products[sp]?.sku }
             if (obj1.category_id !== undefined) {
-                // console.log("Pushing")
                 tempSKU.push(obj1)
             }
-
-
         }
 
 
@@ -1002,16 +510,11 @@ class Products extends Component {
             })
         }
 
-        var originalListLength = this.state.originalList?.length
-
-        console.log("originalListLength", originalListLength)
-        console.log("lastFetchedProductLength", lastFetchedProductLength)
-
         let loopIndex = 10
         var temp = this.state.originalList
         var temp_left = temp
         for (let t = 0; t < temp.length; t++) {
-            console.log("TEMP check by index", temp[t])
+            // console.log("TEMP check by index", temp[t])
             for (let check = 0; check < tempSKU.length; check++) {
                 if (tempSKU[check].sku == temp[t]?.sku) {
                     var spliced = temp.splice(t, 1);
@@ -1021,9 +524,7 @@ class Products extends Component {
             }
         }
 
-        console.log("     temp_left.length:", temp.length)
         for (let p = 0; p < loopIndex; p++) {
-            // console.log("Products In Loop: ", this.state.originalList[ol]?.name)
             await api.get('/products/' + temp_left[p]?.sku, {
                 headers: {
                     Authorization: `Bearer ${admintoken}`,
@@ -1158,7 +659,7 @@ class Products extends Component {
 
     fetchFilterData = async () => {
         var { item, productApiCounter } = this.state;
-        const { userData: { admintoken,allproducts }, actions, route: { params: { sub_category_id } } } = this.props
+        const { userData: { admintoken, allproducts }, actions, route: { params: { sub_category_id } } } = this.props
 
         let products = []
         var tempSKU = []
@@ -1254,7 +755,7 @@ class Products extends Component {
                                             // then we push this product into main products array with all of these things so it can be displayed
                                             // in the Products Detail screen
 
-                                          this.createFilterData(result.data.items[rdi])
+                                            this.createFilterData(result.data.items[rdi])
 
                                             // Emptying the temporary array that we pushed products varients so the varients of other products
                                             // dont get added in the other products
@@ -1275,11 +776,7 @@ class Products extends Component {
                                 } else {
                                 }
                             }
-
                             this.createFilterData(result?.data?.items[rdi])
-
-
-
                         }
                     }).catch((err) => {
                         console.log("DAta for Brands Api errr", err)
@@ -1287,459 +784,8 @@ class Products extends Component {
                     break;
                 }
             }
-
-
-
-
-
-
-
-
-
-
         }
-
-        // await api.get('/categories/' + item.id + '/products', {
-        //     headers: {
-        //         Authorization: `Bearer ${admintoken}`,
-        //     },
-        // }).then(async (res) => {
-        //     var temp = res?.data
-
-        //     setImmediate(() => {
-        //         this.setState({
-        //             productSkuLength: temp.length,
-        //         })
-        //     })
-
-        //     // once the Array of sku is fetched we use it in a loop to fetch every product detail in the array
-
-        //     // if (savedProducts.length == 0 || savedProducts == null || savedProducts == undefined) {
-
-
-
-        //     //     for (let p = 0; p < itemsToLoad + 1; p++) {
-        //     //         await api.get('/products/' + temp[p]?.sku, {
-        //     //             headers: {
-        //     //                 Authorization: `Bearer ${admintoken}`,
-        //     //             },
-        //     //         }).then(async (prod) => {
-
-        //     //             if (p == itemsToLoad) {
-        //     //                 setImmediate(() => {
-        //     //                     this.setState({
-        //     //                         loaderFilter: false,
-        //     //                         loader: false,
-        //     //                     })
-        //     //                 })
-        //     //             }
-        //     //             // console.log("res?.data?.category_id", temp)
-
-        //     //             prod.data.category_id = temp[p]?.category_id;
-        //     //             prod.data.position = temp[p]?.position;
-
-        //     //             // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
-        //     //             // on the screen as it is not in the main body of the object
-
-        //     //             for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
-
-        //     //                 // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
-
-        //     //                 if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
-        //     //                     await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-        //     //                         prod.data.brand = data?.data
-
-        //     //                         // Condition for fetching products with type_id:"simple"
-
-        //     //                         if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-        //     //                             let obj = {
-        //     //                                 "id": prod?.data?.id,
-        //     //                                 "sku": prod?.data?.sku,
-        //     //                                 "name": prod?.data?.name,
-        //     //                                 "brand": data?.data,
-        //     //                                 "price": prod?.data?.price,
-        //     //                                 "type_id": "simple",
-        //     //                                 "media_gallery_entries": prod?.data?.media_gallery_entries,
-        //     //                                 "weight": prod?.data?.weight,
-        //     //                             }
-        //     //                             products.push(obj)
-        //     //                             savedProducts.push(prod?.data)
-        //     //                             actions.savedProducts(sub_category_id.toString(), savedProducts)
-        //     //                             this.createFilterData(prod?.data)
-        //     //                             // prod = null
-        //     //                         }
-
-        //     //                         // Condition for fetching products with type_id:"Configurable"
-
-        //     //                         if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-
-        //     //                             var getprice = await axios.post("https://aljaberoptical.com/pub/script/custom_api.php?func=configurable_price&id=" + prod?.data?.id).then((price_api) => {
-        //     //                                 return price_api?.data
-        //     //                             }).catch((err) => {
-        //     //                                 console.log("Error caught in custom Price fetch API PRoduct Details screen")
-        //     //                             })
-
-        //     //                             console.log("Price from APi:", getprice)
-
-        //     //                             prod.data.price = getprice
-        //     //                             prod.data.brand = data?.data
-
-        //     //                             let obj = {
-        //     //                                 "id": prod?.data?.id,
-        //     //                                 "sku": prod?.data?.sku,
-        //     //                                 "name": prod?.data?.name,
-        //     //                                 "brand": data?.data,
-        //     //                                 "price": getprice,
-        //     //                                 "type_id": "configurable",
-        //     //                                 "media_gallery_entries": prod?.data?.media_gallery_entries,
-        //     //                                 "weight": prod?.data?.weight,
-        //     //                             }
-        //     //                             products.push(obj)
-        //     //                             savedProducts.push(prod?.data)
-        //     //                             actions.savedProducts(sub_category_id.toString(), savedProducts)
-        //     //                             this.createFilterData(prod?.data)
-
-
-
-        //     //                         }
-        //     //                     }).catch((err) => {
-        //     //                         console.log("DAta for Brands Api errr", err)
-        //     //                     })
-        //     //                     break;
-        //     //                 }
-        //     //             }
-
-        //     //             // if (products?.length >= itemsToLoad - 1) {
-        //     //             //     // console.log("Products length in cond",products?.length)
-        //     //             //     setImmediate(() => {
-        //     //             //         this.setState({
-        //     //             //             loader: false,
-        //     //             //             loaderFilter: false,
-        //     //             //         })
-        //     //             //     })
-        //     //             // }
-
-
-        //     //             var sorted = products.slice().sort(function (a, b) {
-        //     //                 return a.price - b.price;
-        //     //             });
-
-        //     //             var smallest = sorted[0],
-        //     //                 largest = sorted[sorted.length - 1];
-
-        //     //             // setting the products in the state once they are all done 
-        //     //             setImmediate(() => {
-        //     //                 this.setState({
-        //     //                     highest_price: largest?.price,
-        //     //                     lowest_price: smallest?.price,
-        //     //                     products: products,
-        //     //                     original: products,
-        //     //                     lastFetchedProductLength: itemsToLoad + 1,
-        //     //                 })
-        //     //             })
-
-
-
-        //     //         }).catch((err) => {
-        //     //             console.log("Product Detail Api error on:  ", temp[p]?.sku)
-        //     //             itemsToLoad = itemsToLoad + 1
-        //     //             return setImmediate(() => {
-        //     //                 // this.setState({
-        //     //                 //     loader: false
-        //     //                 // })
-
-        //     //             })
-
-        //     //         })
-
-        //     //         if (this.state.breakLoop == "break") {
-        //     //             console.log("")
-        //     //             console.log("")
-        //     //             console.log("----------||||||||||---------------")
-        //     //             console.log("Loop Broken")
-        //     //             console.log("----------||||||||||---------------")
-        //     //             console.log("")
-        //     //             console.log("")
-        //     //             break;
-        //     //         }
-
-
-        //     //     }
-
-
-        //     // } else {
-
-        //     //     for (let sp = 0; sp < savedProducts.length; sp++) {
-        //     //         let obj = {
-        //     //             "id": savedProducts[sp].id,
-        //     //             "sku": savedProducts[sp].sku,
-        //     //             "name": savedProducts[sp].name,
-        //     //             "brand": savedProducts[sp].brand,
-        //     //             "price": savedProducts[sp].price,
-        //     //             "type_id": savedProducts[sp]?.type_id,
-        //     //             "media_gallery_entries": savedProducts[sp].media_gallery_entries,
-        //     //             "weight": savedProducts[sp].weight,
-        //     //         }
-        //     //         // console.log("savedProducts[sp]?.category_id", savedProducts[sp]?.category_id)
-        //     //         let obj1 = { "category_id": savedProducts[sp]?.category_id, "position": savedProducts[sp]?.position, "sku": savedProducts[sp]?.sku }
-        //     //         if (obj1.category_id !== undefined) {
-        //     //             // console.log("Pushing")
-        //     //             tempSKU.push(obj1)
-        //     //             products.push(obj)
-        //     //         }
-
-        //     //         this.createFilterData(savedProducts[sp])
-        //     //         // console.log("--------")
-        //     //         // console.log("--------")
-        //     //         // console.log("INDEX", sp)
-        //     //         // console.log("--------")
-        //     //         // console.log("--------")
-
-
-        //     //     }
-        //     //     var sorted = products.slice().sort(function (a, b) {
-        //     //         return a.price - b.price;
-        //     //     });
-
-        //     //     var smallest = sorted[0],
-        //     //         largest = sorted[sorted.length - 1];
-        //     //     setImmediate(() => {
-        //     //         this.setState({
-        //     //             highest_price: largest?.price,
-        //     //             lowest_price: smallest?.price,
-        //     //             products: products,
-        //     //             original: products,
-        //     //             loaderFilter: false,
-        //     //             loader: false,
-        //     //             lastFetchedProductLength: savedProducts.length,
-        //     //         })
-        //     //     })
-        //     //     // setImmediate(() => {
-        //     //     //     this.setState({
-        //     //     //         loaderFilter: false,
-
-
-        //     //     //     })
-        //     //     // })
-
-        //     //     // var { item, mainCat_selected } = this.props?.route?.params;
-
-        //     //     // var categoryLength = await api.get('/categories/' + item.id + '/products', {
-        //     //     //     headers: {
-        //     //     //         Authorization: `Bearer ${admintoken}`,
-        //     //     //     },
-        //     //     // }).then(async (res) => {
-        //     //     //     return await res?.data.length
-        //     //     // }).catch((err) => {
-        //     //     //     console.log("Cannot fetch categories LEngth")
-        //     //     // })
-
-        //     //     // // if products length are equal to api data length no need to add new products
-        //     //     // if (products.length >= categoryLength) {
-        //     //     //     var sorted = products.slice().sort(function (a, b) {
-        //     //     //         return a.price - b.price;
-        //     //     //     });
-
-        //     //     //     var smallest = sorted[0],
-        //     //     //         largest = sorted[sorted.length - 1];
-
-        //     //     //     // setting the products in the state once they are all done 
-        //     //     //     return setImmediate(() => {
-        //     //     //         this.setState({
-        //     //     //             highest_price: largest?.price,
-        //     //     //             lowest_price: smallest?.price,
-        //     //     //             products: products,
-        //     //     //             original: products,
-        //     //     //             loaderFilter: false,
-        //     //     //             loader: false,
-        //     //     //         })
-        //     //     //     })
-        //     //     // }
-
-        //     //     // var temp_left = temp
-        //     //     // for (let t = 0; t < temp.length; t++) {
-        //     //     //     console.log("TEMP check by index", temp[t])
-        //     //     //     for (let check = 0; check < tempSKU.length; check++) {
-        //     //     //         if (tempSKU[check].sku == temp[t]?.sku) {
-        //     //     //             var spliced = temp.splice(t, 1);
-        //     //     //             // console.log("SPliced:", spliced, "LEft:", temp)
-        //     //     //         }
-
-        //     //     //     }
-        //     //     // }
-
-        //     //     // console.log("     temp_left.length:", temp_left.length)
-
-
-        //     //     // // for (let p = 0; p < temp_left.length; p++) {
-        //     //     // //     // console.log("TEMP check by index", temp_left[p])
-        //     //     // // }
-
-
-        //     //     // let itemsToLoad = load
-
-        //     //     // console.log("itemsToLoad", load)
-
-        //     //     // for (let p = 0; p < itemsToLoad + 1; p++) {
-        //     //     //     await api.get('/products/' + temp_left[p]?.sku, {
-        //     //     //         headers: {
-        //     //     //             Authorization: `Bearer ${admintoken}`,
-        //     //     //         },
-        //     //     //     }).then(async (prod) => {
-
-        //     //     //         prod.data.category_id = temp_left[p]?.category_id;
-        //     //     //         prod.data.position = temp_left[p]?.position;
-        //     //     //         // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
-        //     //     //         // on the screen as it is not in the main body of the object
-
-        //     //     //         for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
-
-        //     //     //             // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
-
-        //     //     //             if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
-        //     //     //                 await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-        //     //     //                     prod.data.brand = data?.data
-
-        //     //     //                     // Condition for fetching products with type_id:"simple"
-
-        //     //     //                     if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-        //     //     //                         let obj = {
-        //     //     //                             "id": prod?.data?.id,
-        //     //     //                             "sku": prod?.data?.sku,
-        //     //     //                             "name": prod?.data?.name,
-        //     //     //                             "brand": data?.data,
-        //     //     //                             "price": prod?.data?.price,
-        //     //     //                             "type_id": "simple",
-        //     //     //                             "media_gallery_entries": prod?.data?.media_gallery_entries,
-        //     //     //                             "weight": prod?.data?.weight,
-        //     //     //                         }
-        //     //     //                         products.push(obj)
-        //     //     //                         savedProducts.push(prod?.data)
-        //     //     //                         actions.savedProducts(sub_category_id.toString(), savedProducts)
-        //     //     //                         this.createFilterData(prod?.data)
-
-        //     //     //                     }
-
-        //     //     //                     // Condition for fetching products with type_id:"Configurable"
-
-        //     //     //                     if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-
-        //     //     //                         var getprice = await axios.post("https://aljaberoptical.com/pub/script/custom_api.php?func=configurable_price&id=" + prod?.data?.id).then((price_api) => {
-        //     //     //                             return price_api?.data
-        //     //     //                         }).catch((err) => {
-        //     //     //                             console.log("Error caught in custom Price fetch API PRoduct Details screen")
-        //     //     //                         })
-
-        //     //     //                         console.log("Price from APi:", getprice)
-
-        //     //     //                         prod.data.price = getprice
-        //     //     //                         prod.data.brand = data?.data
-
-        //     //     //                         let obj = {
-        //     //     //                             "id": prod?.data?.id,
-        //     //     //                             "sku": prod?.data?.sku,
-        //     //     //                             "name": prod?.data?.name,
-        //     //     //                             "brand": data?.data,
-        //     //     //                             "price": getprice,
-        //     //     //                             "type_id": "configurable",
-        //     //     //                             "media_gallery_entries": prod?.data?.media_gallery_entries,
-        //     //     //                             "weight": prod?.data?.weight,
-        //     //     //                         }
-        //     //     //                         products.push(obj)
-        //     //     //                         savedProducts.push(prod?.data)
-        //     //     //                         actions.savedProducts(sub_category_id.toString(), savedProducts)
-        //     //     //                         this.createFilterData(prod?.data)
-        //     //     //                     }
-        //     //     //                 }).catch((err) => {
-        //     //     //                     console.log("DAta for Brands Api errr", err)
-        //     //     //                 })
-        //     //     //                 break;
-        //     //     //             }
-        //     //     //         }
-        //     //     //         if (products.length >= itemsToLoad - 1) {
-        //     //     //             setImmediate(() => {
-        //     //     //                 this.setState({
-        //     //     //                     loader: false,
-        //     //     //                 })
-        //     //     //             })
-        //     //     //         }
-
-
-
-        //     //     //         var sorted = products.slice().sort(function (a, b) {
-        //     //     //             return a.price - b.price;
-        //     //     //         });
-
-        //     //     //         var smallest = sorted[0],
-        //     //     //             largest = sorted[sorted.length - 1];
-
-        //     //     //         // setting the products in the state once they are all done 
-
-
-        //     //     //         setImmediate(() => {
-        //     //     //             this.setState({
-        //     //     //                 highest_price: largest?.price,
-        //     //     //                 lowest_price: smallest?.price,
-        //     //     //                 products: products,
-        //     //     //                 original: products,
-        //     //     //             })
-        //     //     //         })
-        //     //     //     }).catch((err) => {
-        //     //     //         console.log("Product Detail Api error on:  ", temp_left[p]?.sku)
-        //     //     //         itemsToLoad = itemsToLoad + 1
-        //     //     //         // return setImmediate(() => {
-        //     //     //         //     this.setState({
-        //     //     //         //         loader: false
-        //     //     //         //     })
-
-        //     //     //         // })
-        //     //     //     })
-
-        //     //     //     if (this.state.breakLoop == "break") {
-        //     //     //         console.log("")
-        //     //     //         console.log("")
-        //     //     //         console.log("----------||||||||||---------------")
-        //     //     //         console.log("Loop Broken")
-        //     //     //         console.log("----------||||||||||---------------")
-        //     //     //         console.log("")
-        //     //     //         console.log("")
-        //     //     //         break;
-        //     //     //     }
-
-        //     //     //     // loops end here main one
-        //     //     // }
-
-
-
-
-        //     // }
-
-
-        // }).catch((err) => {
-        //     //alert("Network Error Code: (CAT#1)")
-        //     if (productApiCounter <= 3) {
-
-        //         productApiCounter = productApiCounter + 1
-        //         console.log("Product Api error: ", err)
-        //         setImmediate(() => {
-        //             this.setState({
-        //                 loader: false
-        //             })
-        //         })
-        //         this.createData()
-        //     }
-        //     else {
-        //         alert("Network Error")
-        //         // this.props.navigation.goBack();
-
-
-        //     }
-        // })
-
     }
-
 
     createFilterData = async (product) => {
         // console.log("Product From CreateData Function:", product)
@@ -2632,7 +1678,6 @@ class Products extends Component {
         const { userData: { admintoken }, actions, userData } = this.props
         switch (key) {
             case "position":
-                // console.log("position Working")
                 this.state.products.sort(function (a, b) {
                     if (a.name < b.name) {
                         return 1;
@@ -2661,12 +1706,9 @@ class Products extends Component {
                 setImmediate(() => {
                     this.setState({ products })
                 })
-
-                //console.log(users);
                 break;
 
             case "price":
-                // console.log("price Working")
                 this.state.products.sort(function (a, b) { return a.price - b.price });
                 setImmediate(() => {
                     this.setState({ products })
@@ -2674,7 +1716,6 @@ class Products extends Component {
                 break;
 
             case "brands":
-                // console.log("Brands of products", this.state.products[0].brand)
                 this.state.products.sort(function (a, b) {
                     if (a.brand > b.brand) {
                         return 1;
@@ -2685,10 +1726,8 @@ class Products extends Component {
                     return 0;
                 });
                 setImmediate(() => {
-
                     this.setState({ products })
                 })
-
                 break;
 
 
@@ -2697,27 +1736,18 @@ class Products extends Component {
 
     updatePriceFilter = (val) => {
         var { products, filtered_products } = this.state
-        // console.log("Price Value:|||||||||", val)
         setImmediate(() => {
             this.setState({
                 filteredPrice: parseInt(val)
             })
         })
         filtered_products = []
-        // var filterData = products.filter((prs) => prs?.price <= parseInt(val))[0]
 
         for (let i = 0; i < products.length; i++) {
             if (products[i]?.price <= parseInt(val)) {
-
-                console.log("products[i]" + i, "   ", products[i])
-
                 filtered_products.push(products[i])
             }
         }
-
-        //  filtered_products = filtered_products.filter((prs, index) => filtered_products.indexOf(prs) === index)
-
-        // console.log("filterData", filtered_products)
         setImmediate(() => {
             this.setState({ filtered_products, })
         })
@@ -2874,7 +1904,7 @@ class Products extends Component {
 
 
     render() {
-        var { item,imageLinkMain } = this.props?.route?.params;
+        var { item, imageLinkMain } = this.props?.route?.params;
         var { contact_lens_diameter, contact_lens_base_curve, temple_size, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
 
         return (
@@ -2885,10 +1915,11 @@ class Products extends Component {
 
                 {/** Top Image & Category Name */}
                 < ImageView
-                    source={item?.parent_id == 102 ?
-                        { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.parent_id + ".jpg" }
-                        :
-                        { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }}
+                    // source={item?.parent_id == 102 ?
+                    //     { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.parent_id + ".jpg" }
+                    //     :
+                    //     { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }}
+                    source={{ uri: "https://aljaberoptical.com" + imageLinkMain }}
                     textEN={item?.name}
                     textAR={""}
                 />

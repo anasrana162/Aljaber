@@ -14,7 +14,12 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
     const selectedItems = (item, index,) => {
 
         // console.log("Selected Item: ", this.state.selectedCat)
-        navProps.navigate("Products", { item, mainCat_selected: mainCatPos,sub_category_id: item?.id, })
+        navProps.navigate("Products", { 
+            item, 
+            mainCat_selected: mainCatPos, 
+            sub_category_id: item?.id,
+            imageLinkMain:item?.image
+        })
 
     }
 
@@ -79,7 +84,7 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
 
                 {
                     data.map((item, index) => {
-                        console.log("item",item.id)
+                        console.log("item", item.id)
                         return (
 
                             <View
@@ -103,7 +108,11 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
 
                                             //   backgroundColor: "red"
                                         }}>
-                                            <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={{ width: "100%", height: "100%", }} />
+                                            <Image
+                                                //  source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }}
+                                                // source={{uri:"https://aljaberoptical.com"+ item?.image}}
+                                                source={{ uri: item?.main_menu_image }}
+                                                style={{ width: "100%", height: "100%", }} />
                                             {/* {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} style={{ width: "100%", height: "100%", }} />}
                                             {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%", }} />} */}
                                         </View>
