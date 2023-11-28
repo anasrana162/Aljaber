@@ -107,7 +107,7 @@ const Options = ({
                     <>
                         <View style={styles.checkBox_option}>
                             <Text style={styles.prescription_text}>ENTER YOUR PRESCRIPTION</Text>
-                           {configurable_product_options !== <View style={[styles?.option_cont, { width: "95%", marginTop: 0, marginBottom: 10,marginLeft:10, borderRadius: 5, overflow: "hidden" }]}>
+                            {configurable_product_options !== null && <View style={[styles?.option_cont, { width: "95%", marginTop: 0, marginBottom: 10, marginLeft: 10, borderRadius: 5, overflow: "hidden" }]}>
 
                                 <TouchableOpacity
                                     onPress={() => openDropDown(configurable_product_options, "CPO")}

@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, Dimensions, NativeModules, ScrollView, ActivityIndicator, Alert, TouchableOpacity } from 'react-native'
+import { Text, StyleSheet, View, Dimensions, NativeModules, ScrollView, ActivityIndicator, Alert, Image, TouchableOpacity, FlatList } from 'react-native'
 import React, { Component } from 'react'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 
@@ -11,7 +11,7 @@ const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
 
-import api from '../../api/api';
+import api, { custom_api_url } from '../../api/api';
 import axios from 'axios';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import ProductList from '../products/components/productList';
@@ -23,7 +23,7 @@ class Cart extends Component {
         super(props);
         this.state = {
             cartData: null,
-            cartItems: null,
+            cartItems: [],
             loader: false,
             loader2: false,
             loaderDot: false,
@@ -35,17 +35,11 @@ class Cart extends Component {
     componentDidMount = () => {
         this.getRecommendedProducts()
         this.getCartData()
+        this.getCartItemDetails()
     }
     getCartData = async () => {
 
         var { userData: { token, admintoken, allproducts } } = this.props
-
-        let products = []
-        let tempPRoducts = []
-
-        if (allproducts == null) {
-            this.getCartData()
-        }
 
         api.get("carts/mine",
             {
@@ -57,13 +51,115 @@ class Cart extends Component {
                 setImmediate(() => {
                     this.setState({
                         cartData: res?.data,
-                        cartItems:res?.data?.items
+                        // cartItems:res?.data?.items
                     })
                 })
 
+            }).catch((err) => {
+                console.log("Get cart Data APi Error", err)
             })
 
     }
+
+    getCartItemDetails = () => {
+        var { userData: { token, admintoken } } = this.props
+
+
+        api.get("carts/mine/items",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }).then((res) => {
+                // console.log("REsponse Get cart ITems APi", res?.data)
+                this.addDataToCartItems(res?.data)
+
+            }).catch((err) => {
+                console.log("Get cart ITems APi Error", err)
+            })
+
+    }
+
+    // this function is used because the options in some of the items comes with id's not with
+    // actual data inorder to fetch that data we have send them through another api's
+    addDataToCartItems = async (items) => {
+        var { cartItems } = this.state
+
+        for (let i = 0; i < items.length; i++) {
+            // console.log(" ------------- ")
+            // console.log("")
+            // console.log("items[i].name", items[i],)
+
+            var image = await api.get(custom_api_url + "func=get_product_image&id=" + items[i]?.id)
+            // console.log("image Obj",image?.data)
+            items[i].image = image.data?.image
+            if (items[i]?.product_option == undefined) {
+
+
+                cartItems.push(items[i])
+
+            } else {
+                for (let co = 0; co < items[i].product_option?.extension_attributes?.custom_options.length; co++) {
+
+                    // console.log("items[i].product_option?.extension_attributes?.custom_options", items[i].product_option?.extension_attributes?.custom_options[co], "  ", co)
+                    var option_value_name = await this.fetchIdDataOptionLabel(items[i].product_option?.extension_attributes?.custom_options[co]?.option_value)
+                    var option_title = await this.fetchIdDataAttributeLabel(items[i].product_option?.extension_attributes?.custom_options[co]?.option_id)
+                    // console.log("option_title: ", option_title, "     ", "option_value_name: ", option_value_name)
+                    items[i].product_option.extension_attributes.custom_options[co].option_title = option_title;
+                    items[i].product_option.extension_attributes.custom_options[co].option_value_name = option_value_name;
+
+                }
+
+                if (
+                    items[i].product_option?.extension_attributes?.configurable_item_options == undefined
+
+                ) {
+                    // console.log("No Configurable Item Options")
+                } else {
+                    // console.log("items[i].product_option?.extension_attributes?.configurable_item_options", items[i].product_option?.extension_attributes?.configurable_item_options)
+                    for (let co = 0; co < items[i].product_option?.extension_attributes?.configurable_item_options.length; co++) {
+                         console.log("items[i].product_option?.extension_attributes?.configurable_item_options", items[i].product_option?.extension_attributes?.configurable_item_options[co], "  ", co)
+                        var option_title ="COLOR" //await this.fetchIdDataAttributeLabel(items[i].product_option?.extension_attributes?.configurable_item_options[co]?.option_id)
+                        var option_value_name = await this.fetchIdDataColor(items[i].product_option?.extension_attributes?.configurable_item_options[co]?.option_value)
+                        items[i].product_option.extension_attributes.configurable_item_options[co].option_title = option_title;
+                        items[i].product_option.extension_attributes.configurable_item_options[co].option_value_name = option_value_name;
+                        console.log("option_title: ", option_title, "     ", "option_value_name: ", option_value_name)
+
+                    }
+                }
+
+                // console.log(" ------------- ")
+                // console.log("")
+                // console.log("items[i].name", items[i].product_option?.extension_attributes,)
+                cartItems.push(items[i])
+
+            }
+            setImmediate(() => {
+                this.setState({ cartItems })
+            })
+            // console.log("")
+            // console.log(" ------------- ")
+            // console.log("CartItems", cartItems[i]?.product_option?.extension_attributes)
+            // console.log(" ------------- ")
+            // console.log("")
+
+        }
+
+    }
+
+    fetchIdDataColor = async (id) => {
+        var result = await axios.get(custom_api_url + 'func=option_color&id=' + id)
+        return result.data
+    }
+    fetchIdDataOptionLabel = async (id) => {
+        var result = await axios.get(custom_api_url + 'func=option_label&id=' + id)
+        return result.data
+    }
+    fetchIdDataAttributeLabel = async (id) => {
+        var result = await axios.get(custom_api_url + 'func=attribute_label&id=' + id)
+        return result.data
+    }
+
     getCartData1 = async () => {
 
         var { userData: { token, admintoken, allproducts } } = this.props
@@ -326,60 +422,134 @@ class Cart extends Component {
     }
 
     render() {
-        var { cartData, loader, randomProducts, loaderDot } = this.state
+        var { cartData, loader, randomProducts, loaderDot, cartItems } = this.state
+
+        const ListEmptyComponent = () => {
+            return (
+
+                <View style={styles.nullCartData_cont} >
+                    <MaterialCommunityIcons name="cart-remove" size={100} color="#233468" />
+                    <Text style={[styles.text_style, { marginTop: 15 }]}>Your cart is empty</Text>
+                    <Text style={[styles.text_style, {
+                        color: "#777",
+                        fontSize: 18,
+                        width: 240,
+                        textAlign: "center",
+                        marginTop: 10,
+                    }]}>Looks like you have't added anything to your cart</Text>
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.navigate("Categories")}
+                        style={styles.continue_shooping_btn}>
+                        <Text style={[styles.text_style, { color: "white", fontSize: 16 }]}>Continue Shopping</Text>
+                    </TouchableOpacity>
+
+                </View>
+
+            )
+        }
+
+        const ListHeaderComponent = () => {
+            return (
+                <View style={styles.header_comp}>
+                    <Text style={styles.header_comp_title}>Shopping Cart</Text>
+                </View>
+            )
+        }
+
+
+        const renderItem = (item) => {
+            // console.log("Items", item?.item)
+            // {"index": 9, "item": {"item_id": 5507, "name": "Bio True 1-Day for Astigmatism", "price": 200, "product_option": {"extension_attributes": [Object]}, "product_type": "simple", "qty": 1, "quote_id": "2848", "sku": "BT30-Astigmatism"}, "separators": {"highlight": [Function highlight], "unhighlight": [Function unhighlight], "updateProps": [Function updateProps]}}
+            return (
+                <TouchableOpacity style={styles.flatList_Cont}>
+                    <View style={styles.flatList_innerCont}>
+                        <Image
+                            source={{ uri: "https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png" }}
+                            style={{ width: 120, height: 120, backgroundColor: "#f0f0f0" }}
+                        />
+                        <View style={styles.text_cont}>
+                            <Text style={[styles.text_style, { fontSize: 14 }]}>{item?.item?.name}</Text>
+                            <Text style={[styles.text_style, { fontSize: 15, marginTop: 5 }]}>AED {item?.item?.price}</Text>
+                            {item?.item?.product_option !== undefined &&
+
+                                <>
+
+                                    {item?.item?.product_option?.extension_attributes?.configurable_item_options !== undefined &&
+                                        item?.item?.product_option?.extension_attributes?.configurable_item_options.map((data, index) => {
+                                           console.log("configurable_item_options",data)
+                                            return (
+                                                <>
+                                                    <View style={styles.option_cont}>
+                                                        <Text style={[styles.text_style, { fontSize: 12, fontWeight: "700", marginTop: 5 }]}>{data?.option_title}</Text>
+                                                        <Text style={[styles.text_style, { fontSize: 12, marginTop: 5 }]}>: {data?.option_value_name}</Text>
+                                                    </View>
+                                                </>
+                                            )
+                                        })
+                                    }
+                                    {item?.item?.product_option?.extension_attributes?.custom_options.map((data, index) => {
+                                        return (
+                                            <>
+                                                <View style={styles.option_cont}>
+                                                    <Text style={[styles.text_style, { fontSize: 12, fontWeight: "700", marginTop: 5 }]}>{data?.option_title}</Text>
+                                                    <Text style={[styles.text_style, { fontSize: 12, marginTop: 5 }]}>: {data?.option_value_name}</Text>
+                                                </View>
+                                            </>
+                                        )
+                                    })
+                                    }
+                                </>
+                            }
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            )
+        }
+
+        const ListFooterComponent = () => {
+            return (
+                <>
+                    <View style={{ width: width, }}>
+                        <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />
+
+                        <Text style={[styles.text_style, {
+                            color: "black",
+                            fontSize: 20,
+                            alignSelf: "flex-start",
+                            marginTop: 20,
+                            marginBottom: -20,
+                            marginLeft: 10,
+                        }]}>Recommended for you</Text>
+                        {/* Recommended Products */}
+                        <ProductList
+                            screenName="Cart"
+                            data={randomProducts}
+                            loaderDot={loaderDot}
+                            navProps={this.props.navigation}
+                            addToCart={(product, index) => this.addToCart(product, index)}
+                        />
+
+                    </View>
+                </>
+            )
+        }
+
         return (
             <View style={styles.mainContainer}>
 
-                {cartData == null &&
-
-                    <View style={styles.nullCartData_cont}>
-                        <MaterialCommunityIcons name="cart-remove" size={100} color="#233468" />
-                        <Text style={[styles.text_style, { marginTop: 15 }]}>Your cart is empty</Text>
-                        <Text style={[styles.text_style, {
-                            color: "#777",
-                            fontSize: 18,
-                            width: 240,
-                            textAlign: "center",
-                            marginTop: 10,
-                        }]}>Looks like you have't added anything to your cart</Text>
-                        <TouchableOpacity
-                            onPress={() => this.props.navigation.navigate("Categories")}
-                            style={styles.continue_shooping_btn}>
-                            <Text style={[styles.text_style, { color: "white", fontSize: 16 }]}>Continue Shopping</Text>
-                        </TouchableOpacity>
-
-
-
-                    </View>
-
-                }
-                {cartData !== null && <ScrollView style={{ width: width }}>
-
-                </ScrollView>}
-                <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />
-
-                <Text style={[styles.text_style, {
-                    color: "black",
-                    fontSize: 20,
-                    alignSelf: "flex-start",
-                    marginTop: 20,
-                    marginBottom: -20,
-                    marginLeft: 10,
-                }]}>Recommended for you</Text>
-                {/* Recommended Products */}
-                <ProductList
-                    screenName="Cart"
-                    data={randomProducts}
-                    loaderDot={loaderDot}
-                    navProps={this.props.navigation}
-                    addToCart={(product, index) => this.addToCart(product, index)}
+                <FlatList
+                    data={cartItems}
+                    ListEmptyComponent={ListEmptyComponent}
+                    ListHeaderComponent={ListHeaderComponent}
+                    ListFooterComponent={ListFooterComponent}
+                    renderItem={renderItem}
                 />
                 {/** Tab Navigator */}
                 <TabNavigator
                     screenName={"Cart"}
                     navProps={this.props.navigation}
                 />
-            </View>
+            </View >
         )
     }
 }
@@ -392,6 +562,56 @@ const styles = StyleSheet.create({
         width: width,
         height: height,
         backgroundColor: "white"
+    },
+    header_comp: {
+        width: width,
+        justifyContent: "center",
+        alignItems: "center",
+        paddingTop: 20,
+        paddingBottom: 10
+    },
+
+    header_comp_title: {
+        fontSize: 20,
+        fontWeight: "600",
+        color: "#020621"
+    },
+
+    flatList_Cont: {
+        width: width - 20,
+        // height: 200,
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        marginTop: 10,
+        marginBottom: 10,
+        alignSelf: "center",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "white",
+        paddingTop: 10,
+        paddingBottom: 10
+    },
+
+    flatList_innerCont: {
+        width: "95%",
+        flexDirection: "row",
+        justifyContent: "space-around",
+        alignItems: "center",
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    option_cont: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+    },
+
+    text_cont: {
+        width: 180,
+        flexDirection: "column",
+        justifyContent: "space-around",
+        alignItems: "flex-start"
     },
 
     nullCartData_cont: {
