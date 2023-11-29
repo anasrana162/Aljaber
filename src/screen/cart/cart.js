@@ -1,6 +1,7 @@
 import { Text, StyleSheet, View, Dimensions, NativeModules, ScrollView, ActivityIndicator, Alert, Image, TouchableOpacity, FlatList } from 'react-native'
 import React, { Component } from 'react'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
@@ -15,7 +16,8 @@ import api, { custom_api_url } from '../../api/api';
 import axios from 'axios';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import ProductList from '../products/components/productList';
-
+import Loading from '../../components_reusable/loading';
+const imageUrl = "https://aljaberoptical.com/media/catalog/product/"
 
 class Cart extends Component {
 
@@ -23,7 +25,9 @@ class Cart extends Component {
         super(props);
         this.state = {
             cartData: null,
-            cartItems: [],
+            cartItems: [], //these are modified Items to show in cart screen
+            original: [], // these are not modified but are used to send in update cart API
+            updateCartItems: [],
             loader: false,
             loader2: false,
             loaderDot: false,
@@ -40,6 +44,10 @@ class Cart extends Component {
     getCartData = async () => {
 
         var { userData: { token, admintoken, allproducts } } = this.props
+
+        setImmediate(() => {
+            this.setState({ loader: true })
+        })
 
         api.get("carts/mine",
             {
@@ -72,10 +80,17 @@ class Cart extends Component {
                 },
             }).then((res) => {
                 // console.log("REsponse Get cart ITems APi", res?.data)
+                setImmediate(() => {
+                    this.setState({ original: res?.data })
+                })
                 this.addDataToCartItems(res?.data)
+                // original.push(items[i])
 
             }).catch((err) => {
                 console.log("Get cart ITems APi Error", err)
+                setImmediate(() => {
+                    this.setState({ loader: false })
+                })
             })
 
     }
@@ -90,19 +105,21 @@ class Cart extends Component {
             // console.log("")
             // console.log("items[i].name", items[i],)
 
-            var image = await api.get(custom_api_url + "func=get_product_image&id=" + items[i]?.id)
+            var image = await api.get(custom_api_url + "func=get_product_image&sku=" + items[i]?.sku)
             // console.log("image Obj",image?.data)
             items[i].image = image.data?.image
+            items[i].subtotal = items[i].price * items[i].qty
             if (items[i]?.product_option == undefined) {
 
 
                 cartItems.push(items[i])
 
+
             } else {
                 for (let co = 0; co < items[i].product_option?.extension_attributes?.custom_options.length; co++) {
 
                     // console.log("items[i].product_option?.extension_attributes?.custom_options", items[i].product_option?.extension_attributes?.custom_options[co], "  ", co)
-                    var option_value_name = await this.fetchIdDataOptionLabel(items[i].product_option?.extension_attributes?.custom_options[co]?.option_value)
+                    var option_value_name = await this.fetchIdDataproductLabel(items[i].product_option?.extension_attributes?.custom_options[co]?.option_value)
                     var option_title = await this.fetchIdDataAttributeLabel(items[i].product_option?.extension_attributes?.custom_options[co]?.option_id)
                     // console.log("option_title: ", option_title, "     ", "option_value_name: ", option_value_name)
                     items[i].product_option.extension_attributes.custom_options[co].option_title = option_title;
@@ -118,37 +135,34 @@ class Cart extends Component {
                 } else {
                     // console.log("items[i].product_option?.extension_attributes?.configurable_item_options", items[i].product_option?.extension_attributes?.configurable_item_options)
                     for (let co = 0; co < items[i].product_option?.extension_attributes?.configurable_item_options.length; co++) {
-                         console.log("items[i].product_option?.extension_attributes?.configurable_item_options", items[i].product_option?.extension_attributes?.configurable_item_options[co], "  ", co)
-                        var option_title ="COLOR" //await this.fetchIdDataAttributeLabel(items[i].product_option?.extension_attributes?.configurable_item_options[co]?.option_id)
-                        var option_value_name = await this.fetchIdDataColor(items[i].product_option?.extension_attributes?.configurable_item_options[co]?.option_value)
+                        // console.log("items[i].product_option?.extension_attributes?.configurable_item_options", items[i].product_option?.extension_attributes?.configurable_item_options[co], "  ", co)
+                        var option_title = "COLOR" //await this.fetchIdDataAttributeLabel(items[i].product_option?.extension_attributes?.configurable_item_options[co]?.option_id)
+                        var option_value_name = await this.fetchIdDataOptionLabel(items[i].product_option?.extension_attributes?.configurable_item_options[co]?.option_value)
                         items[i].product_option.extension_attributes.configurable_item_options[co].option_title = option_title;
                         items[i].product_option.extension_attributes.configurable_item_options[co].option_value_name = option_value_name;
-                        console.log("option_title: ", option_title, "     ", "option_value_name: ", option_value_name)
+                        // console.log("option_title: ", option_title, "     ", "option_value_name: ", option_value_name)
 
                     }
                 }
 
-                // console.log(" ------------- ")
-                // console.log("")
-                // console.log("items[i].name", items[i].product_option?.extension_attributes,)
                 cartItems.push(items[i])
+
+                setImmediate(() => {
+                    this.setState({ loader: false })
+                })
 
             }
             setImmediate(() => {
                 this.setState({ cartItems })
             })
-            // console.log("")
-            // console.log(" ------------- ")
-            // console.log("CartItems", cartItems[i]?.product_option?.extension_attributes)
-            // console.log(" ------------- ")
-            // console.log("")
+
 
         }
 
     }
 
-    fetchIdDataColor = async (id) => {
-        var result = await axios.get(custom_api_url + 'func=option_color&id=' + id)
+    fetchIdDataproductLabel = async (id) => {
+        var result = await axios.get(custom_api_url + 'func=product_option_label&id=' + id)
         return result.data
     }
     fetchIdDataOptionLabel = async (id) => {
@@ -398,7 +412,7 @@ class Cart extends Component {
                     }).then((response) => {
                         console.log("Add to cart Item API response : ", response?.data)
                     }).catch((err) => {
-                        console.log("Add to cart item api error:  ", err)
+                        console.log("Add to cart item api error:  ", err.response)
                     })
 
                 } else {
@@ -417,6 +431,109 @@ class Cart extends Component {
         else {
             alert("Please Login to your account first!")
             this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+    }
+
+    minusOne = (qty, index) => {
+        var { cartData, cartItems, original, updateCartItems } = this.state
+
+        if (qty > 1) {
+
+            cartItems[index].qty = qty - 1  // for modified List 
+            original[index].qty = qty - 1  // For update cart API
+            //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
+
+            // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
+            // and index and pick whole object form cartItems to send to update cart API
+            var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
+
+            // a check if id already exist then no need to send it again which can cause duplicates
+            if (check?.item_id !== cartItems[index].item_id) {
+                // console.log("ID PUSHED")
+                updateCartItems.push({ item_id: cartItems[index].item_id, index: index })
+            }
+
+            setImmediate(() => {
+                this.setState({ cartItems, updateCartItems, original })
+            })
+        }
+
+    }
+
+    plusOne = (qty, index) => {
+        var { cartData, cartItems, original, updateCartItems } = this.state
+
+        // increasing quantity
+        cartItems[index].qty = qty + 1  // for modified List 
+        original[index].qty = qty + 1  // For update cart API
+
+        // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
+        // and index and pick whole object form cartItems to send to update cart API
+        var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
+
+        // a check if id already exist then no need to send it again which can cause duplicates
+        if (check?.item_id !== cartItems[index].item_id) {
+            // console.log("ID PUSHED")
+            updateCartItems.push({ item_id: cartItems[index].item_id, index: index })
+        }
+        //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
+
+        setImmediate(() => {
+            this.setState({ cartItems, updateCartItems, original })
+        })
+    }
+
+    updateCart = async () => {
+
+        var { updateCartItems, cartItems } = this.state
+        var { userData } = this.props
+        // console.log("working updateCart FUnc")
+        if (updateCartItems.length == 0) {
+            return console.log("working updateCart FUnc")
+        }
+        for (let i = 0; i < updateCartItems.length; i++) {
+            console.log("updateCartItems OBJ", updateCartItems[i])
+            if (cartItems[updateCartItems[i]?.index]?.item_id == updateCartItems[i]?.item_id) {
+                var obj = { "cartItem": cartItems[updateCartItems[i]?.index] }
+                // delete obj?.cartItem?.item_id;
+                delete obj?.cartItem?.image;
+                delete obj?.cartItem?.subtotal
+                if (cartItems[updateCartItems[i]?.index]?.product_option !== undefined) {
+
+                    for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options.length; u++) {
+                        console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u])
+                        delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_title
+                        delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_value_name
+                    }
+
+                    if (cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options == undefined) {
+                    } else {
+                        for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options.length; u++) {
+                            console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u])
+                            delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_title
+                            delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_value_name
+                        }
+
+                    }
+                }
+                console.log("Final OBJ", cartItems[updateCartItems[i]?.index].product_option?.extension_attributes)
+
+                await api.post("carts/mine/items", obj, {
+                    headers: {
+                        Authorization: `Bearer ${userData?.token}`,
+                    },
+                }).then((response) => {
+
+                    console.log("Update Cart Item API response : ", response?.data)
+                    if (i == updateCartItems.length - 1){
+                        this.getCartData()
+                        this.getCartItemDetails()
+                    }
+                }).catch((err) => {
+                        console.log("Update Cart item api error:  ", err)
+                    })
+            }
         }
 
     }
@@ -462,21 +579,24 @@ class Cart extends Component {
             // {"index": 9, "item": {"item_id": 5507, "name": "Bio True 1-Day for Astigmatism", "price": 200, "product_option": {"extension_attributes": [Object]}, "product_type": "simple", "qty": 1, "quote_id": "2848", "sku": "BT30-Astigmatism"}, "separators": {"highlight": [Function highlight], "unhighlight": [Function unhighlight], "updateProps": [Function updateProps]}}
             return (
                 <TouchableOpacity style={styles.flatList_Cont}>
+
+                    {/* Image & Text */}
                     <View style={styles.flatList_innerCont}>
                         <Image
-                            source={{ uri: "https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png" }}
-                            style={{ width: 120, height: 120, backgroundColor: "#f0f0f0" }}
+                            source={{ uri: imageUrl + item?.item?.image }}
+                            resizeMode='contain'
+                            style={{ width: 120, height: 100, }}
                         />
                         <View style={styles.text_cont}>
                             <Text style={[styles.text_style, { fontSize: 14 }]}>{item?.item?.name}</Text>
-                            <Text style={[styles.text_style, { fontSize: 15, marginTop: 5 }]}>AED {item?.item?.price}</Text>
+
                             {item?.item?.product_option !== undefined &&
 
                                 <>
 
                                     {item?.item?.product_option?.extension_attributes?.configurable_item_options !== undefined &&
                                         item?.item?.product_option?.extension_attributes?.configurable_item_options.map((data, index) => {
-                                           console.log("configurable_item_options",data)
+                                            // console.log("configurable_item_options", data)
                                             return (
                                                 <>
                                                     <View style={styles.option_cont}>
@@ -502,6 +622,47 @@ class Cart extends Component {
                             }
                         </View>
                     </View>
+
+                    {/* Quantity ,Price Subtotal*/}
+                    <View style={[styles.flatList_innerCont, { marginTop: 0 }]}>
+
+                        {/* Price Item */}
+                        <View style={styles.small_box}>
+                            <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600" }]}>Price</Text>
+                            <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", marginTop: 10 }]}>AED {item?.item?.price}</Text>
+                        </View>
+
+                        {/* Quantity */}
+                        <View style={styles?.row_quantity}>
+
+                            {/* Minus Button */}
+                            <TouchableOpacity
+                                onPress={() => this.minusOne(item?.item?.qty, item?.index)}
+                                style={styles.quantityBox}>
+                                <AntDesign name="minus" size={18} color="#020621" />
+                            </TouchableOpacity>
+
+                            {/* Quantity Number */}
+                            <View
+                                style={styles.quantityBox}>
+                                <Text style={styles.product_name}>{item?.item?.qty}</Text>
+                            </View>
+
+                            {/* Plus Button */}
+                            <TouchableOpacity
+                                onPress={() => this.plusOne(item?.item?.qty, item?.index)}
+                                style={styles.quantityBox}>
+                                <AntDesign name="plus" size={18} color="#020621" />
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Subtotal */}
+                        <View style={styles.small_box}>
+                            <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600" }]}>Subtotal</Text>
+                            <Text style={[styles.text_style, { fontSize: 15, marginTop: 10 }]}>AED {item?.item?.subtotal}</Text>
+                        </View>
+                    </View>
+
                 </TouchableOpacity>
             )
         }
@@ -510,7 +671,14 @@ class Cart extends Component {
             return (
                 <>
                     <View style={{ width: width, }}>
-                        <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />
+
+                        <TouchableOpacity
+                            onPress={() => this.updateCart()}
+                            style={styles.updateCartBtn}>
+                            <Text style={[styles.text_style, { fontSize: 14 }]}>Update Cart</Text>
+                        </TouchableOpacity>
+
+                        {cartItems.length == 0 && <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />}
 
                         <Text style={[styles.text_style, {
                             color: "black",
@@ -544,6 +712,9 @@ class Cart extends Component {
                     ListFooterComponent={ListFooterComponent}
                     renderItem={renderItem}
                 />
+
+                {loader && <Loading />}
+
                 {/** Tab Navigator */}
                 <TabNavigator
                     screenName={"Cart"}
@@ -580,8 +751,8 @@ const styles = StyleSheet.create({
     flatList_Cont: {
         width: width - 20,
         // height: 200,
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
+        // borderTopWidth: 1,
+        borderBottomWidth: 0.5,
         marginTop: 10,
         marginBottom: 10,
         alignSelf: "center",
@@ -599,6 +770,39 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 10,
         marginBottom: 10,
+    },
+    updateCartBtn: {
+        width: 120,
+        height: 45,
+        backgroundColor: "#f0f0f0",
+        borderRadius: 5,
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "center",
+        marginTop: 10,
+    },
+
+    small_box: {
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    row_quantity: {
+        //width: 100,
+        height: 35,
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#020621",
+        borderRadius: 5,
+    },
+    quantityBox: {
+        width: 35,
+        height: "100%",
+        borderWidth: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        borderColor: "#020621",
     },
     option_cont: {
         width: "100%",

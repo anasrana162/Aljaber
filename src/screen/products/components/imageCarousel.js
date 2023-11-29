@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react'
 import Entypo from "react-native-vector-icons/Entypo"
 import { PinchGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler'
 const width = Dimensions.get("screen").width
-const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
-const imageUrl2 = "https://aljaberoptical.com/media/catalog/product/cache/91596cb40167486f0a253bd4173ab8c2"
+const imageUrl = "https://aljaberoptical.com/media/catalog/product/"
 const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_selected }) => {
 
     const [selected, setSelected] = useState('')
@@ -96,14 +95,14 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
                     >
                         {/* {varient_selected ? */}
                             <Image
-                                source={{ uri: imageUrl2 + selected?.url }}
+                                source={{ uri: imageUrl + selected?.url }}
                                 style={{
                                     width: "100%", height: "100%",
                                 }}
                                 resizeMode='contain'
                             />
                             {/* // : <Image
-                            //     source={{ uri: imageUrl2 + selected?.url }}
+                            //     source={{ uri: imageUrl + selected?.url }}
                             //     style={{
                             //         width: "100%", height: "100%",
                             //     }}
@@ -119,7 +118,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
                     >
 
                         <Animated.Image
-                            source={{ uri: imageUrl2 + selected?.url }}
+                            source={{ uri: imageUrl + selected?.url }}
                             style={[{ width: "80%", height: "100%", zIndex: 700 }, {
                                 transform: [{
                                     scale: this.scale
@@ -152,7 +151,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
 
                                     {/* {varient_selected ? */}
                                         <Image
-                                            source={{ uri: imageUrl2 +  image.file }}
+                                            source={{ uri: imageUrl +  image.file }}
                                             style={{
                                                 width: "100%", height: "100%",
                                             }}

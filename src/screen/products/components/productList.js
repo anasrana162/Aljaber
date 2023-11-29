@@ -5,7 +5,7 @@ import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 import LottieView from 'lottie-react-native';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 const width = Dimensions.get("screen").width
-const imageUrl = "https://aljaberoptical.com/media/catalog/product/cache/92a9a8f6050de739a96ad3044e707950"
+const imageUrl = "https://aljaberoptical.com/media/catalog/product/"
 
 const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatListEnd, navProps, sortBY, openFilterBoard, loaderDot, addToCart }) => {
     //  console.log("Products", data)

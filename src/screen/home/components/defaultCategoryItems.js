@@ -4,12 +4,10 @@ import AntDesign from 'react-native-vector-icons/AntDesign'
 import api from '../../../api/api'
 const width = Dimensions.get("screen").width
 
-const DefaultCategoryItems = ({ data, navProps, onNextPress,admintoken }) => {
-    // console.log("DefaultCategoryItems:;;;;; ", data?.children_data)
+const DefaultCategoryItems = ({ data, navProps, onNextPress, admintoken }) => {
 
     selectedItems = async (item, index, key) => {
 
-        // console.log("Selected Item: ", this.state.selectedCat)
         var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
         await api.get("categories/" + item?.id, {
             headers: {
@@ -46,9 +44,6 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress,admintoken }) => {
                 overflow: "hidden"
             }}>
                 <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + data?.id + ".jpg" }} style={{ width: "100%", height: "100%", }} />
-                {/* {data?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + data?.img }} style={{ width: "100%", height: "100%", }} />}
-                {data?.placeHolder == "true" && <Image source={{ uri: data?.img }} style={{ width: "100%", height: "100%", }} />} */}
-
                 <View style={{
                     width: "100%",
                     height: "100%",
@@ -123,8 +118,6 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress,admintoken }) => {
                                                 {item?.parent_id == 102 && <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>}
                                                 {/* https://wpstaging51.a2zcreatorz.com/ */}
                                                 {item?.parent_id !== 102 && <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={{ width: "100%", height: "100%", }} />}
-                                                {/* {item?.placeHolder == "false" && <Image source={{ uri: "https://aljaberoptical.com/" + item?.img }} resizeMode='cover' style={{ width: "100%", height: "100%" }} />}
-                                                {item?.placeHolder == "true" && <Image source={{ uri: item?.img }} style={{ width: "100%", height: "100%" }} />} */}
                                             </View>
                                             {item?.parent_id !== 102 && <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>}
                                         </TouchableOpacity>
