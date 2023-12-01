@@ -144,6 +144,7 @@ const ImageCarousel = ({ data, fisrtImage, onImagePress, usage, style, varient_s
                         data.map((image, index) => {
                             return (
                                 <TouchableOpacity
+                                key={String(index)}
                                     onPress={() => selectImage({ id: image?.id, url: image.file, index: index })}
                                     style={[styles.image_selector_image, {
                                         borderWidth: image?.id == selected?.id ? 1 : null

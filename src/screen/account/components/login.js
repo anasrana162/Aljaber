@@ -106,6 +106,7 @@ class Login extends Component {
             }).then((res) => {
 
                 console.log("Customer Token", res?.data)
+                console.log("customerToken", customerToken)
                 //alert("Login Successful!")
                 // this.props.modal()
                 return res?.data
@@ -119,7 +120,7 @@ class Login extends Component {
                     })
                 })
             })
-            console.log("customerToken", customerToken)
+       
             if (customerToken !== "") {
                 const res = await api.post(
                     "carts/mine",
@@ -143,7 +144,7 @@ class Login extends Component {
 
 
                         if (user_data?.data) {
-
+console.log("TOKEN GENERATED============", )
                             actions.userToken(customerToken)
                             user_data.data.cartID = result?.data
                             actions.user(user_data?.data)
@@ -191,41 +192,41 @@ class Login extends Component {
         })
     }
 
-    componentDidMount = async () => {
+    // componentDidMount = async () => {
 
-        var customerToken = await api.post('integration/customer/token', {
-            "username": "anasrana.ar162@gmail.com",
-            "password": "Knc8761#"
+    //     var customerToken = await api.post('integration/customer/token', {
+    //         "username": "anasrana.ar162@gmail.com",
+    //         "password": "Knc8761#"
 
-        }).then((res) => {
+    //     }).then((res) => {
 
-            console.log("Customer Token", res?.data)
-            //alert("Login Successful!")
-            // this.props.modal()
-            return res?.data
+    //         console.log("Customer Token", res?.data)
+    //         //alert("Login Successful!")
+    //         // this.props.modal()
+    //         return res?.data
 
-        }).catch((err) => {
-            alert("Network Error Code: (APL1)")
-            console.log("Login Api error: ", err.response)
-            setImmediate(() => {
-                this.setState({
-                    loader: false
-                })
-            })
-        })
+    //     }).catch((err) => {
+    //         alert("Network Error Code: (APL1)")
+    //         console.log("Login Api error: ", err.response)
+    //         setImmediate(() => {
+    //             this.setState({
+    //                 loader: false
+    //             })
+    //         })
+    //     })
 
-        //var token = "eyJraWQiOiIxIiwiYWxnIjoiSFMyNTYifQ.eyJ1aWQiOjM0MjUyOSwidXR5cGlkIjozLCJpYXQiOjE2OTk2MTM5NzAsImV4cCI6MTY5OTYxNzU3MH0.ibyF2bZeRumJJBXoukfjVp-v0gjzxsoz9YswjiT67FM"
-        axios.post('https://aljaberoptical.com/pub/rest/V1/carts/mine', {
-            headers: {
-                Authorization: `Bearer ${customerToken}`,
-            },
-        }).then((result) => {
-            console.log("result CUstomer Token CompDidMount:", result)
-        }).catch((err) => {
-            console.log("Error result CUstomer Token CompDidMount:", err?.message)
+    //     //var token = "eyJraWQiOiIxIiwiYWxnIjoiSFMyNTYifQ.eyJ1aWQiOjM0MjUyOSwidXR5cGlkIjozLCJpYXQiOjE2OTk2MTM5NzAsImV4cCI6MTY5OTYxNzU3MH0.ibyF2bZeRumJJBXoukfjVp-v0gjzxsoz9YswjiT67FM"
+    //     axios.post('https://aljaberoptical.com/pub/rest/V1/carts/mine', {
+    //         headers: {
+    //             Authorization: `Bearer ${customerToken}`,
+    //         },
+    //     }).then((result) => {
+    //         console.log("result CUstomer Token CompDidMount:", result)
+    //     }).catch((err) => {
+    //         console.log("Error result CUstomer Token CompDidMount:", err?.message)
 
-        })
-    }
+    //     })
+    // }
 
     render() {
         return (

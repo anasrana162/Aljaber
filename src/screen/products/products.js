@@ -8,6 +8,7 @@ import api, { custom_api_url } from '../../api/api';
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
+
 import ImageView from './components/ImageView';
 import CategoryList from './components/categoryList';
 import ProductList from './components/productList';
@@ -302,102 +303,6 @@ class Products extends Component {
 
 
     }
-
-    // checkExistingProductDataLive = () => {
-    //     const { userData: { admintoken, allproducts, clearpres, color, toric, pres, lenssol,
-    //         cgadults, cgkids, egmen, egwomen, egkids, sgmen, sgwomen,
-    //         sgkids, cords, spraycleaner, cases, giftcards, safetyglasses, swimgoggles },
-    //         actions, userData, route: { params: { sub_category_id } } } = this.props
-
-    //     console.log("sub_category_id |||||", sub_category_id)
-
-    //     if (this.state.loopInProgress == true) return
-    //     setImmediate(() => {
-    //         this.setState({ loopInProgress: true })
-    //     })
-
-    //     console.log("swicth working");
-    //     switch (sub_category_id) {
-    //         // Category Contact Lenses
-    //         case 29:
-    //             console.log("Working clearpres")
-    //             this.onMomentumScrollEnd(clearpres, 10)
-    //             break;
-    //         case 30:
-    //             this.onMomentumScrollEnd(color, 10)
-    //             break;
-    //         case 31:
-    //             this.onMomentumScrollEnd(toric, 10)
-    //             break;
-    //         case 32:
-    //             this.onMomentumScrollEnd(pres, 10)
-    //             break;
-    //         case 33:
-    //             this.onMomentumScrollEnd(lenssol, 10)
-    //             break;
-
-    //         // Category Computer Glasses
-    //         case 27:
-    //             this.onMomentumScrollEnd(cgadults, 10)
-    //             break;
-    //         case 28:
-    //             this.onMomentumScrollEnd(cgkids, 10)
-    //             break;
-
-
-    //         // Category Eyeglasses
-    //         case 34:
-    //             this.onMomentumScrollEnd(egmen, 10)
-    //             break;
-    //         case 103:
-    //             this.onMomentumScrollEnd(egwomen, 10)
-    //             break;
-    //         case 104:
-    //             this.onMomentumScrollEnd(egkids, 10)
-    //             break;
-
-    //         // Category Sunglasses
-    //         case 42:
-    //             this.onMomentumScrollEnd(sgmen, 10)
-    //             break;
-    //         case 43:
-    //             this.onMomentumScrollEnd(sgwomen, 10)
-    //             break;
-    //         case 44:
-    //             // console.log("WOrking 44,")
-    //             this.onMomentumScrollEnd(sgkids, 10)
-    //             break;
-
-    //         // Category Accessories
-    //         case 122:
-    //             this.onMomentumScrollEnd(cords, 10)
-    //             break;
-    //         case 123:
-    //             this.onMomentumScrollEnd(spraycleaner, 10)
-    //             break;
-    //         case 124:
-    //             this.onMomentumScrollEnd(cases, 10)
-    //             break;
-    //         case 125:
-    //             this.onMomentumScrollEnd(giftcards, 10)
-    //             break;
-    //         case 126:
-    //             this.onMomentumScrollEnd(safetyglasses, 10)
-    //             break;
-    //         case 127:
-    //             this.onMomentumScrollEnd(swimgoggles, 10)
-    //             break;
-
-    //         default:
-    //             this.onMomentumScrollEnd(null, 10)
-    //             break;
-
-    //     }
-
-
-
-
-    // }
 
     createData = async (savedProducts) => {
         var { item, productApiCounter } = this.state;
@@ -755,6 +660,8 @@ class Products extends Component {
                                             // then we push this product into main products array with all of these things so it can be displayed
                                             // in the Products Detail screen
 
+                                            console.log("result.data.items[rdi].product_varients",result.data.items[rdi].product_varients)
+
                                             this.createFilterData(result.data.items[rdi])
 
                                             // Emptying the temporary array that we pushed products varients so the varients of other products
@@ -793,6 +700,7 @@ class Products extends Component {
         var { custom_attributes, product_varients, } = product
         var { contact_lens_diameter, contact_lens_base_curve, temple_size, bridge_size, gender, temple_material, temple_color, frame_type, polarized, frame_color, frame_shape, frame_material, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
         if (product_varients !== undefined) {
+             console.log("Product From CreateData Function:", product_varients)
             for (let pv = 0; pv < product_varients.length; pv++) {
                 for (let ca = 0; ca < product_varients[pv]?.custom_attributes.length; ca++) {
                     if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
@@ -1914,11 +1822,7 @@ class Products extends Component {
                 < HomeHeader navProps={this.props.navigation} />
 
                 {/** Top Image & Category Name */}
-                < ImageView
-                    // source={item?.parent_id == 102 ?
-                    //     { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.parent_id + ".jpg" }
-                    //     :
-                    //     { uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }}
+                < ImageView    
                     source={{ uri: "https://aljaberoptical.com" + imageLinkMain }}
                     textEN={item?.name}
                     textAR={""}
@@ -1944,8 +1848,7 @@ class Products extends Component {
                     openFilterBoard={() => this.openFilterBoard()}
                     loaderFilter={this.state.loaderFilter}
                     addToCart={(product, index) => this.addToCart(product, index)}
-                    totalProductsLength={this.state.productSkuLength}
-                // onMomentumScrollEnd={() => this.checkExistingProductDataLive()}
+                    totalProductsLength={this.state.productSkuLength}      
                 />
 
 

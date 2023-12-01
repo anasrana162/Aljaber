@@ -2,6 +2,8 @@ import { Text, StyleSheet, View, Dimensions, NativeModules, ScrollView, Activity
 import React, { Component } from 'react'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Entypo from 'react-native-vector-icons/Entypo';
 
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
@@ -14,6 +16,7 @@ const height = Dimensions.get("screen").height - HEIGHT
 
 import api, { custom_api_url } from '../../api/api';
 import axios from 'axios';
+import LottieView from 'lottie-react-native';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import ProductList from '../products/components/productList';
 import Loading from '../../components_reusable/loading';
@@ -28,6 +31,10 @@ class Cart extends Component {
             cartItems: [], //these are modified Items to show in cart screen
             original: [], // these are not modified but are used to send in update cart API
             updateCartItems: [],
+            subtotal: 0,
+            flatrate: 0,
+            shipping: '',
+            calculating: false,
             loader: false,
             loader2: false,
             loaderDot: false,
@@ -37,6 +44,13 @@ class Cart extends Component {
     }
 
     componentDidMount = () => {
+        // this.props.navigation.addListener('focus', async () => this.refresh());
+        this.getRecommendedProducts()
+        this.getCartData()
+        this.getCartItemDetails()
+    }
+
+    refresh = () => {
         this.getRecommendedProducts()
         this.getCartData()
         this.getCartItemDetails()
@@ -46,7 +60,15 @@ class Cart extends Component {
         var { userData: { token, admintoken, allproducts } } = this.props
 
         setImmediate(() => {
-            this.setState({ loader: true })
+            this.setState({
+                loader: true,
+                calculating: true,
+                cartItems: [],
+                cartData: null,
+                subtotal: 0,
+                flatrate: 0,
+                shipping: "",
+            })
         })
 
         api.get("carts/mine",
@@ -98,7 +120,7 @@ class Cart extends Component {
     // this function is used because the options in some of the items comes with id's not with
     // actual data inorder to fetch that data we have send them through another api's
     addDataToCartItems = async (items) => {
-        var { cartItems } = this.state
+        var { cartItems, subtotal } = this.state
 
         for (let i = 0; i < items.length; i++) {
             // console.log(" ------------- ")
@@ -109,6 +131,7 @@ class Cart extends Component {
             // console.log("image Obj",image?.data)
             items[i].image = image.data?.image
             items[i].subtotal = items[i].price * items[i].qty
+            subtotal = subtotal + items[i].subtotal
             if (items[i]?.product_option == undefined) {
 
 
@@ -153,12 +176,60 @@ class Cart extends Component {
 
             }
             setImmediate(() => {
-                this.setState({ cartItems })
+                this.setState({ cartItems, subtotal })
             })
+
+            if (i == items.length - 1) {
+                setImmediate(() => {
+                    this.setState({
+                        calculating: false,
+                    })
+                })
+                this.calculateShipping()
+            }
+
+
 
 
         }
 
+
+    }
+
+    calculateShipping = () => {
+        var { subtotal } = this.state
+
+        //    / console.log("calculateShipping subtotal", subtotal)
+
+        if (subtotal > 150) {
+            this.setState({
+                flatrate: 20,
+                shipping: ""
+            })
+        } else {
+            this.setState({
+                shipping: "free",
+            })
+        }
+
+    }
+
+
+    deleteCartItem = (product) => {
+        var { userData: { token, admintoken, allproducts } } = this.props
+        console.log("Delete Item PRoduct", token)
+        api.delete("carts/" + product?.quote_id + "/items/" + product?.item_id, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            },
+        })
+            .then((res) => {
+                console.log("Delete cart item Api Res ", res?.data)
+                this.refresh()
+                alert("Item Removed")
+            }).catch((err) => {
+                console.log("Delete cart item Api ERR", err)
+            })
     }
 
     fetchIdDataproductLabel = async (id) => {
@@ -441,7 +512,7 @@ class Cart extends Component {
         if (qty > 1) {
 
             cartItems[index].qty = qty - 1  // for modified List 
-            original[index].qty = qty - 1  // For update cart API
+            // original[index].qty = qty - 1  // For update cart API
             //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
 
             // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
@@ -466,7 +537,7 @@ class Cart extends Component {
 
         // increasing quantity
         cartItems[index].qty = qty + 1  // for modified List 
-        original[index].qty = qty + 1  // For update cart API
+        // original[index].qty = qty + 1  // For update cart API
 
         // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
         // and index and pick whole object form cartItems to send to update cart API
@@ -526,20 +597,29 @@ class Cart extends Component {
                 }).then((response) => {
 
                     console.log("Update Cart Item API response : ", response?.data)
-                    if (i == updateCartItems.length - 1){
+                    if (i == updateCartItems.length - 1) {
+                        setImmediate(() => {
+                            this.setState({
+                                cartItems: [],
+                                cartData: null,
+                                subtotal: 0,
+                                flatrate: 0,
+                                shipping: "",
+                            })
+                        })
                         this.getCartData()
                         this.getCartItemDetails()
                     }
                 }).catch((err) => {
-                        console.log("Update Cart item api error:  ", err)
-                    })
+                    console.log("Update Cart item api error:  ", err)
+                })
             }
         }
 
     }
 
     render() {
-        var { cartData, loader, randomProducts, loaderDot, cartItems } = this.state
+        var { cartData, loader, randomProducts, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
 
         const ListEmptyComponent = () => {
             return (
@@ -578,7 +658,7 @@ class Cart extends Component {
             // console.log("Items", item?.item)
             // {"index": 9, "item": {"item_id": 5507, "name": "Bio True 1-Day for Astigmatism", "price": 200, "product_option": {"extension_attributes": [Object]}, "product_type": "simple", "qty": 1, "quote_id": "2848", "sku": "BT30-Astigmatism"}, "separators": {"highlight": [Function highlight], "unhighlight": [Function unhighlight], "updateProps": [Function updateProps]}}
             return (
-                <TouchableOpacity style={styles.flatList_Cont}>
+                <View style={styles.flatList_Cont}>
 
                     {/* Image & Text */}
                     <View style={styles.flatList_innerCont}>
@@ -663,22 +743,93 @@ class Cart extends Component {
                         </View>
                     </View>
 
-                </TouchableOpacity>
+                    {/* Wishlist, remove, Edit */}
+                    <View style={[styles.flatList_innerCont, { marginTop: 10, justifyContent: "space-between" }]}>
+                        <TouchableOpacity>
+                            <Text style={[styles.text_style, { fontSize: 14, padding: 10, }]}>Move to Wishlist</Text>
+                        </TouchableOpacity>
+
+                        <View style={[styles.flatList_innerCont, { justifyContent: "space-between", width: 60, }]}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate("ProductDetails", { product_details: item?.item, product_index: item?.index, screenName: "Cart" })}>
+                                <FontAwesome5 name='pencil-alt' size={18} color='#020621' style={{ padding: 5 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.deleteCartItem(item?.item)}>
+                                <Entypo name='cross' size={24} color='#020621' style={{ padding: 5 }} />
+                            </TouchableOpacity>
+                        </View>
+
+
+                    </View>
+                </View>
             )
         }
 
         const ListFooterComponent = () => {
             return (
-                <>
-                    <View style={{ width: width, }}>
+
+                <View style={styles.footerComp}>
+
+                    <ScrollView>
 
                         <TouchableOpacity
                             onPress={() => this.updateCart()}
                             style={styles.updateCartBtn}>
-                            <Text style={[styles.text_style, { fontSize: 14 }]}>Update Cart</Text>
+                            {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 14,color:"white" }]}>Update Cart</Text>}
                         </TouchableOpacity>
 
+                        {/* Summary Container */}
+
+                        <Text style={[styles.text_style, {
+                            color: "black",
+                            fontSize: 20,
+                            fontWeight: "700",
+                            alignSelf: "flex-start",
+                            marginTop: 20,
+                            marginBottom: 10,
+                            marginLeft: 20,
+                        }]}>Summary</Text>
                         {cartItems.length == 0 && <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />}
+                        {calculating ? <View style={{
+                            width: "80%",
+                            alignSelf: "center",
+                            height: 150,
+                        }} >
+                            <Text style={[styles.text_style, { alignSelf: "center", marginTop: 10, }]}>Calculating</Text>
+                            < LottieView source={require('../../animations/dots_load.json')}
+                                autoPlay={true}
+                                resizeMode='cover'
+                                loop
+
+                            />
+                        </View>
+                            :
+                            <>
+                                <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 10 }} />
+                                <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 30 }} />
+
+                                {/* Subtotal */}
+                                <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center", marginTop: 20 }]}>
+                                    <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "#777" }]}>Subtotal</Text>
+                                    <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", color: "#777" }]}>AED {subtotal} </Text>
+                                </View>
+
+                                {/* Flatrate */}
+                                {shipping == "" && <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center" }]}>
+                                    <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "#777" }]}>Shipping (Flat Rate - Flat Rate)</Text>
+                                    <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", color: "#777" }]}>AED {flatrate} </Text>
+                                </View>}
+
+                                <View style={{ width: width - 20, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 10 }} />
+
+                                {/* Order Total */}
+                                <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center", marginTop: 20 }]}>
+                                    <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "black" }]}>Order Total</Text>
+                                    <Text style={[styles.text_style, { fontSize: 18, fontWeight: "700", color: "black" }]}>AED {flatrate + subtotal} </Text>
+                                </View>
+                            </>
+                        }
+
+
 
                         <Text style={[styles.text_style, {
                             color: "black",
@@ -686,7 +837,7 @@ class Cart extends Component {
                             alignSelf: "flex-start",
                             marginTop: 20,
                             marginBottom: -20,
-                            marginLeft: 10,
+                            marginLeft: 20,
                         }]}>Recommended for you</Text>
                         {/* Recommended Products */}
                         <ProductList
@@ -696,30 +847,34 @@ class Cart extends Component {
                             navProps={this.props.navigation}
                             addToCart={(product, index) => this.addToCart(product, index)}
                         />
+                    </ScrollView>
 
-                    </View>
-                </>
+                </View>
+
             )
         }
 
         return (
             <View style={styles.mainContainer}>
 
+                <ListHeaderComponent />
+
                 <FlatList
                     data={cartItems}
                     ListEmptyComponent={ListEmptyComponent}
-                    ListHeaderComponent={ListHeaderComponent}
-                    ListFooterComponent={ListFooterComponent}
+                    // ListHeaderComponent={ListHeaderComponent}
+                    // ListFooterComponent={ListFooterComponent}
                     renderItem={renderItem}
                 />
 
                 {loader && <Loading />}
 
+                <ListFooterComponent />
                 {/** Tab Navigator */}
-                <TabNavigator
+                {/* <TabNavigator
                     screenName={"Cart"}
                     navProps={this.props.navigation}
-                />
+                /> */}
             </View >
         )
     }
@@ -734,18 +889,36 @@ const styles = StyleSheet.create({
         height: height,
         backgroundColor: "white"
     },
+    footerComp: {
+        width: width,
+        height: height / 2.5,
+        backgroundColor: "white",
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingBottom: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.27,
+        shadowRadius: 4.65,
+
+        elevation: 6,
+    },
     header_comp: {
         width: width,
         justifyContent: "center",
+        backgroundColor: "#020621",
         alignItems: "center",
-        paddingTop: 20,
+        paddingTop: 0,
         paddingBottom: 10
     },
 
     header_comp_title: {
         fontSize: 20,
         fontWeight: "600",
-        color: "#020621"
+        color: "#ffffff"
     },
 
     flatList_Cont: {
@@ -764,7 +937,7 @@ const styles = StyleSheet.create({
     },
 
     flatList_innerCont: {
-        width: "95%",
+        width: "90%",
         flexDirection: "row",
         justifyContent: "space-around",
         alignItems: "center",
@@ -774,12 +947,12 @@ const styles = StyleSheet.create({
     updateCartBtn: {
         width: 120,
         height: 45,
-        backgroundColor: "#f0f0f0",
+        backgroundColor: "#020621",
         borderRadius: 5,
         justifyContent: "center",
         alignItems: "center",
         alignSelf: "center",
-        marginTop: 10,
+        marginTop: 20,
     },
 
     small_box: {

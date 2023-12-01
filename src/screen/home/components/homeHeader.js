@@ -24,7 +24,9 @@ export default class HomeHeader extends Component {
                     />
 
                     {/** Search icon Button */}
-                    <TouchableOpacity style={styles.searchIcon}>
+                    <TouchableOpacity
+                    onPress={() => navProps.navigate("Search")}
+                     style={styles.searchIcon}>
                         <Ionicons name="search" size={30} color="#020621" />
                     </TouchableOpacity>
 

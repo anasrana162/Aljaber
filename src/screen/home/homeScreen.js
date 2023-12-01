@@ -4,7 +4,7 @@ import HomeHeader from './components/homeHeader';
 import Swiper from './components/Swiper';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import HomeCategories from './components/homeCategories';
-import api from '../../api/api';
+import api, { custom_api_url } from '../../api/api';
 import RNRestart from 'react-native-restart';
 import NetInfo from "@react-native-community/netinfo";
 import DefaultCategories from './components/defaultCategories';
@@ -153,7 +153,24 @@ class HomeScreen extends Component {
         // this.adminApi()
         this.getDefaultCategories()
         this.unsubscribe()
+        
         // 
+    }
+
+    fetchAllProductsForSearch = async () => {
+        var { actions } = this.props
+        // actions?.allProducts(temp_sku_arr)
+        var fetchProducts = await api.get(custom_api_url + "func=get_all_products")
+        // console.log("fetchProducts fetchAllProductsForSearchFunc ", fetchProducts?.data)
+        let products = []
+        for (let i = 0; i < fetchProducts.length; i++) {
+            if (fetchProducts[i].type == "configurable" || fetchProducts[i].type == "simple") {
+                products.push(fetchProducts[i])
+            }
+        }
+        actions?.allProducts(products)
+        // console.log("Fetched products final:",fetchProducts)
+
     }
 
     adminApi = async () => {
@@ -198,69 +215,57 @@ class HomeScreen extends Component {
     getDefaultCategories = async () => {
 
         const { actions, userData } = this.props
-        var { categoryApiCounter,adminToken } = this.state
+        var { categoryApiCounter, adminToken } = this.state
         setImmediate(() => {
             this.setState({ loader: true })
         })
         if (this.state.network == true) {
 
-            // if (userData?.admintoken == null) {
-            //     setImmediate(() => {
-            //         this.setState({ loader: true })
-            //     })
-            //     console.log("Admin Token is null");
-            //     // alert("Network error check your connection")
-            //     this.adminApi()
+            await api.get('categories', {
+                headers: {
+                    Authorization: `Bearer ${adminToken}`,
+                },
+            }).then((res) => {
+                //console.log("User Data:", res?.data)
 
-            //     setTimeout(() => {
-            //         this.setState({ loader: false })
-            //         this.getDefaultCategories()
-            //     }, 5000);
-            // } else {
-             
-                await api.get('categories', {
-                    headers: {
-                        Authorization: `Bearer ${adminToken}`,
-                    },
-                }).then((res) => {
-                    //console.log("User Data:", res?.data)
+                setImmediate(() => {
+                    this.setState({
 
-                    setImmediate(() => {
-                        this.setState({
-
-                            defaultCategories: res?.data
-                        })
-                        actions.defaultCategories(res?.data)
-
-                        setTimeout(() => {
-                            this.defaultCategories()
-                            this.randomProducts()
-                        }, 500)
-
+                        defaultCategories: res?.data
                     })
+                    actions.defaultCategories(res?.data)
 
-
-                }).catch((err) => {
-                    //alert("Network Error Code: (CAT#1)")
-                    console.log("categories Api error: ", err.response)
                     setTimeout(() => {
+                        this.defaultCategories()
+                        this.fetchAllProductsForSearch()
+                        this.randomProducts()
+                    }, 500)
 
-                        if (categoryApiCounter == 3) {
-                            RNRestart.restart();
-                        } else {
-
-                            categoryApiCounter = categoryApiCounter + 1
-                            this.setState({ categoryApiCounter })
-                            this.getDefaultCategories()
-                        }
-                    }, 3000);
-                    // setImmediate(() => {
-                    //     this.setState({
-                    //         // loader: false
-                    //     })
-                    // })
                 })
-            }
+
+
+            }).catch((err) => {
+                //alert("Network Error Code: (CAT#1)")
+                console.log("categories Api error: ", err.response)
+                setTimeout(() => {
+
+                    if (categoryApiCounter == 3) {
+                        RNRestart.restart();
+                    } else {
+
+                        categoryApiCounter = categoryApiCounter + 1
+                        this.setState({ categoryApiCounter })
+                        this.adminApi()
+                        this.getDefaultCategories()
+                    }
+                }, 3000);
+                // setImmediate(() => {
+                //     this.setState({
+                //         // loader: false
+                //     })
+                // })
+            })
+        }
         // }
     }
 
@@ -358,48 +363,6 @@ class HomeScreen extends Component {
         })
     }
 
-    // topCatData = (array) => {
-    //     var { userData: { admintoken } } = this.props
-    //     let arr = []
-    //     console.log("Array Top Cats", array)
-    //     for (let ar = 0; ar < array.length; ar++) {
-    //         if (array[ar]?.id == 26) {
-
-    //             for (let p = 0; p < array[ar]?.children_data.length; p++) {
-    //                 console.log("Top Cats", array[ar]?.children_data[p])
-
-    //                 api.get("categories/" + array[ar]?.children_data[p]?.id, {
-    //                     headers: {
-    //                         Authorization: `Bearer ${admintoken}`,
-    //                     }
-    //                 }).then((res) => {
-    //                     for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
-
-    //                         if (res?.data?.custom_attributes[r].attribute_code == "image") {
-    //                             console.log("Cat detail response:", res?.data.custom_attributes[r])
-    //                             array[ar].children_data.imageLink = 'https://aljaberoptical.com/' + res?.data?.custom_attributes[r]?.value
-    //                             arr.push(array[ar])
-    //                             break;
-    //                         }
-    //                     }
-    //                 })
-    //             }
-    //             arr.push(array[ar])
-
-
-    //         }
-    //     }
-    //     // console.log("Top Categories:", arr[0]?.children_data)
-    //     // for(let p=0;arr)
-    //     setImmediate(() => {
-    //         this.setState({
-    //             loader: false,
-    //             topCategoryData: arr
-    //         })
-    //     })
-
-    // }
-
     randomProducts = async () => {
         var { userData } = this.props
         var sku_arr = []
@@ -490,7 +453,7 @@ class HomeScreen extends Component {
 
         setImmediate(() => {
             var { actions } = this.props
-            actions?.allProducts(temp_sku_arr)
+            // actions?.allProducts(temp_sku_arr)
             actions?.randomProducts(store_product)
             this.setState(
                 {
@@ -561,7 +524,6 @@ class HomeScreen extends Component {
     }
 
     render() {
-        // console.log("random Produuct", this.state.randomProducts)
         return (
             <View style={styles.mainContainer}>
 

@@ -38,6 +38,7 @@ class ProductDetails extends Component {
             option_cyl: null,
             option_axes: null,
             option_addition: null,
+            optionKey: 0,
             bigImage: "",
             openBigImageModal: false,
             configurable_product_options: null,
@@ -65,6 +66,7 @@ class ProductDetails extends Component {
             finalItemRightPower: {},
             // Power Whole
             finalItemPower: {},
+            finalCartItemPower: {},
 
             // Package Size options
             // Package Left
@@ -89,6 +91,7 @@ class ProductDetails extends Component {
             finalItemRightPackage: {},
             // Package whole
             finalItemPackage: {},
+            finalCartItemPackage: {},
 
             //CYL Options
             // Left CYL
@@ -113,6 +116,7 @@ class ProductDetails extends Component {
             finalItemRightCYL: {},
             // CYL Whole
             finalItemCYL: {},
+            finalCartItemCYL: {},
 
             //AXES Options
             // Left AXES
@@ -137,6 +141,7 @@ class ProductDetails extends Component {
             finalItemRightAXES: {},
             // AXES Whole
             finalItemAXES: {},
+            finalCartItemAXES: {},
 
 
             //ADDITION Options
@@ -162,6 +167,7 @@ class ProductDetails extends Component {
             finalItemRightADDITION: {},
             // ADDITION Whole
             finalItemADDITION: {},
+            finalCartItemADDITION: {},
 
 
             // Options Ended
@@ -187,11 +193,12 @@ class ProductDetails extends Component {
     }
 
     getProductDetails = async () => {
-        var { product_details: { sku } } = this.props.route.params
+        var { product_details, product_details: { sku }, screenName } = this.props.route.params
         var { userData: { admintoken, allproducts } } = this.props
         // console.log("product_details", sku)
 
-        tempPRoducts = []
+
+        var tempPRoducts = []
 
         setImmediate(() => {
             this.setState({
@@ -347,6 +354,8 @@ class ProductDetails extends Component {
 
     }
 
+
+
     check_Configurable_Product_Options = async () => {
         var { product_details: { extension_attributes } } = this.state
         if (extension_attributes?.configurable_product_options == undefined || extension_attributes?.configurable_product_options.length == 0) {
@@ -370,8 +379,13 @@ class ProductDetails extends Component {
     }
 
     checkOptions = (key) => {
+        var { screenName, product_details } = this.props.route.params
         var { product_details: { options } } = this.state
         // console.log("OPtions For Product", options)
+
+        if (screenName !== undefined || screenName == "Cart") {
+            this.checkCartScreenOption(product_details, options)
+        }
 
         var x = [];
 
@@ -410,6 +424,116 @@ class ProductDetails extends Component {
                 this.setState({ option_addition: x[i] })
             }
 
+        }
+    }
+    checkCartScreenOption = (product_details, options) => {
+
+
+        console.log("product_details Cart ", product_details, "       ", options)
+        setImmediate(() => {
+            this.setState({ quantity: product_details?.qty })
+        })
+        if (product_details?.product_option != undefined) {
+
+            console.log("product_details Cart extension_attributes", product_details?.product_option?.extension_attributes)
+            var custom_options = product_details?.product_option?.extension_attributes?.custom_options
+            // let titles = []
+            // options.filter((data) => {
+            //     titles.push(data?.title)
+            // })
+            for (let i = 0; i < options?.length; i++) {
+
+                console.log("")
+                console.log("-----------------------")
+                console.log("options  ", options[i])
+                console.log("-----------------------")
+                console.log("")
+                for (let k = 0; k < custom_options.length; k++) {
+                    if (options[i]?.title == custom_options[k]?.option_title) {
+                        console.log("Option Picked:     ", options[i]?.title)
+                        if (custom_options[k]?.option_title == "PACKAGE SIZE") {
+                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
+                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
+                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
+                            setImmediate(() => {
+                                this.setState({
+                                    optionKey: this.state.optionKey + 1,
+                                    finalCartItemPackage: value_name,
+                                    finalItemPackage: {
+                                        "option_id": options[i]?.option_id,
+                                        "option_value": value_name?.option_type_id
+                                    }
+                                })
+                            })
+                            break;
+                        }
+                        if (custom_options[k]?.option_title == "POWER") {
+                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
+                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
+                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
+                            setImmediate(() => {
+                                this.setState({
+                                    optionKey: this.state.optionKey + 1,
+                                    finalCartItemPower: value_name,
+                                    finalItemPower: {
+                                        "option_id": options[i]?.option_id,
+                                        "option_value": value_name?.option_type_id
+                                    }
+                                })
+                            })
+                            break;
+                        }
+                        if (custom_options[k]?.option_title == "CYL") {
+                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
+                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
+                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
+                            setImmediate(() => {
+                                this.setState({
+                                    optionKey: this.state.optionKey + 1,
+                                    finalCartItemCYL: value_name,
+                                    finalItemCYL: {
+                                        "option_id": options[i]?.option_id,
+                                        "option_value": value_name?.option_type_id
+                                    }
+                                })
+                            })
+                            break;
+                        }
+                        if (custom_options[k]?.option_title == "AXES") {
+                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
+                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
+                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
+                            setImmediate(() => {
+                                this.setState({
+                                    optionKey: this.state.optionKey + 1,
+                                    finalCartItemAXES: value_name,
+                                    finalItemAXES: {
+                                        "option_id": options[i]?.option_id,
+                                        "option_value": value_name?.option_type_id
+                                    }
+                                })
+                            })
+                            break;
+                        }
+                        if (custom_options[k]?.option_title == "ADDITION") {
+                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
+                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
+                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
+                            setImmediate(() => {
+                                this.setState({
+                                    optionKey: this.state.optionKey + 1,
+                                    finalCartItemADDITION: value_name,
+                                    finalItemADDITION: {
+                                        "option_id": options[i]?.option_id,
+                                        "option_value": value_name?.option_type_id
+                                    }
+                                })
+                            })
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -930,9 +1054,9 @@ class ProductDetails extends Component {
     }
 
     plusOne = () => {
-        var { product_details: { extension_attributes: { stock_item }, quantity } } = this.state
+        var { product_details: { extension_attributes: { stock_item } }, quantity } = this.state
         var qty = stock_item?.qty
-
+        console.log("qty", qty, " ", quantity)
         if (quantity <= qty) {
             quantity = quantity + 1
             setImmediate(() => {
@@ -948,6 +1072,7 @@ class ProductDetails extends Component {
 
     minusOne = () => {
         var { quantity } = this.state
+        console.log("qty", " ", quantity)
         if (quantity == 1) {
             return alert("Minimum quantity is 1")
         } else {
@@ -1202,13 +1327,19 @@ class ProductDetails extends Component {
         //     productToSend = this.state.product_varient_selected
 
         // } else {
+
+        if (product?.type == undefined) {
+            product.type = product?.product_type
+        }
+
         productToSend = product
         // }
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
             console.log("productToSend?.type_id", productToSend)
+
             if (productToSend?.type == "configurable" || productToSend?.type == "simple") {
 
-                if (productToSend?.options?.length == 0) {
+                if (this.state.product_details?.options?.length == 0) {
 
                     let obj = {
                         "cartItem": {
@@ -2490,6 +2621,8 @@ class ProductDetails extends Component {
                         Object.keys(this.state.finalItemRightAXES).length == 0 &&
                         Object.keys(this.state.finalItemLeftCYL).length == 0 &&
                         Object.keys(this.state.finalItemRightCYL).length == 0
+                        // &&
+                        // this.state.product_details?.options.length !== 0
                     ) {
                         setImmediate(() => {
                             this.setState({
@@ -2781,16 +2914,43 @@ class ProductDetails extends Component {
                     </Text>
 
                     {/* Options */}
+                    {/* {console.log("")}
+                    {console.log("finalCartItemPackage", this.state.finalCartItemPackage)}
+                    {console.log("")}
+                    {console.log("")}
+                    {console.log("finalCartItemPower", this.state.finalCartItemPower)}
+                    {console.log("")}
+                    {console.log("")}
+                    {console.log("finalCartItemCYL", this.state.finalCartItemCYL)}
+                    {console.log("")}
+                    {console.log("")}
+                    {console.log("finalCartItemAXES", this.state.finalCartItemAXES)}
+                    {console.log("")}
+                    {console.log("")}
+                    {console.log("finalCartItemADDITION", this.state.finalCartItemADDITION)}
+                    {console.log("")} */}
                     <Options
+                        key={this.state.optionKey}
+
+                        // Option Data
                         option_package_size={this.state.option_package_size}
                         option_power={this.state.option_power}
                         option_cyl={this.state.option_cyl}
                         option_axes={this.state.option_axes}
                         option_addition={this.state.option_addition}
-                        selectedVarient={(data, index) => this.selectedVarient(data, index)}
                         product_varients={this.state.product_varients}
+                        selectedVarient={(data, index) => this.selectedVarient(data, index)}
                         dropdown={this.state.dropdown}
                         checkMarked={(val) => this.checkMarked(val)}
+
+                        // cart screen DATA
+                        finalCartItemPackage={this.state.finalCartItemPackage}
+                        finalCartItemPower={this.state.finalCartItemPower}
+                        finalCartItemCYL={this.state.finalCartItemCYL}
+                        finalCartItemAXES={this.state.finalCartItemAXES}
+                        finalCartItemADDITION={this.state.finalCartItemADDITION}
+
+
                         selectedItemLeftPower={this.state.selectedItemLeftPower}
                         selectedItemLeftPackage={this.state.selectedItemLeftPackage}
                         selectedItemRightPower={this.state.selectedItemRightPower}

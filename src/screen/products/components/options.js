@@ -7,6 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 const width = Dimensions.get("screen").width;
 
 const Options = ({
+    optionKey,
     checkMarked,
     onChangeText,
     option_package_size,
@@ -25,6 +26,11 @@ const Options = ({
     selectedItemLeftCYL,
     selectedItemRightAXES,
     selectedItemLeftAXES,
+    finalCartItemPackage,
+    finalCartItemPower,
+    finalCartItemCYL,
+    finalCartItemAXES,
+    finalCartItemADDITION,
     openDropDown,
     leftEyeQuantity,
     rigthEyeQuantity,
@@ -394,24 +400,76 @@ const Options = ({
                     </>
                     :
                     <>
-                        {option_package_size != null &&
-                            <OptionDropdown checked={checked} title={option_package_size?.title} data={option_package_size} setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)} />
+                        {/* {console.log("")}
+                        {console.log("finalCartItemPackage", finalCartItemPackage)}
+                        {console.log("")}
+                        {console.log("")}
+                        {console.log("finalCartItemPower", finalCartItemPower)}
+                        {console.log("")}
+                        {console.log("")}
+                        {console.log("finalCartItemCYL", finalCartItemCYL)}
+                        {console.log("")}
+                        {console.log("")}
+                        {console.log("finalCartItemAXES", finalCartItemAXES)}
+                        {console.log("")}
+                        {console.log("")}
+                        {console.log("finalCartItemADDITION", finalCartItemADDITION)}
+                        {console.log("")} */}
+                        
+
+                        {option_package_size != null  &&
+                            <OptionDropdown
+                                // key={optionKey}
+                                checked={checked}
+                                title={option_package_size?.title}
+                                data={option_package_size}
+                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
+                                // getItemDefault={finalCartItemPackage}
+                            />
                         }
 
-                        {option_power != null &&
-                            <OptionDropdown checked={checked} title={option_power?.title} data={option_power} setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)} />
+                        {option_power != null  &&
+                            <OptionDropdown
+                                //  key={optionKey}
+                                checked={checked}
+                                title={option_power?.title}
+                                data={option_power}
+                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
+                                getItemDefault={finalCartItemPower}
+                            />
                         }
 
-                        {option_cyl != null &&
-                            <OptionDropdown checked={checked} title={option_cyl?.title} data={option_cyl} setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)} />
+                        {option_cyl != null  &&
+                            <OptionDropdown
+                                // key={optionKey}
+                                checked={checked}
+                                title={option_cyl?.title}
+                                data={option_cyl}
+                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
+                                getItemDefault={finalCartItemCYL}
+                            />
                         }
 
-                        {option_axes != null &&
-                            <OptionDropdown checked={checked} title={option_axes?.title} data={option_axes} setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)} />
+                        {option_axes != null  &&
+                            <OptionDropdown
+                                //key={optionKey}
+                                checked={checked}
+                                title={option_axes?.title}
+                                data={option_axes}
+                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
+                                getItemDefault={finalCartItemAXES}
+                            />
                         }
 
-                        {option_addition != null &&
-                            <OptionDropdown checked={checked} title={option_addition?.title} data={option_addition} setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)} />
+                        {option_addition != null  &&
+                            <OptionDropdown
+                                //key={optionKey}
+                                checked={checked}
+                                title={option_addition?.title}
+                                data={option_addition}
+                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
+                                getItemDefault={finalCartItemADDITION}
+                            />
                         }
 
                         <View style={{

@@ -4,15 +4,25 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 const width = Dimensions.get("screen").width;
 
-const OptionDropdown = ({ title, data, style, checked, style1, setWholeItemSelected }) => {
-    
-    const [selectedItem, setSelectedItem] = useState({
-        "title": "--Please Select--",
-        "sort_order": 0,
-        "price": 0,
-        "price_type": "",
-        "option_type_id": null
-    })
+const OptionDropdown = ({
+    title,
+    data,
+    style,
+    checked,
+    style1,
+    setWholeItemSelected, getItemDefault }) => {
+
+    const [selectedItem, setSelectedItem] = useState(
+        Object.keys(getItemDefault).length == 0 ?
+            {
+                "title": "--Please Select--",
+                "sort_order": 0,
+                "price": 0,
+                "price_type": "",
+                "option_type_id": null
+            } :
+            getItemDefault
+    )
     const [dropdown, setDropdown] = useState(false)
 
     const selectItem = (item, key,) => {
@@ -20,6 +30,8 @@ const OptionDropdown = ({ title, data, style, checked, style1, setWholeItemSelec
         setWholeItemSelected(item, key)
         setSelectedItem(item)
     }
+
+    // console.log("getItemDefault",getItemDefault)
 
     return (
         <View style={[styles?.option_cont, style]}>
