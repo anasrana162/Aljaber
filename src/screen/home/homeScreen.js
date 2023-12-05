@@ -216,6 +216,9 @@ class HomeScreen extends Component {
                 })
             }
         }
+        else{
+            console.log("No credentials found for login")
+        }
     }
 
     fetchAllProductsForSearch = async () => {

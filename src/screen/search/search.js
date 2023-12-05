@@ -1,6 +1,6 @@
-import { Text, StyleSheet, Image, TextInput, View, Dimensions, NativeModules, FlatList, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Text, StyleSheet, Image,  View, Dimensions, NativeModules, FlatList, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { Component } from 'react'
-
+import { TextInput } from 'react-native-gesture-handler';
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
@@ -158,6 +158,7 @@ class Search extends Component {
                             style={{
                                 width: "90%",
                                 height: "100%",
+                                color:"black"
                             }}
                             autoFocus={true}
                             autoCorrect={false}

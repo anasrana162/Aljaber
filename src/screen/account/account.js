@@ -7,9 +7,15 @@ import Entypo from 'react-native-vector-icons/Entypo'
 import AuthSelector from './components/authSelector';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Information from './components/information';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
+
+{/* {---------------Redux Imports------------} */ }
+import { connect } from 'react-redux';
+import * as userActions from "../../redux/actions/user"
+import { bindActionCreators } from 'redux';
 
 class Account extends Component {
     constructor(props) {
@@ -40,15 +46,27 @@ class Account extends Component {
 
     }
 
+    Logout = () => {
+        var { actions } = this.props
+        this.props.navigation.navigate("HomeScreen")
+        setTimeout(() => {
+            // console.log("Actions Redex", actions)
+            actions.userToken("")
+            actions.adminToken("")
+            AsyncStorage.setItem("@aljaber_userLoginData", "")
+        }, 1000)
+
+    }
+
     checkProps = () => {
-        if( this.props?.route?.params?.modal !== undefined && this.props?.route?.params?.modal == "open" ){
+        if (this.props?.route?.params?.modal !== undefined && this.props?.route?.params?.modal == "open") {
 
             setImmediate(() => {
                 this.setState({
                     authModal: true
                 })
             })
-        }else{
+        } else {
             console.log("Nothing to check Account.js")
         }
     }
@@ -82,7 +100,7 @@ class Account extends Component {
 
                         {/** Order Track */}
                         <Text style={styles.track_order_text}>Track your orders and check out quicker</Text>
-                        <OrderList navProps={this.props.navigation} />
+                        <OrderList Logout={() => this.Logout()} navProps={this.props.navigation} />
 
                         {/** Settings */}
                         <Settings />
@@ -161,8 +179,6 @@ class Account extends Component {
         )
     }
 }
-
-export default Account;
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
@@ -251,3 +267,19 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     }
 })
+{/* {---------------redux State ------------} */ }
+const mapStateToProps = state => ({
+    userData: state.userData
+});
+
+{/* {---------------redux Actions ------------} */ }
+
+const ActionCreators = Object.assign(
+    {},
+    userActions,
+);
+const mapDispatchToProps = dispatch => ({
+    actions: bindActionCreators(ActionCreators, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Account);

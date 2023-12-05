@@ -729,7 +729,7 @@ class Cart extends Component {
                             {/* Quantity Number */}
                             <View
                                 style={styles.quantityBox}>
-                                <Text style={styles.product_name}>{item?.item?.qty}</Text>
+                                <Text style={[styles.text_style,{fontSize:14}]}>{item?.item?.qty}</Text>
                             </View>
 
                             {/* Plus Button */}

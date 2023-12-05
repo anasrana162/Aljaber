@@ -5,7 +5,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 
 const width = Dimensions.get("screen").width
 
-const OrderList = () => {
+const OrderList = ({ Logout }) => {
     return (
         <>
             <TouchableOpacity
@@ -13,6 +13,16 @@ const OrderList = () => {
                 style={[styles.mainContainer, { marginTop: 20 }]}>
                 <Ionicons name="cube-outline" color='#3F51B5' size={30} />
                 <Text style={styles.text_list}>Orders</Text>
+                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
+            </TouchableOpacity>
+
+            {/* Logout Button */}
+            <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={Logout}
+                style={[styles.mainContainer, { marginTop: 0 }]}>
+                <MaterialCommunityIcons name="logout" color='#3F51B5' size={30} />
+                <Text style={styles.text_list}>Logout</Text>
                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
             </TouchableOpacity>
 

@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         paddingBottom: Platform.OS == "ios" ? 15 : 0,
         // borderRadius: 15,
         position: "absolute",
-        bottom: Platform.OS == "ios" ? 0 : 10,
+        bottom: 0,
         zIndex: 150,
         overflow: "hidden",
         flexDirection: "row",
