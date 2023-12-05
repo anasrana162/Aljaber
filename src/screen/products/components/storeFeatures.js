@@ -11,8 +11,8 @@ const StoreFeatures = ({ screenName }) => {
     return (
         <View style={[styles.mainContainer, {
             alignSelf: screenName == "home" ? "center" : null,
-            backgroundColor: screenName == "home" ? "#d9e7fa" : "white",
-            marginBottom: screenName == "home" ? 100 : 0
+            backgroundColor: screenName == "home" ? "#e6ecff" : "white",
+            marginBottom: screenName == "home" ? 0 : 0
         }]}>
 
             {/* First Column */}

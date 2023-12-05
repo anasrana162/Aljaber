@@ -195,7 +195,7 @@ class ProductDetails extends Component {
     getProductDetails = async () => {
         var { product_details, product_details: { sku }, screenName } = this.props.route.params
         var { userData: { admintoken, allproducts } } = this.props
-        // console.log("product_details", sku)
+        console.log("product_details", sku)
 
 
         var tempPRoducts = []
@@ -215,6 +215,7 @@ class ProductDetails extends Component {
             // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
             // on the screen as it is not in the main body of the object
 
+            
             for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
 
                 // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
@@ -241,20 +242,20 @@ class ProductDetails extends Component {
                         if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
 
                             // Checking value of configurable_product_links (product Varients)
-
+                            // console.log("prod?.data", prod?.data?.extension_attributes?.configurable_product_links?.length)
                             for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
 
                                 // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
-
+// console.log("allproducts",allproducts)
                                 const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
 
                                 // Condition
-
+console.log("selected_products",selected_products)
                                 if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
 
                                     // if id's match then the value "sku" is picked up from the matching product object and then we run an api
                                     // to fetch details for the varient because they are not in the products object from all products api
-
+console.log("check 1")
                                     var check = false
 
                                     // Api for fetching product details
@@ -331,7 +332,7 @@ class ProductDetails extends Component {
             // this is for loader skeleton 
 
 
-
+console.log("No Issue")
 
             this.getDescription('prop')
             this.checkOptions('prop')
@@ -341,7 +342,8 @@ class ProductDetails extends Component {
             this.check_Configurable_Product_Options()
 
         }).catch((err) => {
-            console.log("Product Detail Api error on:  ", sku)
+            console.log("Product Detail Api error on:  ", sku , err)
+            alert("Error Fetching Data Try again")
             return setImmediate(() => {
                 this.setState({
                     loader: false

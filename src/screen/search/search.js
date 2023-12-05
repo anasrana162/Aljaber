@@ -7,6 +7,9 @@ import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
 
 import Entypo from "react-native-vector-icons/Entypo"
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+import Ionicons from "react-native-vector-icons/Ionicons"
+
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -21,6 +24,7 @@ class Search extends Component {
         this.state = {
             products: [],
             filteredProducts: [],
+            textInput: '',
         };
     }
 
@@ -29,24 +33,26 @@ class Search extends Component {
     }
 
     fetchAllProducts = () => {
-        var { userData: { allproducts } } = this.props
+        var { userData: { searchproducts } } = this.props
+        // console.log("allproducts",allproducts)
         this.setState({
-            products: allproducts
+            products: searchproducts
         })
     }
 
     onSearch = (txt) => {
         var { products, filteredProducts } = this.state;
-console.log("TXT REACHED",txt)
+        console.log("TXT REACHED", txt)
+        console.log("Products", products)
         const filterData = products.filter((data) => {
-            console.log("DAta", data)
-            const matches_name = data?.name
+            console.log("DAta", data.brand)
+            const matches_name = data?.name.toString()
                 .toLowerCase()
                 .includes(txt.toLowerCase());
-            const matches_brand = data?.brand
+            const matches_brand = data?.brand.toString()
                 .toLowerCase()
                 .includes(txt.toLowerCase());
-            const matches_price = data?.price
+            const matches_price = data?.price.toString()
                 .toLowerCase()
                 .includes(txt?.toLowerCase());
 
@@ -65,12 +71,76 @@ console.log("TXT REACHED",txt)
         });
     }
 
+    selectedItem = (product, index) => {
+        console.log("Product Selected:", product)
+    }
+
+    addToCart = (product, index) => {
+
+        var { userData } = this.props
+        console.log("userData", userData?.token)
+
+        if (userData?.token !== null || userData?.user?.cartID !== undefined) {
+
+            if ( product?.type == "simple") {
+
+
+                    var obj = {
+                        "cartItem": {
+                            "sku": product?.sku,
+                            "qty": 1,
+                            "name": product?.name,
+                            "price": product?.price,
+                            "product_type": product?.type,
+                            "quote_id": userData?.user?.cartID
+                        }
+                    }
+                    console.log("this product does not have options", obj)
+
+                    api.post("carts/mine/items", obj, {
+                        headers: {
+                            Authorization: `Bearer ${userData?.token}`,
+                        },
+                    }).then((response) => {
+                        console.log("Add to cart Item API response : ", response?.data)
+                        alert("Product Added to Cart!")
+                    }).catch((err) => {
+                        console.log("Add to cart item api error:  ", err)
+                        this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                    })
+
+           
+
+            } else {
+                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                return alert("Please select a Product Option!")
+            }
+
+        }
+
+        else {
+            alert("Please Login to your account first!")
+            this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+    }
+
     render() {
         var { products, filteredProducts } = this.state
 
         const ListEmptyComponent = () => {
             return (
-                <View></View>
+                <View style={{
+                    width: width,
+                    height: height - 60,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}>
+
+                    <Text style={{ fontSize: 24, fontWeight: "700", color: "#bbb", width: 180, textAlign: "center" }}>No content type to search</Text>
+
+                </View>
             )
         }
 
@@ -80,13 +150,29 @@ console.log("TXT REACHED",txt)
                     <TouchableOpacity onPress={() => this.props.navigation.pop()} >
                         <Entypo name="chevron-with-circle-left" size={30} color="white" style={{ paddingVertical: 10, }} />
                     </TouchableOpacity>
-                    <TextInput
-
-                        placeholder='Search...'
-                        placeholderTextColor={"#777"}
-                        style={styles.textinp}
-                        onChangeText={(txt) => this.onSearch(txt)}
-                    />
+                    <View style={styles.textinpCont}>
+                        <TextInput
+                            value={this.state.textInput}
+                            placeholder='Search...'
+                            placeholderTextColor={"#777"}
+                            style={{
+                                width: "90%",
+                                height: "100%",
+                            }}
+                            autoFocus={true}
+                            autoCorrect={false}
+                            onChangeText={(txt) => {
+                                this.setState({ textInput: txt })
+                                // this.onSearch(txt)
+                            }}
+                        />
+                        <TouchableOpacity
+                            onPress={() => this.onSearch(this.state.textInput)}
+                        // style={styles.searchIcon}
+                        >
+                            <Ionicons name="search" size={30} color="#020621" />
+                        </TouchableOpacity>
+                    </View>
                 </View>
             )
         }
@@ -94,7 +180,7 @@ console.log("TXT REACHED",txt)
         const renderItem = (products) => {
             return (
                 <Pressable
-                    // onPress={() => selectedItem(products?.item, products?.index)}
+                    onPress={() => this.selectedItem(products?.item, products?.index)}
                     style={styles.product_Cont}
                     activeOpacity={0.8}
 
@@ -118,7 +204,7 @@ console.log("TXT REACHED",txt)
                                 <MaterialCommunityIcons name="cards-heart-outline" size={20} color="black" />
                             </TouchableOpacity>
                             <TouchableOpacity
-                                // onPress={() => addToCart(products?.item, products?.index)}
+                                onPress={() => this.addToCart(products?.item, products?.index)}
                                 style={styles?.addToCart_Cont}>
                                 <MaterialCommunityIcons name="shopping-outline" size={18} color="white" style={{ marginRight: 5 }} />
                                 <Text style={styles.addToCart}>Add to Cart</Text>
@@ -135,6 +221,7 @@ console.log("TXT REACHED",txt)
                 <ListHeaderComponent />
                 <FlatList
                     data={filteredProducts}
+                    numColumns={2}
                     ListEmptyComponent={ListEmptyComponent}
                     // ListHeaderComponent={ListHeaderComponent}
                     // ListFooterComponent={ListFooterComponent}
@@ -171,13 +258,16 @@ const styles = StyleSheet.create({
         // marginBottom: 50,
         alignItems: "center",
     },
-    textinp: {
+    textinpCont: {
         width: 270,
         height: 40,
         borderRadius: 10,
         paddingHorizontal: 10,
         color: "#020621",
         backgroundColor: "white",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center"
     },
     product_inner_Cont: {
         width: "100%",

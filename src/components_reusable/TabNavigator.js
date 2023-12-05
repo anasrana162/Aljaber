@@ -20,39 +20,39 @@ const TabNavigator = ({ navProps, screenName }) => {
                 disabled={screenName == "home" ? true : false}
                 activeOpacity={0.4}
                 style={styles.iconContainer} >
-                {screenName == "home" && <View style={styles.activeBar} />}
-                <Ionicons name="home" size={25} color="white" />
-                <Text style={styles.iconText}>Home</Text>
+                {screenName == "home" && <View style={[styles.activeBar, { backgroundColor: screenName == "home" ? "#020621" : "#98999c" }]} />}
+                <Ionicons name="home" size={25} color={screenName == "home" ? "#020621" : "#98999c"} />
+                <Text style={[styles.iconText, { color: screenName == "home" ? "#020621" : "#98999c" }]}>Home</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => navigateT0("Categories",navProps)}
+                onPress={() => navigateT0("Categories", navProps)}
                 activeOpacity={0.4}
                 disabled={screenName == "category" ? true : false}
                 style={styles.iconContainer} >
-                {screenName == "category" && <View style={styles.activeBar} />}
-                <Ionicons name="grid-outline" size={25} color="white" />
-                <Text style={styles.iconText}>Categories</Text>
+                {screenName == "category" && <View style={[styles.activeBar, { backgroundColor: screenName == "category" ? "#020621" : "#98999c" }]} />}
+                <Ionicons name="grid-outline" size={25} color={screenName == "category" ? "#020621" : "#98999c"} />
+                <Text style={[styles.iconText, { color: screenName == "category" ? "#020621" : "#98999c" }]}>Categories</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => navigateT0("Cart",navProps)}
+                onPress={() => navigateT0("Cart", navProps)}
                 activeOpacity={0.4}
                 disabled={screenName == "Cart" ? true : false}
                 style={styles.iconContainer} >
-                {screenName == "Cart" && <View style={styles.activeBar} />}
-                <Ionicons name="cart-outline" size={25} color="white" />
-                <Text style={styles.iconText}>Cart</Text>
+                {screenName == "Cart" && <View style={[styles.activeBar, { backgroundColor: screenName == "Cart" ? "#020621" : "#98999c" }]} />}
+                <Ionicons name="cart-outline" size={25} color={screenName == "Cart" ? "#020621" : "#98999c"} />
+                <Text style={[styles.iconText, { color: screenName == "Cart" ? "#020621" : "#98999c" }]}>Cart</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={() => navigateT0("Account",navProps)}
+                onPress={() => navigateT0("Account", navProps)}
                 activeOpacity={0.4}
                 disabled={screenName == "account" ? true : false}
                 style={styles.iconContainer} >
-                {screenName == "account" && <View style={styles.activeBar} />}
-                <Ionicons name="person-sharp" size={25} color="white" />
-                <Text style={styles.iconText}>Account</Text>
+                {screenName == "account" && <View style={[styles.activeBar, { backgroundColor: screenName == "account" ? "#020621" : "#98999c" }]} />}
+                <Ionicons name="person-sharp" size={25} color={screenName == "account" ? "#020621" : "#98999c"} />
+                <Text style={[styles.iconText, { color: screenName == "account" ? "#020621" : "#98999c" }]}>Account</Text>
             </TouchableOpacity>
         </View>
     )
@@ -62,41 +62,43 @@ export default TabNavigator
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: width - 20,
-        borderWidth:1,
-        borderColor:"white",
-        height: 55,
-        backgroundColor: "#020621",
-        borderRadius: 15,
+        width: width ,
+        borderWidth: 0.2,
+        borderColor: "#98999c",
+        height: Platform.OS == "ios" ? 80 : 55,
+        backgroundColor: "white",
+        paddingBottom: Platform.OS == "ios" ? 15 : 0,
+        // borderRadius: 15,
         position: "absolute",
-        bottom: Platform.OS == "ios" ? 25 : 10,
+        bottom: Platform.OS == "ios" ? 0 : 10,
         zIndex: 150,
         overflow: "hidden",
         flexDirection: "row",
         justifyContent: "space-around",
         alignItems: "center",
-        elevation: 4,
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: {
-            width: 1,
-            height: 2
+            width: 0,
+            height: 2,
         },
-        shadowOpacity: 0.5,
-        shadowRadius: 2,
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+
+        elevation: 5,
     },
     iconContainer: {
         justifyContent: "center",
         alignItems: "center"
     },
     iconText: {
-        color: "white",
+        color: "#98999c",
         fontSize: 11,
         fontWeight: "600"
     },
     activeBar: {
         width: "100%",
         height: 2,
-        backgroundColor: "white",
+        backgroundColor: "#98999c",
         borderRadius: 10,
         marginBottom: 5,
         marginTop: 3

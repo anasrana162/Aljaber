@@ -17,6 +17,9 @@ import Loading from '../../components_reusable/loading';
 import { ImageArray } from '../categories/categoryData';
 import { ProductData } from './productData';
 import StoreFeatures from '../products/components/storeFeatures';
+import NewsLetter from '../../components_reusable/newsLetter';
+import CustomerServices from '../../components_reusable/customerServices';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -153,23 +156,80 @@ class HomeScreen extends Component {
         // this.adminApi()
         this.getDefaultCategories()
         this.unsubscribe()
-        
+
+
         // 
+    }
+
+    loginUser = async () => {
+
+        var { actions } = this.props
+
+        var LoginData = await AsyncStorage.getItem("@aljaber_userLoginData")
+        var objLoginData = JSON.parse(LoginData)
+        // console.log("LoginData", objLoginData)
+        if (objLoginData !== null) {
+
+            var customerToken = await api.post('integration/customer/token', {
+                username: objLoginData?.username,
+                password: objLoginData?.password,
+            })
+
+            // console.log("customerToken", customerToken?.data)
+            if (customerToken?.data !== "") {
+                const res = await api.post(
+                    "carts/mine",
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${customerToken?.data}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                ).then((result) => {
+
+
+                    // console.log("========Success ALJEBER============ Home", result?.data);
+
+                    api.get('customers/me', {
+                        headers: {
+                            Authorization: `Bearer ${customerToken?.data}`,
+                        },
+                    }).then((user_data) => {
+
+
+                        if (user_data?.data) {
+                            // console.log("TOKEN GENERATED============Home",)
+                            actions.userToken(customerToken?.data)
+                            user_data.data.cartID = result?.data
+                            actions.user(user_data?.data)
+
+                        }
+                    }).catch((err) => {
+                        alert("Network Error Code: (cd1)")
+                        console.log("customer data Api error HOme: ", err?.response)
+
+                    })
+                }).catch((err) => {
+                    console.log("Error AddtoCart ID API Home:", err?.message)
+
+                })
+            }
+        }
     }
 
     fetchAllProductsForSearch = async () => {
         var { actions } = this.props
-        // actions?.allProducts(temp_sku_arr)
         var fetchProducts = await api.get(custom_api_url + "func=get_all_products")
-        // console.log("fetchProducts fetchAllProductsForSearchFunc ", fetchProducts?.data)
         let products = []
-        for (let i = 0; i < fetchProducts.length; i++) {
-            if (fetchProducts[i].type == "configurable" || fetchProducts[i].type == "simple") {
-                products.push(fetchProducts[i])
+        for (let i = 0; i < fetchProducts?.data.length; i++) {
+            if (fetchProducts?.data[i].type == "configurable" || fetchProducts?.data[i].type == "simple" && fetchProducts?.data[i].visibility == 4) {
+                products.push(fetchProducts?.data[i])
             }
         }
-        actions?.allProducts(products)
-        // console.log("Fetched products final:",fetchProducts)
+
+        actions?.searchProducts(products)
+        // console.log("Fetched products final:", products)
 
     }
 
@@ -236,6 +296,7 @@ class HomeScreen extends Component {
                     actions.defaultCategories(res?.data)
 
                     setTimeout(() => {
+                        this.loginUser()
                         this.defaultCategories()
                         this.fetchAllProductsForSearch()
                         this.randomProducts()
@@ -246,7 +307,7 @@ class HomeScreen extends Component {
 
             }).catch((err) => {
                 //alert("Network Error Code: (CAT#1)")
-                console.log("categories Api error: ", err.response)
+                console.log("categories Api error: ", err)
                 setTimeout(() => {
 
                     if (categoryApiCounter == 3) {
@@ -397,7 +458,7 @@ class HomeScreen extends Component {
         })
 
         // Generate random Index number to store some from huge amount of products
-        console.log("Stored Products length", sku_arr?.length)
+        // console.log("Stored Products length", sku_arr?.length)
 
         var store_product = []
         var index = 15
@@ -437,14 +498,14 @@ class HomeScreen extends Component {
                         // storing products with its detail in array
                         store_product.push(res?.data)
                     } else {
-                        console.log(" adding Index 1")
+                        // console.log(" adding Index 1")
                         // index = index + 1
                     }
 
                 }
 
             }).catch((err) => {
-                console.log("Product Details Api in Random Products Function ERROR", err)
+                // console.log("Product Details Api in Random Products Function ERROR", err)
                 index = index + 1
             })
 
@@ -453,7 +514,7 @@ class HomeScreen extends Component {
 
         setImmediate(() => {
             var { actions } = this.props
-            // actions?.allProducts(temp_sku_arr)
+            actions?.allProducts(temp_sku_arr)
             actions?.randomProducts(store_product)
             this.setState(
                 {
@@ -560,6 +621,10 @@ class HomeScreen extends Component {
                     />
 
                     <StoreFeatures screenName={"home"} />
+
+                    <NewsLetter props={this.props} />
+
+                    <CustomerServices />
 
                 </ScrollView>
 

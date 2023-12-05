@@ -27,7 +27,7 @@ class Products extends Component {
             products: null,
             categories: null,
             breakLoop: "",
-            loopInProgress: false,
+            // loopInProgress: false,
             item: this.props?.route?.params?.item,
             lastFetchedProductLength: 0,
             productSkuLength: 0,
@@ -196,23 +196,23 @@ class Products extends Component {
 
     }
     handleBackButtonClick() {
-        setImmediate(() => {
-            this.setState({ breakLoop: "break", loopInProgress: false })
-        })
-        setTimeout(() => {
-            this.props.navigation.pop()
-        }, 500)
+        // setImmediate(() => {
+        //     this.setState({ breakLoop: "break", loopInProgress: false })
+        // })
+        // setTimeout(() => {
+        this.props.navigation.pop()
+        // }, 500)
         return true;
     }
     goBack = () => {
         if (this.state.loader == false) {
 
-            setImmediate(() => {
-                this.setState({ breakLoop: "break", loopInProgress: false })
-            })
-            setTimeout(() => {
-                this.props.navigation.pop()
-            }, 500)
+            // setImmediate(() => {
+            //     this.setState({ breakLoop: "break", loopInProgress: false })
+            // })
+            // setTimeout(() => {
+            this.props.navigation.pop()
+            // }, 500)
         }
     }
 
@@ -333,6 +333,10 @@ class Products extends Component {
 
 
             // console.log("result.data", result.data)
+
+            // Reversing Array because data is showing from wrong end
+            result.data = result?.data?.reverse()
+
             actions.savedProducts(sub_category_id.toString(), result.data)
             setImmediate(() => {
 
@@ -356,6 +360,7 @@ class Products extends Component {
 
             var smallest = sorted[0],
                 largest = sorted[sorted.length - 1];
+                
             setImmediate(() => {
 
                 this.setState({
@@ -374,197 +379,9 @@ class Products extends Component {
 
     }
 
-    onMomentumScrollEnd = async (savedProducts, load) => {
-        console.log("")
-        console.log("")
-        console.log("")
-        console.log("-------------------------------------")
-        console.log("-----------------onMomentumScrollEnd Function--------------------")
-        console.log("-------------------------------------")
-        console.log("")
-        console.log("")
-        console.log("")
-        var { lastFetchedProductLength, products, original, item, } = this.state
-        const { userData: { admintoken, }, actions, route: { params: { sub_category_id } } } = this.props
-        // alert("fetch more")
-
-        let productsArr = []
-        var tempSKU = []
-
-
-        for (let sp = 0; sp < products.length; sp++) {
-            let obj1 = { "category_id": products[sp]?.products, "position": products[sp]?.position, "sku": products[sp]?.sku }
-            if (obj1.category_id !== undefined) {
-                tempSKU.push(obj1)
-            }
-        }
-
-
-        if (this.state.originalList == null) {
-
-            await api.get('/categories/' + item.id + '/products', {
-                headers: {
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            }).then((res) => {
-                setImmediate(() => {
-                    this.setState({ originalList: res?.data })
-                })
-            }).catch((err) => {
-                console.log("Cannot fetch categories LEngth")
-            })
-        }
-
-        let loopIndex = 10
-        var temp = this.state.originalList
-        var temp_left = temp
-        for (let t = 0; t < temp.length; t++) {
-            // console.log("TEMP check by index", temp[t])
-            for (let check = 0; check < tempSKU.length; check++) {
-                if (tempSKU[check].sku == temp[t]?.sku) {
-                    var spliced = temp.splice(t, 1);
-                    // console.log("SPliced:", spliced, "LEft:", temp)
-                }
-
-            }
-        }
-
-        for (let p = 0; p < loopIndex; p++) {
-            await api.get('/products/' + temp_left[p]?.sku, {
-                headers: {
-                    Authorization: `Bearer ${admintoken}`,
-                },
-            }).then(async (prod) => {
-
-                prod.data.category_id = temp_left[p]?.category_id;
-                prod.data.position = temp_left[p]?.position;
-                // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
-                // on the screen as it is not in the main body of the object
-
-                for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
-
-                    // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
-
-                    if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
-                        await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-                            prod.data.brand = data?.data
-
-                            // Condition for fetching products with type_id:"simple"
-
-                            if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-                                let obj = {
-                                    "id": prod?.data?.id,
-                                    "sku": prod?.data?.sku,
-                                    "name": prod?.data?.name,
-                                    "brand": data?.data,
-                                    "price": prod?.data?.price,
-                                    "type_id": "simple",
-                                    "media_gallery_entries": prod?.data?.media_gallery_entries,
-                                    "weight": prod?.data?.weight,
-                                }
-                                products.push(obj)
-                                original.push(obj)
-                                setImmediate(() => {
-                                    this.setState({ products, original })
-                                })
-                                savedProducts.push(prod?.data)
-                                actions.savedProducts(sub_category_id.toString(), savedProducts)
-                                this.createFilterData(prod?.data)
-
-                            }
-
-                            // Condition for fetching products with type_id:"Configurable"
-
-                            if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-
-                                var getprice = await axios.post("https://aljaberoptical.com/pub/script/custom_api.php?func=configurable_price&id=" + prod?.data?.id).then((price_api) => {
-                                    return price_api?.data
-                                }).catch((err) => {
-                                    console.log("Error caught in custom Price fetch API PRoduct Details screen")
-                                })
-
-                                console.log("Price from APi:", getprice)
-
-                                prod.data.price = getprice
-                                prod.data.brand = data?.data
-
-                                let obj = {
-                                    "id": prod?.data?.id,
-                                    "sku": prod?.data?.sku,
-                                    "name": prod?.data?.name,
-                                    "brand": data?.data,
-                                    "price": getprice,
-                                    "type_id": "configurable",
-                                    "media_gallery_entries": prod?.data?.media_gallery_entries,
-                                    "weight": prod?.data?.weight,
-                                }
-                                products.push(obj)
-                                original.push(obj)
-                                setImmediate(() => {
-                                    this.setState({ products, original })
-                                })
-                                savedProducts.push(prod?.data)
-                                actions.savedProducts(sub_category_id.toString(), savedProducts)
-                                this.createFilterData(prod?.data)
-                            }
-                        }).catch((err) => {
-                            console.log("DAta for Brands Api errr", err)
-                        })
-                        break;
-                    }
-                }
-                // if (products.length >= itemsToLoad - 1) {
-                //     setImmediate(() => {
-                //         this.setState({
-                //             loader: false,
-                //         })
-                //     })
-                // }
-
-
-
-                var sorted = products.slice().sort(function (a, b) {
-                    return a.price - b.price;
-                });
-
-                var smallest = sorted[0],
-                    largest = sorted[sorted.length - 1];
-
-                // // setting the products in the state once they are all done 
-
-
-                setImmediate(() => {
-                    this.setState({
-                        highest_price: largest?.price,
-                        lowest_price: smallest?.price,
-                        loopInProgress: false,
-                    })
-                })
-            }).catch((err) => {
-                console.log("Product Detail Api error on:  ", temp_left[p]?.sku)
-                loopIndex = loopIndex + 1
-
-            })
-
-            if (this.state.breakLoop == "break") {
-                console.log("")
-                console.log("")
-                console.log("----------||||||||||---------------")
-                console.log("Loop Broken")
-                console.log("----------||||||||||---------------")
-                console.log("")
-                console.log("")
-                break;
-            }
-
-        }
-
-    }
-
     fetchFilterData = async () => {
         var { item, productApiCounter } = this.state;
-        const { userData: { admintoken, allproducts }, actions, route: { params: { sub_category_id } } } = this.props
+        const { userData: { admintoken, searchproducts }, actions, route: { params: { sub_category_id } } } = this.props
 
         let products = []
         var tempSKU = []
@@ -577,8 +394,8 @@ class Products extends Component {
                 Authorization: `Bearer ${admintoken}`,
             },
         })
-        // console.log("Result For Custom Attributes", result?.data?.items)
-
+        console.log("Result For Custom Attributes", result?.data?.items.length)
+        result.data.items = result?.data?.items.reverse()
         for (let rdi = 0; rdi < result?.data?.items.length; rdi++) {
 
             for (let ca = 0; ca < result?.data?.items[rdi].custom_attributes.length; ca++) {
@@ -613,7 +430,7 @@ class Products extends Component {
 
                                 // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
 
-                                const selected_products = allproducts.filter((value) => value?.id == result.data.items[rdi].extension_attributes?.configurable_product_links[tp])[0]
+                                const selected_products = searchproducts.filter((value) => value?.id == result.data.items[rdi].extension_attributes?.configurable_product_links[tp])[0]
 
                                 // Condition
 
@@ -660,7 +477,7 @@ class Products extends Component {
                                             // then we push this product into main products array with all of these things so it can be displayed
                                             // in the Products Detail screen
 
-                                            console.log("result.data.items[rdi].product_varients",result.data.items[rdi].product_varients)
+                                            // console.log("result.data.items[rdi].product_varients",result.data.items[rdi].product_varients)
 
                                             this.createFilterData(result.data.items[rdi])
 
@@ -677,9 +494,9 @@ class Products extends Component {
                                     })
 
                                     // this condition break the loop from further adding more products
-                                    if (check == true) {
-                                        break;
-                                    }
+                                    // if (check == true) {
+                                    break;
+                                    // }
                                 } else {
                                 }
                             }
@@ -700,7 +517,7 @@ class Products extends Component {
         var { custom_attributes, product_varients, } = product
         var { contact_lens_diameter, contact_lens_base_curve, temple_size, bridge_size, gender, temple_material, temple_color, frame_type, polarized, frame_color, frame_shape, frame_material, water_container_content, contact_lens_usage, brands, size, lense_color, model_no, box_content_pcs, color } = this.state
         if (product_varients !== undefined) {
-             console.log("Product From CreateData Function:", product_varients)
+            //  console.log("Product From CreateData Function:", product_varients)
             for (let pv = 0; pv < product_varients.length; pv++) {
                 for (let ca = 0; ca < product_varients[pv]?.custom_attributes.length; ca++) {
                     if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
@@ -771,9 +588,10 @@ class Products extends Component {
 
                     for (let n = 0; n < contact_lens_diameter?.value.length; n++) {
                         if (contact_lens_diameter?.value[n].product_name == value) {
-                            // console.log("found Value",)
+                            // console.log("found Value",contact_lens_diameter?.value[n].product_name, '   ', value)
                             contact_lens_diameter.value[n].product_ids.push(product?.id)
                             contact_lens_diameter.value[n].product_count = contact_lens_diameter?.value[n].product_count + 1
+                            this.setState({ contact_lens_diameter })
                             break;
                         }
                     }
@@ -789,7 +607,7 @@ class Products extends Component {
                     obj.product_ids.push(product?.id)
                     contact_lens_diameter?.value?.push(obj)
                     this.setState({ contact_lens_diameter })
-                    // console.log(contact_lens_diameter)
+                    console.log(contact_lens_diameter)
                 }
 
             }
@@ -813,6 +631,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             contact_lens_base_curve.value[n].product_ids.push(product?.id)
                             contact_lens_base_curve.value[n].product_count = contact_lens_base_curve?.value[n].product_count + 1
+                            this.setState({ contact_lens_base_curve })
                             break;
                         }
                     }
@@ -850,6 +669,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             water_container_content.value[n].product_ids.push(product?.id)
                             water_container_content.value[n].product_count = water_container_content?.value[n].product_count + 1
+                            this.setState({ water_container_content })
                             break;
                         }
                     }
@@ -887,6 +707,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             contact_lens_usage?.value[n].product_ids.push(product?.id)
                             contact_lens_usage.value[n].product_count = contact_lens_usage?.value[n].product_count + 1
+                            this.setState({ contact_lens_usage })
                             break;
                         }
                     }
@@ -924,6 +745,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             brands?.value[n].product_ids.push(product?.id)
                             brands.value[n].product_count = brands?.value[n].product_count + 1
+                            this.setState({ brands })
                             break;
                         }
                     }
@@ -961,6 +783,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             size?.value[n].product_ids.push(product?.id)
                             size.value[n].product_count = size?.value[n].product_count + 1
+                            this.setState({ size })
                             break;
                         }
                     }
@@ -998,6 +821,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             temple_size?.value[n].product_ids.push(product?.id)
                             temple_size.value[n].product_count = temple_size?.value[n].product_count + 1
+                            this.setState({ temple_size })
                             break;
                         }
                     }
@@ -1035,6 +859,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             model_no?.value[n].product_ids.push(product?.id)
                             model_no.value[n].product_count = model_no?.value[n].product_count + 1
+                            this.setState({ model_no })
                             break;
                         }
                     }
@@ -1072,6 +897,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             lense_color?.value[n].product_ids.push(product?.id)
                             lense_color.value[n].product_count = lense_color?.value[n].product_count + 1
+                            this.setState({ lense_color })
                             break;
                         }
                     }
@@ -1199,6 +1025,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             bridge_size?.value[n].product_ids.push(product?.id)
                             bridge_size.value[n].product_count = bridge_size?.value[n].product_count + 1
+                            this.setState({ bridge_size })
                             break;
                         }
                     }
@@ -1236,6 +1063,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             frame_material?.value[n].product_ids.push(product?.id)
                             frame_material.value[n].product_count = frame_material?.value[n].product_count + 1
+                            this.setState({ frame_material })
                             break;
                         }
                     }
@@ -1273,6 +1101,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             frame_type?.value[n].product_ids.push(product?.id)
                             frame_type.value[n].product_count = frame_type?.value[n].product_count + 1
+                            this.setState({ frame_type })
                             break;
                         }
                     }
@@ -1310,6 +1139,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             polarized?.value[n].product_ids.push(product?.id)
                             polarized.value[n].product_count = polarized?.value[n].product_count + 1
+                            this.setState({ polarized })
                             break;
                         }
                     }
@@ -1347,6 +1177,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             temple_color?.value[n].product_ids.push(product?.id)
                             temple_color.value[n].product_count = temple_color?.value[n].product_count + 1
+                            this.setState({ temple_color })
                             break;
                         }
                     }
@@ -1384,6 +1215,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             gender?.value[n].product_ids.push(product?.id)
                             gender.value[n].product_count = gender?.value[n].product_count + 1
+                            this.setState({ gender })
                             break;
                         }
                     }
@@ -1421,6 +1253,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             temple_material?.value[n].product_ids.push(product?.id)
                             temple_material.value[n].product_count = temple_material?.value[n].product_count + 1
+                            this.setState({ temple_material })
                             break;
                         }
                     }
@@ -1458,6 +1291,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             frame_shape?.value[n].product_ids.push(product?.id)
                             frame_shape.value[n].product_count = frame_shape?.value[n].product_count + 1
+                            this.setState({ frame_shape })
                             break;
                         }
                     }
@@ -1495,6 +1329,7 @@ class Products extends Component {
                             // console.log("found Value",)
                             box_content_pcs?.value[n].product_ids.push(product?.id)
                             box_content_pcs.value[n].product_count = box_content_pcs?.value[n].product_count + 1
+                            this.setState({ box_content_pcs })
                             break;
                         }
                     }
@@ -1822,7 +1657,7 @@ class Products extends Component {
                 < HomeHeader navProps={this.props.navigation} />
 
                 {/** Top Image & Category Name */}
-                < ImageView    
+                < ImageView
                     source={{ uri: "https://aljaberoptical.com" + imageLinkMain }}
                     textEN={item?.name}
                     textAR={""}
@@ -1848,7 +1683,7 @@ class Products extends Component {
                     openFilterBoard={() => this.openFilterBoard()}
                     loaderFilter={this.state.loaderFilter}
                     addToCart={(product, index) => this.addToCart(product, index)}
-                    totalProductsLength={this.state.productSkuLength}      
+                    totalProductsLength={this.state.productSkuLength}
                 />
 
 

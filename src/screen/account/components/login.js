@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import Ionicons from "react-native-vector-icons/Ionicons"
 import Entypo from "react-native-vector-icons/Entypo"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AuthTxtInp from '../../../components_reusable/authTxtInp'
 import FooterIcons from './footerIcons'
 import api from '../../../api/api'
@@ -107,6 +108,13 @@ class Login extends Component {
 
                 console.log("Customer Token", res?.data)
                 console.log("customerToken", customerToken)
+
+                let obj={
+                    username: email.toLowerCase(),
+                    password: password,
+                }
+                
+                AsyncStorage.setItem("@aljaber_userLoginData", JSON.stringify(obj));
                 //alert("Login Successful!")
                 // this.props.modal()
                 return res?.data
@@ -120,7 +128,7 @@ class Login extends Component {
                     })
                 })
             })
-       
+
             if (customerToken !== "") {
                 const res = await api.post(
                     "carts/mine",
@@ -144,7 +152,7 @@ class Login extends Component {
 
 
                         if (user_data?.data) {
-console.log("TOKEN GENERATED============", )
+                            console.log("TOKEN GENERATED============",)
                             actions.userToken(customerToken)
                             user_data.data.cartID = result?.data
                             actions.user(user_data?.data)

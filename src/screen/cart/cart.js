@@ -87,6 +87,7 @@ class Cart extends Component {
 
             }).catch((err) => {
                 console.log("Get cart Data APi Error", err)
+                alert("Please try Logging in your account first")
             })
 
     }
@@ -111,7 +112,7 @@ class Cart extends Component {
             }).catch((err) => {
                 console.log("Get cart ITems APi Error", err)
                 setImmediate(() => {
-                    this.setState({ loader: false })
+                    this.setState({ loader: true })
                 })
             })
 
@@ -121,6 +122,10 @@ class Cart extends Component {
     // actual data inorder to fetch that data we have send them through another api's
     addDataToCartItems = async (items) => {
         var { cartItems, subtotal } = this.state
+
+        // setImmediate(() => {
+        //     this.setState({ cartItems: items ,loader:false})
+        // })
 
         for (let i = 0; i < items.length; i++) {
             // console.log(" ------------- ")
@@ -134,11 +139,10 @@ class Cart extends Component {
             subtotal = subtotal + items[i].subtotal
             if (items[i]?.product_option == undefined) {
 
-
                 cartItems.push(items[i])
 
-
             } else {
+
                 for (let co = 0; co < items[i].product_option?.extension_attributes?.custom_options.length; co++) {
 
                     // console.log("items[i].product_option?.extension_attributes?.custom_options", items[i].product_option?.extension_attributes?.custom_options[co], "  ", co)
@@ -774,7 +778,7 @@ class Cart extends Component {
                         <TouchableOpacity
                             onPress={() => this.updateCart()}
                             style={styles.updateCartBtn}>
-                            {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 14,color:"white" }]}>Update Cart</Text>}
+                            {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 14, color: "white" }]}>Update Cart</Text>}
                         </TouchableOpacity>
 
                         {/* Summary Container */}
@@ -869,7 +873,7 @@ class Cart extends Component {
 
                 {loader && <Loading />}
 
-                <ListFooterComponent />
+                {!loader && <ListFooterComponent />}
                 {/** Tab Navigator */}
                 {/* <TabNavigator
                     screenName={"Cart"}

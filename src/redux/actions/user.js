@@ -1,5 +1,5 @@
 import {
-    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS,
+    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
     SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES
@@ -46,6 +46,12 @@ export function allProducts(allproducts) {
     return {
         type: ALLPRODUCTS,
         payload: allproducts
+    }
+}
+export function searchProducts(searchproducts) {
+    return {
+        type: SEARCHPRODUCTS,
+        payload: searchproducts
     }
 }
 export function randomProducts(randomproducts) {
@@ -138,7 +144,7 @@ export function savedProducts(category_id, savedproducts) {
         // Category Accessories
         case "122":
             return {
-                type: CORDS ,
+                type: CORDS,
                 payload: savedproducts
             }
         case "123":
@@ -153,7 +159,7 @@ export function savedProducts(category_id, savedproducts) {
             }
         case "125":
             return {
-                type: GIFTCARDS ,
+                type: GIFTCARDS,
                 payload: savedproducts
             }
         case "126":
