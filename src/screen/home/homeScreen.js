@@ -152,7 +152,7 @@ class HomeScreen extends Component {
     }
 
     componentDidMount = () => {
-        this.props.navigation.addListener('focus', async () => this.adminApi());
+        this.props.navigation.addListener('focus', async () => {this.adminApi(),this.loginUser()});
         // this.adminApi()
         this.getDefaultCategories()
         this.unsubscribe()
@@ -167,7 +167,7 @@ class HomeScreen extends Component {
 
         var LoginData = await AsyncStorage.getItem("@aljaber_userLoginData")
         var objLoginData = JSON.parse(LoginData)
-        // console.log("LoginData", objLoginData)
+        console.log("LoginData", objLoginData)
         if (objLoginData !== null) {
 
             var customerToken = await api.post('integration/customer/token', {

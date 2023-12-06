@@ -20,6 +20,7 @@ import LottieView from 'lottie-react-native';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import ProductList from '../products/components/productList';
 import Loading from '../../components_reusable/loading';
+import Shipping_Tax from './components/shipping_Tax';
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/"
 
 class Cart extends Component {
@@ -39,6 +40,12 @@ class Cart extends Component {
             loader2: false,
             loaderDot: false,
             randomProducts: [],
+            openShipping_TaxModal: false,
+            countries: [],
+            countrySelected: "",
+            provinces: [],
+            provinceSelected: "",
+            shipping_tax_key: 0
 
         };
     }
@@ -48,6 +55,7 @@ class Cart extends Component {
         this.getRecommendedProducts()
         this.getCartData()
         this.getCartItemDetails()
+        this.getCountries()
     }
 
     refresh = () => {
@@ -55,6 +63,20 @@ class Cart extends Component {
         this.getCartData()
         this.getCartItemDetails()
     }
+
+    getCountries = () => {
+
+        api.get("aljaber/getallcountry").then((result) => {
+            console.log("Get Country Api Result: ", result?.data)
+            setImmediate(() => {
+                this.setState({ countries: result?.data })
+            })
+        }).catch(err => {
+            console.log("Get Country Api Error: ", err)
+        })
+
+    }
+
     getCartData = async () => {
 
         var { userData: { token, admintoken, allproducts } } = this.props
@@ -622,6 +644,163 @@ class Cart extends Component {
 
     }
 
+    openShipping_TaxModal = () => {
+        this.setState({
+            openShipping_TaxModal: !this.state.openShipping_TaxModal
+        })
+    }
+
+    itemSelectedFromShipping_Tax = (val, key) => {
+        switch (key) {
+            case "country":
+                console.log("Vale Selected Country:  ", val)
+                if (val?.country_id == "AE") {
+                    this.setState({
+                        countrySelected: val,
+                        shipping: "free",
+                        flatrate: 0,
+                        // shipping_tax_key: this.state.shipping_tax_key + 1,
+                    })
+
+                } else {
+
+                    this.setState({
+                        countrySelected: val,
+                        shipping: "",
+                        flatrate: 20,
+                        // shipping_tax_key: this.state.shipping_tax_key + 1,
+                    })
+                }
+                this.getProvinces(val)
+                break;
+            case "province":
+                console.log("Vale Selected Province:  ", val)
+                this.setState({
+                    provinceSelected: val,
+                    // shipping_tax_key: this.state.shipping_tax_key + 1,
+                })
+                break;
+        }
+    }
+
+    getProvinces = (val) => {
+
+        api.get("aljaber/getallregionbycid?country_id=" + val?.country_id).then((result) => {
+            console.log("Get Provinces Api Result: ", result?.data)
+            setImmediate(() => {
+                this.setState({ provinces: result?.data })
+            })
+        }).catch(err => {
+            console.log("Get Provinces Api Error: ", err)
+        })
+    }
+
+
+    //this component was placed here because it was re-rendering when state was updated 
+    ListFooterComponent = () => {
+        var { cartData, loader, randomProducts, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
+
+        return (
+
+            <View style={styles.footerComp}>
+
+                <ScrollView>
+
+                    <TouchableOpacity
+                        onPress={() => this.updateCart()}
+                        style={styles.updateCartBtn}>
+                        {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 14, color: "white" }]}>Update Cart</Text>}
+                    </TouchableOpacity>
+
+                    {/* Summary Container */}
+
+                    <Text style={[styles.text_style, {
+                        color: "black",
+                        fontSize: 20,
+                        fontWeight: "700",
+                        alignSelf: "flex-start",
+                        marginTop: 20,
+                        marginBottom: 10,
+                        marginLeft: 20,
+                    }]}>Summary</Text>
+                    {cartItems.length == 0 && <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />}
+                    {calculating ?
+                        <View style={{
+                            width: "80%",
+                            alignSelf: "center",
+                            height: 150,
+                        }} >
+                            <Text style={[styles.text_style, { alignSelf: "center", marginTop: 10, }]}>Calculating</Text>
+                            < LottieView source={require('../../animations/dots_load.json')}
+                                autoPlay={true}
+                                resizeMode='cover'
+                                loop
+
+                            />
+                        </View>
+                        :
+                        <>
+                            <Shipping_Tax
+                                key={this.state.shipping_tax_key}
+                                openShipping_TaxModal={this.openShipping_TaxModal}
+                                isModalOpen={this.state.openShipping_TaxModal}
+                                countries={this.state.countries}
+                                provinces={this.state.provinces}
+                                props={this.props}
+                                shipping={shipping}
+                                flatrate={flatrate}
+                                selectItem={(val, key) => this.itemSelectedFromShipping_Tax(val, key)}
+                            />
+
+
+
+                            {/* Subtotal */}
+                            <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center", marginTop: 20 }]}>
+                                <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "#777" }]}>Subtotal</Text>
+                                <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", color: "#777" }]}>AED {subtotal} </Text>
+                            </View>
+
+                            {/* Flatrate */}
+                            {shipping == "" && <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center" }]}>
+                                <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "#777" }]}>Shipping (Flat Rate - Flat Rate)</Text>
+                                <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", color: "#777" }]}>AED {flatrate} </Text>
+                            </View>}
+
+                            <View style={{ width: width - 20, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 10 }} />
+
+                            {/* Order Total */}
+                            <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center", marginTop: 20 }]}>
+                                <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "black" }]}>Order Total</Text>
+                                <Text style={[styles.text_style, { fontSize: 18, fontWeight: "700", color: "black" }]}>AED {flatrate + subtotal} </Text>
+                            </View>
+                        </>
+                    }
+
+
+
+                    <Text style={[styles.text_style, {
+                        color: "black",
+                        fontSize: 20,
+                        alignSelf: "flex-start",
+                        marginTop: 20,
+                        marginBottom: -20,
+                        marginLeft: 20,
+                    }]}>Recommended for you</Text>
+                    {/* Recommended Products */}
+                    <ProductList
+                        screenName="Cart"
+                        data={randomProducts}
+                        loaderDot={loaderDot}
+                        navProps={this.props.navigation}
+                        addToCart={(product, index) => this.addToCart(product, index)}
+                    />
+                </ScrollView>
+
+            </View>
+
+        )
+    }
+
     render() {
         var { cartData, loader, randomProducts, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
 
@@ -729,7 +908,7 @@ class Cart extends Component {
                             {/* Quantity Number */}
                             <View
                                 style={styles.quantityBox}>
-                                <Text style={[styles.text_style,{fontSize:14}]}>{item?.item?.qty}</Text>
+                                <Text style={[styles.text_style, { fontSize: 14 }]}>{item?.item?.qty}</Text>
                             </View>
 
                             {/* Plus Button */}
@@ -768,95 +947,7 @@ class Cart extends Component {
             )
         }
 
-        const ListFooterComponent = () => {
-            return (
-
-                <View style={styles.footerComp}>
-
-                    <ScrollView>
-
-                        <TouchableOpacity
-                            onPress={() => this.updateCart()}
-                            style={styles.updateCartBtn}>
-                            {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 14, color: "white" }]}>Update Cart</Text>}
-                        </TouchableOpacity>
-
-                        {/* Summary Container */}
-
-                        <Text style={[styles.text_style, {
-                            color: "black",
-                            fontSize: 20,
-                            fontWeight: "700",
-                            alignSelf: "flex-start",
-                            marginTop: 20,
-                            marginBottom: 10,
-                            marginLeft: 20,
-                        }]}>Summary</Text>
-                        {cartItems.length == 0 && <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />}
-                        {calculating ? <View style={{
-                            width: "80%",
-                            alignSelf: "center",
-                            height: 150,
-                        }} >
-                            <Text style={[styles.text_style, { alignSelf: "center", marginTop: 10, }]}>Calculating</Text>
-                            < LottieView source={require('../../animations/dots_load.json')}
-                                autoPlay={true}
-                                resizeMode='cover'
-                                loop
-
-                            />
-                        </View>
-                            :
-                            <>
-                                <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 10 }} />
-                                <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 30 }} />
-
-                                {/* Subtotal */}
-                                <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center", marginTop: 20 }]}>
-                                    <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "#777" }]}>Subtotal</Text>
-                                    <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", color: "#777" }]}>AED {subtotal} </Text>
-                                </View>
-
-                                {/* Flatrate */}
-                                {shipping == "" && <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center" }]}>
-                                    <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "#777" }]}>Shipping (Flat Rate - Flat Rate)</Text>
-                                    <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", color: "#777" }]}>AED {flatrate} </Text>
-                                </View>}
-
-                                <View style={{ width: width - 20, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 10 }} />
-
-                                {/* Order Total */}
-                                <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center", marginTop: 20 }]}>
-                                    <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "black" }]}>Order Total</Text>
-                                    <Text style={[styles.text_style, { fontSize: 18, fontWeight: "700", color: "black" }]}>AED {flatrate + subtotal} </Text>
-                                </View>
-                            </>
-                        }
-
-
-
-                        <Text style={[styles.text_style, {
-                            color: "black",
-                            fontSize: 20,
-                            alignSelf: "flex-start",
-                            marginTop: 20,
-                            marginBottom: -20,
-                            marginLeft: 20,
-                        }]}>Recommended for you</Text>
-                        {/* Recommended Products */}
-                        <ProductList
-                            screenName="Cart"
-                            data={randomProducts}
-                            loaderDot={loaderDot}
-                            navProps={this.props.navigation}
-                            addToCart={(product, index) => this.addToCart(product, index)}
-                        />
-                    </ScrollView>
-
-                </View>
-
-            )
-        }
+        // const 
 
         return (
             <View style={styles.mainContainer}>
@@ -873,7 +964,7 @@ class Cart extends Component {
 
                 {loader && <Loading />}
 
-                {!loader && <ListFooterComponent />}
+                {!loader && <this.ListFooterComponent />}
                 {/** Tab Navigator */}
                 {/* <TabNavigator
                     screenName={"Cart"}
