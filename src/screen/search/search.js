@@ -73,6 +73,7 @@ class Search extends Component {
 
     selectedItem = (product, index) => {
         console.log("Product Selected:", product)
+        this.props.navigation.navigate("ProductDetails", { product_details:  product, product_index: index })
     }
 
     addToCart = (product, index) => {
@@ -125,8 +126,42 @@ class Search extends Component {
 
     }
 
+    ListHeaderComponent = () => {
+        return (
+            <View style={styles.headerComp}>
+                <TouchableOpacity onPress={() => this.props.navigation.pop()} >
+                    <Entypo name="chevron-with-circle-left" size={30} color="white" style={{ paddingVertical: 10, }} />
+                </TouchableOpacity>
+                <View style={styles.textinpCont}>
+                    <TextInput
+                        value={this.state.textInput}
+                        placeholder='Search...'
+                        placeholderTextColor={"#777"}
+                        style={{
+                            width: "90%",
+                            height: "100%",
+                            color:"black"
+                        }}
+                        autoFocus={true}
+                        autoCorrect={false}
+                        onChangeText={(txt) => {
+                            this.setState({ textInput: txt })
+                            // this.onSearch(txt)
+                        }}
+                    />
+                    <TouchableOpacity
+                        onPress={() => this.onSearch(this.state.textInput)}
+                    // style={styles.searchIcon}
+                    >
+                        <Ionicons name="search" size={30} color="#020621" />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
+    }
+
     render() {
-        var { products, filteredProducts } = this.state
+        var { filteredProducts } = this.state
 
         const ListEmptyComponent = () => {
             return (
@@ -144,46 +179,14 @@ class Search extends Component {
             )
         }
 
-        const ListHeaderComponent = () => {
-            return (
-                <View style={styles.headerComp}>
-                    <TouchableOpacity onPress={() => this.props.navigation.pop()} >
-                        <Entypo name="chevron-with-circle-left" size={30} color="white" style={{ paddingVertical: 10, }} />
-                    </TouchableOpacity>
-                    <View style={styles.textinpCont}>
-                        <TextInput
-                            value={this.state.textInput}
-                            placeholder='Search...'
-                            placeholderTextColor={"#777"}
-                            style={{
-                                width: "90%",
-                                height: "100%",
-                                color:"black"
-                            }}
-                            autoFocus={true}
-                            autoCorrect={false}
-                            onChangeText={(txt) => {
-                                this.setState({ textInput: txt })
-                                // this.onSearch(txt)
-                            }}
-                        />
-                        <TouchableOpacity
-                            onPress={() => this.onSearch(this.state.textInput)}
-                        // style={styles.searchIcon}
-                        >
-                            <Ionicons name="search" size={30} color="#020621" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )
-        }
+    
 
         const renderItem = (products) => {
             return (
-                <Pressable
+                <TouchableOpacity
                     onPress={() => this.selectedItem(products?.item, products?.index)}
                     style={styles.product_Cont}
-                    activeOpacity={0.8}
+                    activeOpacity={0.6}
 
                 >
                     <View style={styles.product_inner_Cont}>
@@ -212,14 +215,14 @@ class Search extends Component {
                             </TouchableOpacity>
                         </View>
                     </View>
-                </Pressable>
+                </TouchableOpacity>
             )
         }
 
 
         return (
             <View style={styles.mainContainer}>
-                <ListHeaderComponent />
+                <this.ListHeaderComponent />
                 <FlatList
                     data={filteredProducts}
                     numColumns={2}

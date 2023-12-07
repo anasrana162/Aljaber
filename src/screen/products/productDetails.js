@@ -215,7 +215,7 @@ class ProductDetails extends Component {
             // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
             // on the screen as it is not in the main body of the object
 
-            
+
             for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
 
                 // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
@@ -246,16 +246,16 @@ class ProductDetails extends Component {
                             for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
 
                                 // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
-// console.log("allproducts",allproducts)
+                                // console.log("allproducts",allproducts)
                                 const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
 
                                 // Condition
-console.log("selected_products",selected_products)
+                                // console.log("selected_products", selected_products)
                                 if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
 
                                     // if id's match then the value "sku" is picked up from the matching product object and then we run an api
                                     // to fetch details for the varient because they are not in the products object from all products api
-console.log("check 1")
+                                    // console.log("check 1")
                                     var check = false
 
                                     // Api for fetching product details
@@ -332,7 +332,7 @@ console.log("check 1")
             // this is for loader skeleton 
 
 
-console.log("No Issue")
+            console.log("No Issue")
 
             this.getDescription('prop')
             this.checkOptions('prop')
@@ -342,7 +342,7 @@ console.log("No Issue")
             this.check_Configurable_Product_Options()
 
         }).catch((err) => {
-            console.log("Product Detail Api error on:  ", sku , err)
+            console.log("Product Detail Api error on:  ", sku, err)
             alert("Error Fetching Data Try again")
             return setImmediate(() => {
                 this.setState({
@@ -3004,7 +3004,7 @@ console.log("No Issue")
                     </TouchableOpacity>
                     <ImageCarousel
                         usage="open"
-                        data={product_details?.media_gallery_entries}
+                        data={media_gallery_entries}
                         onImagePress={(selected) => this.onImagePress(selected)}
                         fisrtImage={this.state.bigImage}
                         style={{ position: "absolute", zIndex: 400, marginTop: height / 4.2, marginLeft: 5 }}

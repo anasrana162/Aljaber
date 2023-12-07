@@ -31,15 +31,17 @@ const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, fla
         }
     }
 
-    // console.log("UserData", user)
+    console.log("UserData", user)
+    if (Object.keys(user).length !== 0) {
 
-    if (user?.addresses?.length !== 0) {
-        addressDefault = user?.addresses[0]
-        provinceDefault = user?.addresses[0]?.region?.region
-        if (countries.length !== 0) {
-            var filtered = countries.filter((val) => val?.country_id == user?.addresses[0]?.country_id)[0]
-            console.log("Filterd", filtered)
-            countryDefault = filtered?.country
+        if (user?.addresses?.length !== 0) {
+            addressDefault = user?.addresses[0]
+            provinceDefault = user?.addresses[0]?.region?.region
+            if (countries.length !== 0) {
+                var filtered = countries.filter((val) => val?.country_id == user?.addresses[0]?.country_id)[0]
+                // console.log("Filterd", filtered)
+                countryDefault = filtered?.country
+            }
         }
     }
 
