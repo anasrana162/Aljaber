@@ -6,9 +6,10 @@ import Dropdown from './dropdown';
 
 const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, openDropDown, defaultSelected, dataDropdown, selectItem, }) => {
 
-    const [countrySelected, setCountrySelected] = useState("")
-    const [provinceSelected, setProvinceSelected] = useState("")
+    const [countrySelected, setCountrySelected] = useState(defaultSelected)
+    const [provinceSelected, setProvinceSelected] = useState(defaultSelected)
     const [modalDropDown, setModalDropDown] = useState(false)
+
 
     const selectValue = (val) => {
         switch (purpose) {
@@ -29,7 +30,18 @@ const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, open
             <Text style={styles.title}>{titleEN}</Text>
             <View style={styles.boxContainer}>
                 {type == 'txtinp' &&
-                    <TextInput />
+                    <TextInput
+                        value={provinceSelected}
+                        onChangeText={(txt) => setProvinceSelected(txt)}
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            fontSize: 14,
+                            fontWeight: "500",
+                            color: "#131313",
+                            paddingLeft: 10
+                        }}
+                    />
                 }
                 {type == 'dropdown' &&
                     <TouchableOpacity

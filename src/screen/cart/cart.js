@@ -709,7 +709,7 @@ class Cart extends Component {
                     <TouchableOpacity
                         onPress={() => this.updateCart()}
                         style={styles.updateCartBtn}>
-                        {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 14, color: "white" }]}>Update Cart</Text>}
+                        {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 16, color: "white" }]}>Update Cart</Text>}
                     </TouchableOpacity>
 
                     {/* Summary Container */}
@@ -773,30 +773,35 @@ class Cart extends Component {
                                 <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "black" }]}>Order Total</Text>
                                 <Text style={[styles.text_style, { fontSize: 18, fontWeight: "700", color: "black" }]}>AED {flatrate + subtotal} </Text>
                             </View>
-                        </>
+
+                            {/* Checkout Button */}
+                            <TouchableOpacity style={styles.checkout_btn}>
+                                <Text style={[styles.text_style, { fontSize: 16, color: "white",fontWeight:"600" }]}>Checkout</Text>
+                        </TouchableOpacity>
+                </>
                     }
 
 
 
-                    <Text style={[styles.text_style, {
-                        color: "black",
-                        fontSize: 20,
-                        alignSelf: "flex-start",
-                        marginTop: 20,
-                        marginBottom: -20,
-                        marginLeft: 20,
-                    }]}>Recommended for you</Text>
-                    {/* Recommended Products */}
-                    <ProductList
-                        screenName="Cart"
-                        data={randomProducts}
-                        loaderDot={loaderDot}
-                        navProps={this.props.navigation}
-                        addToCart={(product, index) => this.addToCart(product, index)}
-                    />
-                </ScrollView>
+                <Text style={[styles.text_style, {
+                    color: "black",
+                    fontSize: 20,
+                    alignSelf: "flex-start",
+                    marginTop: 20,
+                    marginBottom: -20,
+                    marginLeft: 20,
+                }]}>Recommended for you</Text>
+                {/* Recommended Products */}
+                <ProductList
+                    screenName="Cart"
+                    data={randomProducts}
+                    loaderDot={loaderDot}
+                    navProps={this.props.navigation}
+                    addToCart={(product, index) => this.addToCart(product, index)}
+                />
+            </ScrollView>
 
-            </View>
+            </View >
 
         )
     }
@@ -1014,6 +1019,18 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "600",
         color: "#ffffff"
+    },
+
+    checkout_btn: {
+        width: 120,
+        height: 40,
+        backgroundColor: "#020621",
+        marginTop: 20,
+        marginBottom: 10,
+        borderRadius: 5,
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "center"
     },
 
     flatList_Cont: {

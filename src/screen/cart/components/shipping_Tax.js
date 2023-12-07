@@ -11,6 +11,12 @@ const width = Dimensions.get("screen").width
 
 const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, flatrate, countries, provinces, selectItem, selectedValue }) => {
 
+    var { userData: { user } } = props
+
+    var addressDefault = {}
+    var countryDefault = ""
+    var provinceDefault = ""
+
     const [countryDD, setCountryDD] = useState(false)
     const [provinceDD, setProvinceDD] = useState(false)
 
@@ -24,6 +30,21 @@ const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, fla
                 break;
         }
     }
+
+    // console.log("UserData", user)
+
+    if (user?.addresses?.length !== 0) {
+        addressDefault = user?.addresses[0]
+        provinceDefault = user?.addresses[0]?.region?.region
+        if (countries.length !== 0) {
+            var filtered = countries.filter((val) => val?.country_id == user?.addresses[0]?.country_id)[0]
+            console.log("Filterd", filtered)
+            countryDefault = filtered?.country
+        }
+    }
+
+    // console.log("addressDefault", addressDefault)
+
 
     return (
         <View>
@@ -49,6 +70,7 @@ const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, fla
                             titleEN={"Country"}
                             titleAR={""}
                             type={"dropdown"}
+                            defaultSelected={Object.keys(addressDefault).length == 0 ? "" : countryDefault}
                             purpose={"country"}
                             isModalOpen={countryDD}
                             openDropDown={() => openDropDowns("country")}
@@ -62,6 +84,7 @@ const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, fla
                             titleAR={""}
                             purpose={"province"}
                             type={provinces?.length == 0 ? "txtinp" : "dropdown"}
+                            defaultSelected={Object.keys(addressDefault).length == 0 ? "" : provinceDefault}
                             isModalOpen={provinceDD}
                             openDropDown={() => openDropDowns("province")}
                             selectItem={(val) => selectItem(val, "province")}
