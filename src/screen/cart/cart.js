@@ -162,6 +162,9 @@ class Cart extends Component {
             if (items[i]?.product_option == undefined) {
 
                 cartItems.push(items[i])
+                setImmediate(() => {
+                    this.setState({ loader: false })
+                })
 
             } else {
 
@@ -271,197 +274,6 @@ class Cart extends Component {
         return result.data
     }
 
-    getCartData1 = async () => {
-
-        var { userData: { token, admintoken, allproducts } } = this.props
-
-        let products = []
-        let tempPRoducts = []
-
-        if (allproducts == null) {
-            this.getCartData()
-        }
-
-        api.get("carts/mine",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }).then(async (res) => {
-                // console.log("REsponse Get cart Data APi", res?.data)
-
-                var temp = res?.data?.items
-
-                // once the Array of sku is fetched we use it in a loop to fetch every product detail in the array
-
-                for (let p = 0; p < temp.length; p++) {
-                    await api.get('/products/' + temp[p]?.sku, {
-                        headers: {
-                            Authorization: `Bearer ${admintoken}`,
-                        },
-                    }).then(async (prod) => {
-
-                        // if (p == temp.length - 1) {
-                        //     setImmediate(() => {
-                        //         this.setState({
-                        //             loader2: false,
-
-                        //         })
-                        //     })
-                        // }
-
-                        // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
-                        // on the screen as it is not in the main body of the object
-                        prod.data.cart_data = temp[p]
-
-                        for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
-
-                            // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
-                            if (prod?.data.custom_attributes[i].attribute_code == 'image') {
-                                prod.data.imageLink = prod?.data.custom_attributes[i].value
-                            }
-                            if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
-                                await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-                                    prod.data.brand = data?.data
-
-                                    // for (let img = 0; img < prod?.data.custom_attributes.length;)
-
-                                    // Condition for fetching products with type_id:"simple"
-
-                                    if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-                                        products.push(prod?.data)
-                                        // this.createFilterData(prod?.data)
-                                    }
-
-                                    // Condition for fetching products with type_id:"Configurable"
-
-                                    if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-
-                                        // Checking value of configurable_product_links (product Varients)
-
-                                        for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
-
-                                            // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
-
-                                            const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
-
-                                            // Condition
-
-                                            if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
-
-                                                // if id's match then the value "sku" is picked up from the matching product object and then we run an api
-                                                // to fetch details for the varient because they are not in the products object from all products api
-
-                                                var check = false
-
-                                                // Api for fetching product details
-
-                                                await api.get('/products/' + selected_products?.sku, {
-                                                    headers: {
-                                                        Authorization: `Bearer ${admintoken}`,
-                                                    },
-                                                }).then(async (cfPD) => {
-
-                                                    // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
-                                                    // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
-                                                    // long process already done above to save time while fetching for its main version of product
-
-                                                    cfPD.data.brand = data?.data // brand value
-                                                    cfPD.data.parent_product_id = prod?.data?.id
-                                                    cfPD.data.options = prod?.data?.options
-
-
-
-                                                    // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
-                                                    // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
-                                                    // together
-
-                                                    tempPRoducts.push(cfPD?.data)
-
-                                                    // here's the condition once the configurable_product_links array reach its end
-                                                    if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
-
-                                                        //we also change the value of price of the main product because products with type_id have "0" price
-                                                        // so we take a price from its varient overwrite (Note price of all vareints are same)
-                                                        prod.data.price = cfPD.data?.price
-
-                                                        // then we create an of product_varients and push into main product's object to show and display the varients in
-                                                        // product details screen
-                                                        prod.data.product_varients = tempPRoducts
-
-                                                        // then we push this product into main products array with all of these things so it can be displayed
-                                                        // in the Products screen
-                                                        products.push(prod?.data)
-                                                        // this.createFilterData(prod?.data)
-                                                        // Emptying the temporary array that we pushed products varients so the varients of other products
-                                                        // dont get added in the other products
-                                                        tempPRoducts = []
-
-                                                        // setting value of check to true from false to break the loop once it reaches its end
-                                                        check = true
-                                                    }
-
-                                                }).catch((err) => {
-                                                    console.log("Configurable Product Details Api Error", err)
-                                                })
-
-                                                // this condition break the loop from further adding more products
-                                                if (check == true) {
-                                                    break;
-                                                }
-                                            } else {
-                                            }
-                                        }
-                                    }
-                                }).catch((err) => {
-                                    console.log("DAta for Brands Api errr", err)
-                                })
-                                break;
-                            }
-                        }
-
-                        // this is for loader skeleton 
-                        if (products?.length >= 1) {
-                            setImmediate(() => {
-                                this.setState({
-                                    loader: false,
-                                })
-                            })
-                        }
-
-                        // var highest_price = Math.max(...products)
-
-
-
-                        // console.log("")
-                        console.log("products", products)
-                        // console.log("")
-                        // setting the products in the state once they are all done 
-                        setImmediate(() => {
-                            this.setState({
-                                cartData: products,
-                            })
-                        })
-
-                    }).catch((err) => {
-                        console.log("Product Detail Api error on:  ", temp[p]?.sku)
-                        console.log("Product Detail Api error:", err)
-                        return setImmediate(() => {
-                            this.setState({
-                                loader: false
-                            })
-
-                        })
-
-                    })
-                }
-
-
-
-            })
-
-    }
 
     getRecommendedProducts = () => {
         var { userData: { randomproducts } } = this.props
@@ -775,31 +587,33 @@ class Cart extends Component {
                             </View>
 
                             {/* Checkout Button */}
-                            <TouchableOpacity style={styles.checkout_btn}>
-                                <Text style={[styles.text_style, { fontSize: 16, color: "white",fontWeight:"600" }]}>Checkout</Text>
-                        </TouchableOpacity>
-                </>
+                            <TouchableOpacity
+                                onPress={() => this.props.navigation.navigate('Billing_Shipping')}
+                                style={styles.checkout_btn}>
+                                <Text style={[styles.text_style, { fontSize: 16, color: "white", fontWeight: "600" }]}>Checkout</Text>
+                            </TouchableOpacity>
+                        </>
                     }
 
 
 
-                <Text style={[styles.text_style, {
-                    color: "black",
-                    fontSize: 20,
-                    alignSelf: "flex-start",
-                    marginTop: 20,
-                    marginBottom: -20,
-                    marginLeft: 20,
-                }]}>Recommended for you</Text>
-                {/* Recommended Products */}
-                <ProductList
-                    screenName="Cart"
-                    data={randomProducts}
-                    loaderDot={loaderDot}
-                    navProps={this.props.navigation}
-                    addToCart={(product, index) => this.addToCart(product, index)}
-                />
-            </ScrollView>
+                    <Text style={[styles.text_style, {
+                        color: "black",
+                        fontSize: 20,
+                        alignSelf: "flex-start",
+                        marginTop: 20,
+                        marginBottom: -20,
+                        marginLeft: 20,
+                    }]}>Recommended for you</Text>
+                    {/* Recommended Products */}
+                    <ProductList
+                        screenName="Cart"
+                        data={randomProducts}
+                        loaderDot={loaderDot}
+                        navProps={this.props.navigation}
+                        addToCart={(product, index) => this.addToCart(product, index)}
+                    />
+                </ScrollView>
 
             </View >
 

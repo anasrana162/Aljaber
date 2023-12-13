@@ -12,6 +12,7 @@ import About_us from '../screen/account/about_us';
 import Contact_us from '../screen/account/contact_us';
 import Cart from '../screen/cart/cart';
 import Search from '../screen/search/search';
+import Billing_Shipping from '../screen/checkout/billing_Shipping';
 
 
 const Stack = createNativeStackNavigator();
@@ -29,6 +30,7 @@ export default class Navigation extends Component {
                     <Stack.Screen name="GetStarted" component={GetStarted} />
                     <Stack.Screen name="HomeScreen" component={HomeScreen} />
                     <Stack.Screen name="Cart" component={Cart} />
+                    <Stack.Screen name="Billing_Shipping" component={Billing_Shipping} />
                     <Stack.Screen name="Search" component={Search} />
                     <Stack.Screen name="Account" component={Account} />
                     <Stack.Screen name="About_us" component={About_us} />
