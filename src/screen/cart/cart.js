@@ -115,7 +115,7 @@ class Cart extends Component {
     }
 
     getCartItemDetails = () => {
-        var { userData: { token, admintoken } } = this.props
+        var { userData: { token, admintoken }, actions } = this.props
 
 
         api.get("carts/mine/items",
@@ -144,7 +144,7 @@ class Cart extends Component {
     // actual data inorder to fetch that data we have send them through another api's
     addDataToCartItems = async (items) => {
         var { cartItems, subtotal } = this.state
-
+        var { actions } = this.props
         // setImmediate(() => {
         //     this.setState({ cartItems: items ,loader:false})
         // })
@@ -209,6 +209,7 @@ class Cart extends Component {
             })
 
             if (i == items.length - 1) {
+                actions.cartItems(cartItems)
                 setImmediate(() => {
                     this.setState({
                         calculating: false,

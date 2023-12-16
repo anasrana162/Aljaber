@@ -2,7 +2,9 @@ import {
     LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
-    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES
+    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
+    // Cart
+    CARTITEMS,
 } from '../constants';
 
 export function userToken(token) {
@@ -58,6 +60,12 @@ export function randomProducts(randomproducts) {
     return {
         type: RANDOMPRODUCTS,
         payload: randomproducts
+    }
+}
+export function cartItems(cartitems) {
+    return {
+        type: CARTITEMS,
+        payload: cartitems
     }
 }
 

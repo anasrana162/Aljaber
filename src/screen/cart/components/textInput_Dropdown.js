@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Dropdown from './dropdown';
 
-const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, openDropDown, defaultSelected, dataDropdown, selectItem, }) => {
+const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, openDropDown, onChangeText, defaultSelected, dataDropdown, selectItem, }) => {
 
     const [countrySelected, setCountrySelected] = useState(defaultSelected)
     const [provinceSelected, setProvinceSelected] = useState(defaultSelected)
@@ -32,7 +32,7 @@ const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, open
                 {type == 'txtinp' &&
                     <TextInput
                         value={provinceSelected}
-                        onChangeText={(txt) => setProvinceSelected(txt)}
+                        onChangeText={(txt) => { onChangeText(txt), setProvinceSelected(txt) }}
                         style={{
                             width: "100%",
                             height: "100%",
@@ -90,14 +90,15 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         borderWidth: 1,
+        borderColor: "#777",
         marginTop: 5,
         marginBottom: 10,
     },
 
     title: {
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#313131"
+        fontSize: 14,
+        fontWeight: "400",
+        color: "#777"   //"#313131"
     },
     touchable: {
         width: "95%",
@@ -106,11 +107,11 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         // backgroundColor:"red",
-        alignSelf: "center"
+        alignSelf: "center",
     },
     dropdown_text: {
         fontSize: 16,
         fontWeight: "700",
-        color: "#313131"
+        color: "#777"   //"#313131"
     }
 })

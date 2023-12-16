@@ -7,6 +7,7 @@ export const CREATEDDEFAULTCAT = 'CREATEDDEFAULTCAT';
 export const ALLPRODUCTS = 'ALLPRODUCTS';
 export const SEARCHPRODUCTS = 'SEARCHPRODUCTS';
 export const RANDOMPRODUCTS = "RANDOMPRODUCTS";
+export const CARTITEMS = "CARTITEMS";
 export const CLEARPRES = "CLEARPRES";
 export const COLOR = "COLOR";
 export const TORIC = "TORIC";

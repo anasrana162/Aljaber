@@ -31,19 +31,19 @@ const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, fla
         }
     }
 
-    console.log("UserData", user)
-    if (Object.keys(user).length !== 0) {
+    // console.log("UserData", user)
+    // if (Object.keys(user).length !== 0) {
 
-        if (user?.addresses?.length !== 0) {
-            addressDefault = user?.addresses[0]
-            provinceDefault = user?.addresses[0]?.region?.region
-            if (countries.length !== 0) {
-                var filtered = countries.filter((val) => val?.country_id == user?.addresses[0]?.country_id)[0]
-                // console.log("Filterd", filtered)
-                countryDefault = filtered?.country
-            }
-        }
-    }
+    //     if (user?.addresses?.length !== 0) {
+    //         addressDefault = user?.addresses[0]
+    //         provinceDefault = user?.addresses[0]?.region?.region
+    //         if (countries.length !== 0) {
+    //             var filtered = countries.filter((val) => val?.country_id == user?.addresses[0]?.country_id)[0]
+    //             // console.log("Filterd", filtered)
+    //             countryDefault = filtered?.country
+    //         }
+    //     }
+    // }
 
     // console.log("addressDefault", addressDefault)
 
@@ -75,6 +75,7 @@ const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, fla
                             defaultSelected={Object.keys(addressDefault).length == 0 ? "" : countryDefault}
                             purpose={"country"}
                             isModalOpen={countryDD}
+                            onChangeText={()=>{}}
                             openDropDown={() => openDropDowns("country")}
                             selectItem={(val) => selectItem(val, "country")}
                         />
@@ -88,6 +89,7 @@ const Shipping_Tax = ({ openShipping_TaxModal, isModalOpen, props, shipping, fla
                             type={provinces?.length == 0 ? "txtinp" : "dropdown"}
                             defaultSelected={Object.keys(addressDefault).length == 0 ? "" : provinceDefault}
                             isModalOpen={provinceDD}
+                            onChangeText={()=>{}}
                             openDropDown={() => openDropDowns("province")}
                             selectItem={(val) => selectItem(val, "province")}
                         />

@@ -2,7 +2,9 @@ import {
     LANGUAGE, TOKEN, USER, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
-    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES
+    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
+    // Cart
+    CARTITEMS,
 } from '../constants';
 
 const initialState = {
@@ -13,6 +15,7 @@ const initialState = {
     defaultcategory: null,
     createddefaultcategory: null,
     allproducts: null,
+    cartitems: null,
     searchproducts: null,
     clearpres: [],
     color: [],
@@ -82,6 +85,11 @@ const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 randomproducts: action.payload
+            }
+        case CARTITEMS:
+            return {
+                ...state,
+                cartitems: action.payload
             }
 
         // SUB CATEGORIES
