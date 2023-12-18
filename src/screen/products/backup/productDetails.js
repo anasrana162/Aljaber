@@ -364,26 +364,19 @@ class ProductDetails extends Component {
             return console.log("No options for color custom options")
         } else {
             var { configurable_product_options } = extension_attributes
-            // console.log("configurable_product_options", configurable_product_options)
-
-            for (let cpo = 0; cpo < configurable_product_options.length; cpo++) {
-                // console.log("configurable_product_options[cpo]?.values", configurable_product_options[cpo]?.values)
-                for (let cpov = 0; cpov < configurable_product_options[cpo]?.values.length; cpov++) {
-                    var value_name = await axios.get(custom_api_url + `${configurable_product_options[cpo]?.label == "Color" ? "func=option_color&id=" : "func=option_label&id="}` + configurable_product_options[cpo]?.values[cpov]?.value_index)
-                    configurable_product_options[cpo].values[cpov].value_name = value_name?.data
-                    // console.log("value_name", value_name?.data)
-                }
+            var label_color = configurable_product_options.filter((value) => value.label == "Color")[0]
+            console.log("label Color", label_color)
+            for (let i = 0; i < label_color.values.length; i++) {
+                console.log("label_color.values", label_color.values[i])
+                var color_name = await axios.get(custom_api_url + "func=option_label&id=" + label_color.values[i].value_index)
+                label_color.values[i].title = color_name.data
             }
-            // console.log("configurable_product_options", configurable_product_options)
+            console.log("label Color", label_color)
             setImmediate(() => {
                 this.setState({
-                    configurable_product_options: configurable_product_options
+                    configurable_product_options: label_color
                 })
             })
-
-
-
-
         }
     }
 
@@ -2923,12 +2916,8 @@ class ProductDetails extends Component {
                     </Text>
 
                     {/* Options */}
+                  
                     <Options
-                        configurable_product_options={this.state.configurable_product_options}
-                        checkMarked={(val) => this.checkMarked(val)}
-                    />
-
-                    {/* <Options
                         key={this.state.optionKey}
 
                         // Option Data
@@ -2967,7 +2956,7 @@ class ProductDetails extends Component {
                         leftEyeQuantity={this.state.leftEyeQuantity}
                         rigthEyeQuantity={this.state.rigthEyeQuantity}
                         setWholeItemSelected={(item, key) => this.setWholeItemSelected(item, key)}
-                    /> */}
+                    />
 
                     {/* Store Features */}
                     <StoreFeatures />

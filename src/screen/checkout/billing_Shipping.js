@@ -32,8 +32,8 @@ class Billing_Shipping extends Component {
             // shipping: "free",
             // flatrate: 0,
             newAddressModal: false,
-            firstName: "",
-            lastName: "",
+            firstName: this.props.userData?.user?.firstname,
+            lastName: this.props.userData?.user?.lastname,
             zipCode: "",
             phone: "",
             address: [],
@@ -42,6 +42,8 @@ class Billing_Shipping extends Component {
             city: "",
             region: "",
             saveToAddressBook: false,
+            addressAdded: false,
+            addressToEdit: '',
 
 
         };
@@ -71,18 +73,12 @@ class Billing_Shipping extends Component {
                 if (val?.country_id == "AE") {
                     this.setState({
                         countrySelected: val,
-                        // shipping: "free",
-                        // flatrate: 0,
-                        // shipping_tax_key: this.state.shipping_tax_key + 1,
                     })
 
                 } else {
 
                     this.setState({
                         countrySelected: val,
-                        // shipping: "",
-                        // flatrate: 20,
-                        // shipping_tax_key: this.state.shipping_tax_key + 1,
                     })
                 }
                 this.getProvinces(val)
@@ -212,8 +208,8 @@ class Billing_Shipping extends Component {
         }
 
         if (this.state.saveToAddressBook == true) {
-            let { userData: { user, user: { token } } } = this.props
-            console.log("userData", user)
+            let { userData: { user, token } } = this.props
+            // console.log("userData", user)
             let obj = {
                 "addressInformation": {
                     "shipping_address": {
@@ -246,15 +242,38 @@ class Billing_Shipping extends Component {
                     "shipping_method_code": "flatrate"
                 }
             }
+            console.log("Customer Token", token)
+            console.log("obj created", obj)
 
-            api.get("carts/mine/shipping-information",
+            api.post("carts/mine/shipping-information", obj,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                }).then((res) => {
+                })
+                .then((res) => {
+
                     console.log("res", res?.data)
-                    this.checkAddress()
+                    // Adding added address to state to show in list
+                    let obj = {
+                        "city": city,
+                        "country_id": countrySelected?.country_id,
+                        "status": "added",
+                        "firstname": firstName,
+                        "lastname": lastName,
+                        "region": {
+                            "region": region == "" ? provinceSelected?.title : region,
+                        },
+                        "street": address,
+                        "telephone": phone
+                    }
+                    addresses.push(obj)
+                    setImmediate(() => {
+                        this.setState({
+                            addresses
+                        })
+                    })
+                    // this.checkAddress()
                 })
 
 
@@ -262,7 +281,7 @@ class Billing_Shipping extends Component {
             let obj = {
                 "city": city,
                 "country_id": countrySelected?.country_id,
-
+                "status": "added",
                 "firstname": firstName,
                 "lastname": lastName,
                 "region": {
@@ -274,7 +293,8 @@ class Billing_Shipping extends Component {
             addresses.push(obj)
             setImmediate(() => {
                 this.setState({
-                    addresses
+                    addresses,
+                    addressAdded: true
                 })
             })
         }
@@ -349,6 +369,20 @@ class Billing_Shipping extends Component {
         })
     }
 
+    onEditAddress = (item, country) => {
+        this.setState({
+            newAddressModal: !this.state.newAddressModal,
+            firstName: item?.item?.firstname,
+            lastName: item?.item?.lastname,
+            addressLine1: item?.item?.street[0],
+            addressLine2: item?.item?.street[1] == undefined ? "" : item?.item?.street[1],
+            city: item?.item?.city,
+            region: item?.item?.region?.region,
+            countrySelected: country,
+            phone: item?.item?.telephone,
+        })
+    }
+
 
     render() {
 
@@ -371,6 +405,13 @@ class Billing_Shipping extends Component {
                     <Text style={styles.itemText}>{item?.item?.city}, {item?.item?.region?.region}</Text>
                     <Text style={styles.itemText}>{country?.country}</Text>
                     <Text style={[styles.itemText, { color: "#08c" }]}>{item?.item?.telephone}</Text>
+                    {item?.item?.status == undefined ?
+                        <></>
+                        :
+                        <TouchableOpacity onPress={() => this.onEditAddress(item, country)} style={{ padding: 5, }}>
+                            <Text style={[styles.itemText, { color: "#08c", marginTop: 10 }]}>Edit</Text>
+                        </TouchableOpacity>
+                    }
                 </TouchableOpacity>
             )
         }
@@ -400,18 +441,30 @@ class Billing_Shipping extends Component {
                             renderItem={renderItem}
                         />
 
-                        <TouchableOpacity
-                            onPress={() => this.openNewAddressModal()}
-                            style={styles.add_new_address_btn}>
-                            <AntDesign name="plus" size={18} color="#848484" />
-                            <Text style={styles.add_new_address_btn_text}>New Address</Text>
-                        </TouchableOpacity>
+                        {this.state.addressAdded == false &&
+                            <TouchableOpacity
+                                onPress={() => this.openNewAddressModal()}
+                                style={styles.add_new_address_btn}>
+                                <AntDesign name="plus" size={18} color="#848484" />
+                                <Text style={styles.add_new_address_btn_text}>New Address</Text>
+                            </TouchableOpacity>}
+
+                        <Text style={styles.shipping_method_title}>SHIPPING METHODS* (PLEASE SELECT)</Text>
 
                     </View>
 
                 }
                 <Add_NewAddress
                     props={this.props}
+                    firstName={this.state.firstName}
+                    lastName={this.state.lastName}
+                    street1={this.state.addressLine1}
+                    street2={this.state.addressLine2}
+                    city={this.state.city}
+                    region={this.state.region}
+                    country={this.state.countrySelected}
+                    telephone={this.state.phone}
+                    zipCode={this.state.zipCode}
                     openModal={this.state.newAddressModal}
                     closeModal={() => this.openNewAddressModal()}
                     provinces={this.state.provinces}
@@ -420,6 +473,7 @@ class Billing_Shipping extends Component {
                     addNewAddress={() => this.addNewAddress()}
                     onChangeText={(val, key) => this.onChangeText(val, key)}
                     check={this.state.saveToAddressBook}
+                    addressToEdit={this.state.addressToEdit}
                     onPressCheck={() => this.setState({ saveToAddressBook: !this.state.saveToAddressBook })}
                 />
             </View>
@@ -465,6 +519,12 @@ const styles = StyleSheet.create({
         color: "#848484",
         fontWeight: "600",
         fontSize: 14
+    },
+    shipping_method_title:{
+        color: "black",
+        fontWeight: "600",
+        fontSize: 16,
+        marginTop:20,
     },
     add_new_address_btn: {
         width: 150,

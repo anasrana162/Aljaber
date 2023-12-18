@@ -27,7 +27,7 @@ const StoreFeatures = ({ screenName }) => {
                 <MaterialIcons name="local-shipping" size={35} color="#020621" />
                 <View style={{ width: "75%", marginLeft: 10 }} >
                     <Text style={styles.item_title}>Free shipping</Text>
-                    <Text style={styles.item_text}>Free shipping on order over $100</Text>
+                    <Text style={styles.item_text}>Free shipping on order over AED 150</Text>
                 </View>
             </View>
 

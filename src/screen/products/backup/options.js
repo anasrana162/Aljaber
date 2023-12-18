@@ -3,8 +3,7 @@ import React, { useState } from 'react'
 import Fontisto from 'react-native-vector-icons/Fontisto'
 import OptionDropdown from './optionDropdown';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
-import axios from 'axios';
-import { custom_api_url } from '../../../api/api';
+
 const width = Dimensions.get("screen").width;
 
 const Options = ({
@@ -45,7 +44,7 @@ const Options = ({
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.checkBox_cont} >
+            {option_power !== null && <View style={styles.checkBox_cont} >
                 {checked ?
                     <TouchableOpacity
                         onPress={() => {
@@ -68,17 +67,19 @@ const Options = ({
                 <Text style={styles?.checkBox_text}>I NEED 2 DIFFERENT POWERS FOR MY LENSES</Text>
 
 
-            </View>
+            </View>}
 
 
 
-            {(configurable_product_options == null || configurable_product_options == undefined || configurable_product_options.length == 0) ?
+            {(product_varients == null || product_varients == undefined) ?
                 <>
                 </>
                 :
                 <>
                     {checked == false && <View style={styles.colorFlatlist}>
 
+                        {/* Title */}
+                        < Text style={styles.title}>Colors: </Text>
 
                         {/* List */}
                         <ScrollView
@@ -86,52 +87,17 @@ const Options = ({
                             style={{ width: "100%" }}
                         >
                             {
-                                configurable_product_options?.map((data, index) => {
+                                product_varients?.map((data, index) => {
                                     // console.log("data", data?.color?.toLowerCase())
                                     return (
-                                        // <TouchableOpacity
-                                        //     onPress={() => selectedVarient(data, index)}
-                                        //     key={String(index)}
-                                        //     style={[styles.color_cont, {
-                                        //         // backgroundColor: data?.color?.toLowerCase()
-                                        //     }]}
-                                        //     >
+                                        <TouchableOpacity
+                                            onPress={() => selectedVarient(data, index)}
+                                            key={String(index)}
+                                            style={[styles.color_cont, {
+                                                backgroundColor: data?.color?.toLowerCase()
+                                            }]}>
 
-                                        // </TouchableOpacity>
-
-
-
-
-                                        <View style={{ flexDirection: "row", alignItems: "center" }}>
-                                            {/* Title */}
-                                            <Text style={styles.title}> {data?.label}: </Text>
-
-                                            {
-                                                data?.values.map((val, index) => {
-                                                    // const fetchValue = async () => {
-                                                    //     var data_name = await axios.get(custom_api_url + "func=option_label&id=" + val?.value_index)
-                                                    //     return await data_name?.data
-                                                    // };
-                                                    // // var data_name = await axios.get(custom_api_url + "func=option_label&id=" + val?.value_index)
-                                                    console.log("data_name", val)
-                                                    return (
-                                                        <TouchableOpacity
-                                                            // onPress={() => selectedVarient(data, index)}
-                                                            key={String(index)}
-                                                            style={[styles.color_cont, {
-                                                                width: data?.label == "Color" ? 30 : null,
-                                                                height: data?.label == "Color" ? 30 : null,
-                                                                backgroundColor: data?.label == "Color" ? val?.value_name.toLowerCase() : "#f0f0f0"
-                                                            }]}
-                                                        >
-                                                            {data?.label !== "Color" && <Text > {val?.value_name} </Text>}
-                                                        </TouchableOpacity>
-                                                    )
-                                                })
-                                            }
-
-
-                                        </View>
+                                        </TouchableOpacity>
                                     )
 
                                 })
@@ -449,20 +415,20 @@ const Options = ({
                         {console.log("")}
                         {console.log("finalCartItemADDITION", finalCartItemADDITION)}
                         {console.log("")} */}
+                        
 
-
-                        {option_package_size != null &&
+                        {option_package_size != null  &&
                             <OptionDropdown
                                 // key={optionKey}
                                 checked={checked}
                                 title={option_package_size?.title}
                                 data={option_package_size}
                                 setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
-                            // getItemDefault={finalCartItemPackage}
+                                // getItemDefault={finalCartItemPackage}
                             />
                         }
 
-                        {option_power != null &&
+                        {option_power != null  &&
                             <OptionDropdown
                                 //  key={optionKey}
                                 checked={checked}
@@ -473,7 +439,7 @@ const Options = ({
                             />
                         }
 
-                        {option_cyl != null &&
+                        {option_cyl != null  &&
                             <OptionDropdown
                                 // key={optionKey}
                                 checked={checked}
@@ -484,7 +450,7 @@ const Options = ({
                             />
                         }
 
-                        {option_axes != null &&
+                        {option_axes != null  &&
                             <OptionDropdown
                                 //key={optionKey}
                                 checked={checked}
@@ -495,7 +461,7 @@ const Options = ({
                             />
                         }
 
-                        {option_addition != null &&
+                        {option_addition != null  &&
                             <OptionDropdown
                                 //key={optionKey}
                                 checked={checked}
@@ -547,14 +513,11 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     color_cont: {
-        // width: 40,
-        // height: 40,
-        paddingHorizontal: 5,
-        paddingVertical: 5,
+        width: 40,
+        height: 40,
         borderRadius: 80,
         borderWidth: 0.3,
         marginHorizontal: 5,
-        backgroundColor: "#f0f0f0"
     },
 
     quantityTextInp: {

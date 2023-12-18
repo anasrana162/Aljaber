@@ -8,7 +8,29 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import CustomTextInp from './CustomTextInp'
 import TextInput_Dropdown from '../../cart/components/textInput_Dropdown'
 
-const Add_NewAddress = ({ openModal, closeModal, onChangeText, countries, check, onPressCheck, provinces, selectItem, props, addNewAddress }) => {
+const Add_NewAddress = ({
+    openModal,
+    closeModal,
+    onChangeText,
+    addressToEdit,
+    countries,
+    check,
+    onPressCheck,
+    provinces,
+    selectItem,
+    props,
+    addNewAddress,
+    // data
+    firstName,
+    lastName,
+    street1,
+    street2,
+    city,
+    region,
+    country,
+    telephone,
+    zipCode,
+}) => {
 
     var { userData: { user } } = props
 
@@ -18,6 +40,17 @@ const Add_NewAddress = ({ openModal, closeModal, onChangeText, countries, check,
 
     const [countryDD, setCountryDD] = useState(false)
     const [provinceDD, setProvinceDD] = useState(false)
+
+    // const [firstName, setFirstName] = useState(addressToEdit?.firstName == undefined ? "" : addressToEdit?.firstName)
+    // const [lastName, setLastName] = useState(addressToEdit?.lastName == undefined ? "" : addressToEdit?.lastName)
+    // const [street1, setStreet1] = useState(addressToEdit?.street == undefined ? "" : addressToEdit?.street[0])
+    // const [street2, setStreet2] = useState(addressToEdit?.street == undefined ? "" : addressToEdit?.street[1])
+    // const [country, setCountry] = useState(addressToEdit?.country == undefined ? "" : addressToEdit?.country?.country)
+    // const [region, setRegion] = useState(addressToEdit?.region == undefined ? "" : addressToEdit?.region)
+    // const [city, setCity] = useState(addressToEdit?.city == undefined ? "" : addressToEdit?.city)
+    // const [zipCode, setZipCode] = useState(addressToEdit?.city == undefined ? "" : addressToEdit?.zipCode)
+    // const [telephone, setTelephone] = useState(addressToEdit?.telephone == undefined ? "" : addressToEdit?.telephone)
+
 
     const openDropDowns = (key) => {
         switch (key) {
@@ -62,12 +95,14 @@ const Add_NewAddress = ({ openModal, closeModal, onChangeText, countries, check,
                             style={{ width: "100%" }}>
                             {/* First Name */}
                             <CustomTextInp
+                                value={firstName}
                                 style={{ marginTop: 30, }}
                                 titleEN={"First Name *"}
                                 onChangeText={(txt) => onChangeText(txt, "first_name")}
                             />
                             {/* Last Name */}
                             <CustomTextInp
+                                value={lastName}
                                 titleEN={"Last Name *"}
                                 onChangeText={(txt) => onChangeText(txt, "last_name")}
                             />
@@ -75,12 +110,14 @@ const Add_NewAddress = ({ openModal, closeModal, onChangeText, countries, check,
                             <Text style={styles.title}>Street Address*</Text>
                             {/* Street Address Line1 */}
                             <CustomTextInp
+                                value={street1}
                                 titleEN={"Street Address: Line 1 *"}
                                 onChangeText={(txt) => onChangeText(txt, "street_address_line1")}
                             />
                             {/* Street Address Line2 */}
                             <CustomTextInp
                                 // titleEN={"Street Address: Line 1 *"}
+                                value={street2}
                                 style={{ marginTop: -3 }}
                                 onChangeText={(txt) => onChangeText(txt, "street_address_line2")}
                             />
@@ -90,7 +127,7 @@ const Add_NewAddress = ({ openModal, closeModal, onChangeText, countries, check,
                                 titleEN={"Country"}
                                 titleAR={""}
                                 type={"dropdown"}
-                                // defaultSelected={Object.keys(addressDefault).length == 0 ? "" : countryDefault}
+                                defaultSelected={country?.country}//Object.keys(addressDefault).length == 0 ? "" : countryDefault
                                 purpose={"country"}
                                 isModalOpen={countryDD}
                                 openDropDown={() => openDropDowns("country")}
@@ -103,7 +140,7 @@ const Add_NewAddress = ({ openModal, closeModal, onChangeText, countries, check,
                                 titleAR={""}
                                 purpose={"province"}
                                 type={provinces?.length == 0 ? "txtinp" : "dropdown"}
-                                // defaultSelected={Object.keys(addressDefault).length == 0 ? "" : provinceDefault}
+                                defaultSelected={region} //Object.keys(addressDefault).length == 0 ? "" : provinceDefault
                                 isModalOpen={provinceDD}
                                 onChangeText={(txt) => onChangeText(txt, "region")}
                                 openDropDown={() => openDropDowns("province")}
@@ -111,16 +148,19 @@ const Add_NewAddress = ({ openModal, closeModal, onChangeText, countries, check,
                             />
                             {/* City */}
                             <CustomTextInp
+                                value={city}
                                 titleEN={"City *"}
                                 onChangeText={(txt) => onChangeText(txt, "city")}
                             />
                             {/* ZIP/POSTAL CODE */}
                             <CustomTextInp
+                                value={zipCode}
                                 titleEN={"Zip / Postal Code *"}
                                 onChangeText={(txt) => onChangeText(txt, "zip_code")}
                             />
                             {/* Phone Number */}
                             <CustomTextInp
+                                value={telephone}
                                 keyboardType={"numeric"}
                                 titleEN={"Phone Number *"}
                                 onChangeText={(txt) => onChangeText(txt, "phone")}
@@ -258,10 +298,10 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 5,
     },
-    save_to_addressbook:{
+    save_to_addressbook: {
         fontSize: 14,
         fontWeight: "500",
         color: "black",
-        marginLeft:5,
+        marginLeft: 5,
     },
 })

@@ -5,6 +5,7 @@ import Swiper from './components/Swiper';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import HomeCategories from './components/homeCategories';
 import api, { custom_api_url } from '../../api/api';
+import axios from 'axios';
 import RNRestart from 'react-native-restart';
 import NetInfo from "@react-native-community/netinfo";
 import DefaultCategories from './components/defaultCategories';
@@ -152,7 +153,7 @@ class HomeScreen extends Component {
     }
 
     componentDidMount = () => {
-        this.props.navigation.addListener('focus', async () => {this.adminApi(),this.loginUser()});
+        this.props.navigation.addListener('focus', async () => { this.adminApi(), this.loginUser() });
         // this.adminApi()
         this.getDefaultCategories()
         this.unsubscribe()
@@ -216,7 +217,7 @@ class HomeScreen extends Component {
                 })
             }
         }
-        else{
+        else {
             console.log("No credentials found for login")
         }
     }
@@ -483,23 +484,29 @@ class HomeScreen extends Component {
                 //store_index.push(random_index)
             }
 
-            // console.log("")
-            // console.log("--------")
-            // // console.log("Data Picked Up", sku_arr[random_index])
-            // console.log("--------")
-            // console.log("")
-
             // Getting product details from each sku
             await api.get('/products/' + sku_arr[random_index]?.sku, {
                 headers: {
                     Authorization: `Bearer ${userData?.admintoken}`,
                 },
-            }).then((res) => {
+            }).then(async (res) => {
                 if (res?.data) {
-                    // console.log("Product Details Api in Random Products Function Response:   ", res?.data?.name, "  ", sku_arr[random_index],)
+                    // console.log("Product Details Api in Random Products Function Response:   ", res?.data?.custom_attributes, "  ", sku_arr[random_index],)
                     if (res?.data?.price > 0 && res?.data?.visibility == 4 && res?.data?.extension_attributes?.stock_item?.is_in_stock == true && res?.data?.status == 1) {
                         // storing products with its detail in array
-                        store_product.push(res?.data)
+                        var brand = res?.data?.custom_attributes.filter((val) => val?.attribute_code == "brands")[0]
+                        // console.log("Brand",brand)
+                        
+                        await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + brand.value,).then(async (data) => {
+                            res.data.brand = data?.data
+                            // console.log("res?.data", res?.data?.brand)
+
+                            store_product.push(res?.data)
+                        }).catch((err)=>{
+                            console.log("Brand value error random products", err)
+                        })
+                  
+             
                     } else {
                         // console.log(" adding Index 1")
                         // index = index + 1
