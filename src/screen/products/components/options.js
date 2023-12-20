@@ -33,13 +33,19 @@ const Options = ({
     finalCartItemAXES,
     finalCartItemADDITION,
     openDropDown,
-    leftEyeQuantity,
     rigthEyeQuantity,
+    leftEyeQuantity,
     selectedVarient,
     setWholeItemSelected,
+    selectedCPO,
+    selectedItemRight,
+    selectedItemLeft,
     configurable_product_options,
-    selectedCPO
+    product_options,
 }) => {
+
+    const [_rigthEyeQuantity, setRigthEyeQuantity] = useState(rigthEyeQuantity)
+    const [_leftEyeQuantity, setLeftEyeQuantity] = useState(leftEyeQuantity)
 
     const [checked, setChecked] = useState(false)
 
@@ -70,15 +76,13 @@ const Options = ({
 
             </View>
 
-
-
+            {/* Configurable Product Options */}
             {(configurable_product_options == null || configurable_product_options == undefined || configurable_product_options.length == 0) ?
                 <>
                 </>
                 :
                 <>
                     {checked == false && <View style={styles.colorFlatlist}>
-
 
                         {/* List */}
                         <ScrollView
@@ -89,18 +93,6 @@ const Options = ({
                                 configurable_product_options?.map((data, index) => {
                                     // console.log("data", data?.color?.toLowerCase())
                                     return (
-                                        // <TouchableOpacity
-                                        //     onPress={() => selectedVarient(data, index)}
-                                        //     key={String(index)}
-                                        //     style={[styles.color_cont, {
-                                        //         // backgroundColor: data?.color?.toLowerCase()
-                                        //     }]}
-                                        //     >
-
-                                        // </TouchableOpacity>
-
-
-
 
                                         <View style={{ flexDirection: "row", alignItems: "center" }}>
                                             {/* Title */}
@@ -108,12 +100,7 @@ const Options = ({
 
                                             {
                                                 data?.values.map((val, index) => {
-                                                    // const fetchValue = async () => {
-                                                    //     var data_name = await axios.get(custom_api_url + "func=option_label&id=" + val?.value_index)
-                                                    //     return await data_name?.data
-                                                    // };
-                                                    // // var data_name = await axios.get(custom_api_url + "func=option_label&id=" + val?.value_index)
-                                                    console.log("data_name", val)
+                                                    // console.log("data_name", val)
                                                     return (
                                                         <TouchableOpacity
                                                             // onPress={() => selectedVarient(data, index)}
@@ -121,7 +108,7 @@ const Options = ({
                                                             style={[styles.color_cont, {
                                                                 width: data?.label == "Color" ? 30 : null,
                                                                 height: data?.label == "Color" ? 30 : null,
-                                                                backgroundColor: data?.label == "Color" ? val?.value_name.toLowerCase() : "#f0f0f0"
+                                                                backgroundColor: data?.label == "Color" ? val?.color_code.toLowerCase() : "#f0f0f0"
                                                             }]}
                                                         >
                                                             {data?.label !== "Color" && <Text > {val?.value_name} </Text>}
@@ -142,376 +129,150 @@ const Options = ({
                 </>
             }
 
-            {
-                checked ?
-                    <>
-                        <View style={styles.checkBox_option}>
-                            <Text style={styles.prescription_text}>ENTER YOUR PRESCRIPTION</Text>
-                            {configurable_product_options !== null && <View style={[styles?.option_cont, { width: "95%", marginTop: 0, marginBottom: 10, marginLeft: 10, borderRadius: 5, overflow: "hidden" }]}>
+            {/* Custom Product Options */}
 
-                                <TouchableOpacity
-                                    onPress={() => openDropDown(configurable_product_options, "CPO")}
-                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                    <Text style={[styles.selectedItem_text, { fontSize: 14 }]}>{selectedCPO?.title}</Text>
-                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                </TouchableOpacity>
+            {checked == false ?
+                <>
+                    {
+                        product_options.map((data, index) => {
+                            return (
+                                <OptionDropdown
+                                    // key={optionKey}
+                                    checked={checked}
+                                    title={data?.title}
+                                    data={data?.values}
+                                    setWholeItemSelected={(item) => setWholeItemSelected(item, data?.option_id)}
+                                // getItemDefault={finalCartItemPackage}
+                                />
+                            )
+                        })
+                    }
+                </>
+                :
+                <>
+                    <View style={styles.checkBox_option}>
 
-                            </View>}
-                            <View style={styles.blue_cont}>
+                        <Text style={styles.prescription_text}>ENTER YOUR PRESCRIPTION</Text>
+                        {configurable_product_options !== null && <View style={[styles?.option_cont, { width: "95%", marginTop: 0, marginBottom: 10, marginLeft: 10, borderRadius: 5, overflow: "hidden" }]}>
+                            {
+                                configurable_product_options.map((data, index) => {
+                                    // console.log(configurable_product_options.length)
+                                    var value_selected = selectedCPO.filter((val) => val?.title == data?.label)[0]
 
-                                <View style={styles.eye_cont}>
+                                    return (
+                                        <>
+                                            {/* DropDown Title */}
+                                            <Text style={{ color: "#020621", marginBottom: 5 }}>{data?.label} *</Text>
+                                            {/* Dropdowns */}
+                                            <TouchableOpacity
+                                                onPress={() => openDropDown(data, data?.label, "CPO")}
+                                                style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                                <Text style={[styles.selectedItem_text, { fontSize: 14 }]}>{value_selected == undefined ? selectedCPO[0]?.value_name : value_selected?.val?.value_name}</Text>
+                                                <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
+                                            </TouchableOpacity>
+                                            {/* ---------------------------- */}
 
-                                    <View style={styles.eye_inner_conts}>
-                                        <Text style={styles.eye_text}>Left Eye</Text>
-                                    </View>
-                                    <View style={styles.eye_inner_conts}>
-                                        <Text style={[styles.eye_text, { marginBottom: 5 }]}>Right Eye</Text>
-                                    </View>
 
+                                        </>
+                                    )
+                                })
+                            }
+
+                        </View>}
+
+
+                        <View style={styles.blue_cont}>
+                            {/* Eye Heading Container */}
+                            <View style={styles.eye_cont}>
+
+                                <View style={styles.eye_inner_conts}>
+                                    <Text style={styles.eye_text}>Left Eye</Text>
                                 </View>
-                                {/* white container */}
-                                <View style={styles.pre_type_cont}>
+                                <View style={styles.eye_inner_conts}>
+                                    <Text style={[styles.eye_text, { marginBottom: 5 }]}>Right Eye</Text>
+                                </View>
+                            </View>
+                            {/* white container */}
+                            <View style={styles.pre_type_cont}>
 
-                                    {/* Package Size */}
-                                    {option_package_size !== null && <View style={[styles.pre_inner_type_cont, { width: "35%" }]}>
+                                {
+                                    product_options.map((data, index) => {
+                                        // console.log("data", data)
+                                        var value_selected_left = selectedItemLeft.filter((val) => val?.title == data?.title)[0]
+                                        var value_selected_right = selectedItemRight.filter((val) => val?.title == data?.title)[0]
+                                        return (
+                                            <View style={[styles.pre_inner_type_cont, { width: width * ((50.5 / 100)) / product_options.length }]}>
+                                                <View style={styles.pres_conts}>
+                                                    <Text style={styles.grid_text}>{data?.title}</Text>
+                                                </View>
+                                                <View style={styles.pres_conts}>
+                                                    <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
 
-                                        <View style={styles.pres_conts}>
-                                            <Text style={styles.grid_text}>{option_package_size?.title}</Text>
-                                        </View>
-                                        <View style={styles.pres_conts}>
+                                                        <TouchableOpacity
+                                                            onPress={() => openDropDown(data, data?.title, "left", data?.option_id)}
+                                                            style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                                            <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{value_selected_left == undefined ? "Select" : value_selected_left?.val?.title}</Text>
+                                                            <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" />
+                                                        </TouchableOpacity>
 
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                                    </View>
+                                                </View>
+                                                <View style={styles.pres_conts}>
+                                                    <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
 
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_package_size, "leftPA")}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={styles.selectedItem_text}>{selectedItemLeftPackage?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                </TouchableOpacity>
+                                                        <TouchableOpacity
+                                                            onPress={() => openDropDown(data, data?.title, "right", data?.option_id)}
+                                                            style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                                            <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{value_selected_right == undefined ? "Select" : value_selected_right?.val?.title}</Text>
+                                                            <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" />
+                                                        </TouchableOpacity>
 
-                                            </View>
-
-
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_package_size, 'rightPA')}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={styles.selectedItem_text}>{selectedItemRightPackage?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                </TouchableOpacity>
-
-                                            </View>
-                                        </View>
-                                    </View>}
-                                    {/* Addition */}
-                                    {option_addition !== null && <View style={[styles.pre_inner_type_cont, { width: "35%" }]}>
-
-                                        <View style={styles.pres_conts}>
-                                            <Text style={styles.grid_text}>{option_addition?.title}</Text>
-                                        </View>
-                                        <View style={styles.pres_conts}>
-
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_addition, "leftADD")}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={styles.selectedItem_text}>{selectedItemLeftADDITION?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                </TouchableOpacity>
-
-                                            </View>
-
-
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_addition, 'rightADD')}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={styles.selectedItem_text}>{selectedItemRightADDITION?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                </TouchableOpacity>
-
-                                            </View>
-                                        </View>
-                                    </View>}
-
-                                    {/* Power Option */}
-                                    {(option_power !== null && option_axes == null && option_cyl == null) && <View style={[styles.pre_inner_type_cont, { width: (option_package_size !== null || option_addition !== null) ? "35%" : "60%" }]}>
-
-                                        <View style={styles.pres_conts}>
-                                            <Text style={styles.grid_text}>{option_power?.title}</Text>
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_power, "leftPO")}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={styles.selectedItem_text}>{selectedItemLeftPower?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                </TouchableOpacity>
-
-                                            </View>
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                <TouchableOpacity
-                                                    onPress={() => openDropDown(option_power, "rightPO")}
-                                                    style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                    <Text style={styles.selectedItem_text}>{selectedItemRightPower?.title}</Text>
-                                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                </TouchableOpacity>
-
-                                            </View>
-                                        </View>
-                                    </View>}
-
-                                    {/* AXES */}
-                                    {option_axes !== null &&
-                                        <View style={[styles.pre_inner_type_cont, { width: "27%" }]}>
-                                            <View style={styles.pres_conts}>
-                                                <Text style={styles.grid_text}>{option_axes?.title}</Text>
-                                            </View>
-                                            <View style={styles.pres_conts}>
-                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                    <TouchableOpacity
-                                                        onPress={() => openDropDown(option_axes, "leftAXES")}
-                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemLeftAXES?.title}</Text>
-                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 0 }} />
-                                                    </TouchableOpacity>
-
+                                                    </View>
                                                 </View>
                                             </View>
-                                            <View style={styles.pres_conts}>
-                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                        )
+                                    })
 
-                                                    <TouchableOpacity
-                                                        onPress={() => openDropDown(option_axes, "rightAXES")}
-                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemRightAXES?.title}</Text>
-                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                    </TouchableOpacity>
+                                }
 
-                                                </View>
-                                            </View>
-                                        </View>
-                                    }
-                                    {/* CYL */}
-                                    {option_cyl !== null &&
-                                        <View style={[styles.pre_inner_type_cont, { width: "27%" }]}>
-                                            <View style={styles.pres_conts}>
-                                                <Text style={styles.grid_text}>{option_cyl?.title}</Text>
-                                            </View>
-                                            <View style={styles.pres_conts}>
-                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
+                                {/* Quantity Container */}
+                                <View style={[styles.pre_inner_type_cont, { width: "25%" }]}>
 
-                                                    <TouchableOpacity
-                                                        onPress={() => openDropDown(option_cyl, "leftCYL")}
-                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemLeftCYL?.title}</Text>
-                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 0 }} />
-                                                    </TouchableOpacity>
-
-                                                </View>
-                                            </View>
-                                            <View style={styles.pres_conts}>
-                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                    <TouchableOpacity
-                                                        onPress={() => openDropDown(option_cyl, "rightCYL")}
-                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemRightCYL?.title}</Text>
-                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                    </TouchableOpacity>
-
-                                                </View>
-                                            </View>
-                                        </View>
-                                    }
-
-                                    {/* Power Option With CYL and AXES */}
-                                    {(option_power !== null && option_axes !== null && option_cyl !== null) &&
-                                        <View style={[styles.pre_inner_type_cont, { width: "27%" }]}>
-
-                                            <View style={styles.pres_conts}>
-                                                <Text style={styles.grid_text}>{option_power?.title}</Text>
-                                            </View>
-                                            <View style={styles.pres_conts}>
-                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                    <TouchableOpacity
-                                                        onPress={() => openDropDown(option_power, "leftPO")}
-                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemLeftPower?.title}</Text>
-                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 0 }} />
-                                                    </TouchableOpacity>
-
-                                                </View>
-                                            </View>
-                                            <View style={styles.pres_conts}>
-                                                <View style={[styles?.option_cont, { width: "90%", marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-
-                                                    <TouchableOpacity
-                                                        onPress={() => openDropDown(option_power, "rightPO")}
-                                                        style={[styles?.dropdown_cont, { marginTop: 0, borderRadius: 5, overflow: "hidden" }]}>
-                                                        <Text style={[styles.selectedItem_text, { marginLeft: 3 }]}>{selectedItemRightPower?.title}</Text>
-                                                        <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
-                                                    </TouchableOpacity>
-
-                                                </View>
-                                            </View>
-                                        </View>}
-
-                                    {/* Quantity with CYL and AXES */}
-                                    {(option_power !== null && option_axes !== null && option_cyl !== null) &&
-                                        <View style={[styles.pre_inner_type_cont, { width: "20%" }]}>
-
-                                            <View style={styles.pres_conts}>
-                                                <Text style={styles.grid_text}>QTY</Text>
-                                            </View>
-                                            <View style={styles.pres_conts}>
-                                                <TextInput
-                                                    value={leftEyeQuantity.toString()}
-                                                    style={styles.quantityTextInp}
-                                                    onChangeText={(val) => onChangeText(val, 'left')}
-                                                    keyboardType='number-pad'
-                                                />
-                                            </View>
-                                            <View style={styles.pres_conts}>
-                                                <TextInput
-                                                    value={rigthEyeQuantity.toString()}
-                                                    style={styles.quantityTextInp}
-                                                    onChangeText={(val) => onChangeText(val, 'right')}
-                                                    keyboardType='number-pad'
-                                                />
-                                            </View>
-                                        </View>
-                                    }
-
-
-
-                                    {/* QUantity */}
-                                    {(option_power !== null && option_axes == null && option_cyl == null) && <View style={[styles.pre_inner_type_cont, { width: (option_package_size !== null || option_addition !== null) ? "30%" : "40%" }]}>
-
-                                        <View style={styles.pres_conts}>
-                                            <Text style={styles.grid_text}>QTY</Text>
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <TextInput
-                                                value={leftEyeQuantity.toString()}
-                                                style={styles.quantityTextInp}
-                                                onChangeText={(val) => onChangeText(val, 'left')}
-                                                keyboardType='number-pad'
-                                            />
-                                        </View>
-                                        <View style={styles.pres_conts}>
-                                            <TextInput
-                                                value={rigthEyeQuantity.toString()}
-                                                style={styles.quantityTextInp}
-                                                onChangeText={(val) => onChangeText(val, 'right')}
-                                                keyboardType='number-pad'
-                                            />
-                                        </View>
-                                    </View>}
+                                    <View style={styles.pres_conts}>
+                                        <Text style={styles.grid_text}>QTY</Text>
+                                    </View>
+                                    <View style={styles.pres_conts}>
+                                        <TextInput
+                                            value={_leftEyeQuantity.toString()}
+                                            style={styles.quantityTextInp}
+                                            onChangeText={(val) => {
+                                                onChangeText(val, 'left')
+                                                setLeftEyeQuantity(val.toString())
+                                            }}
+                                            keyboardType='number-pad'
+                                        />
+                                    </View>
+                                    <View style={styles.pres_conts}>
+                                        <TextInput
+                                            value={_rigthEyeQuantity.toString()}
+                                            style={styles.quantityTextInp}
+                                            onChangeText={(val) => {
+                                                onChangeText(val, 'right')
+                                                setRigthEyeQuantity(val.toString())
+                                            }}
+                                            keyboardType='number-pad'
+                                            autoFocus={true}
+                                        />
+                                    </View>
                                 </View>
 
                             </View>
-
                         </View>
-                        <View style={{
-                            width: "100%", height: 1, backgroundColor: "#020621",
-                            marginTop: 15
-                        }}></View>
-                    </>
-                    :
-                    <>
-                        {/* {console.log("")}
-                        {console.log("finalCartItemPackage", finalCartItemPackage)}
-                        {console.log("")}
-                        {console.log("")}
-                        {console.log("finalCartItemPower", finalCartItemPower)}
-                        {console.log("")}
-                        {console.log("")}
-                        {console.log("finalCartItemCYL", finalCartItemCYL)}
-                        {console.log("")}
-                        {console.log("")}
-                        {console.log("finalCartItemAXES", finalCartItemAXES)}
-                        {console.log("")}
-                        {console.log("")}
-                        {console.log("finalCartItemADDITION", finalCartItemADDITION)}
-                        {console.log("")} */}
-
-
-                        {option_package_size != null &&
-                            <OptionDropdown
-                                // key={optionKey}
-                                checked={checked}
-                                title={option_package_size?.title}
-                                data={option_package_size}
-                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
-                            // getItemDefault={finalCartItemPackage}
-                            />
-                        }
-
-                        {option_power != null &&
-                            <OptionDropdown
-                                //  key={optionKey}
-                                checked={checked}
-                                title={option_power?.title}
-                                data={option_power}
-                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
-                                getItemDefault={finalCartItemPower}
-                            />
-                        }
-
-                        {option_cyl != null &&
-                            <OptionDropdown
-                                // key={optionKey}
-                                checked={checked}
-                                title={option_cyl?.title}
-                                data={option_cyl}
-                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
-                                getItemDefault={finalCartItemCYL}
-                            />
-                        }
-
-                        {option_axes != null &&
-                            <OptionDropdown
-                                //key={optionKey}
-                                checked={checked}
-                                title={option_axes?.title}
-                                data={option_axes}
-                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
-                                getItemDefault={finalCartItemAXES}
-                            />
-                        }
-
-                        {option_addition != null &&
-                            <OptionDropdown
-                                //key={optionKey}
-                                checked={checked}
-                                title={option_addition?.title}
-                                data={option_addition}
-                                setWholeItemSelected={(item, key) => setWholeItemSelected(item, key)}
-                                getItemDefault={finalCartItemADDITION}
-                            />
-                        }
-
-                        <View style={{
-                            width: "100%", height: 1, backgroundColor: "#020621",
-                            marginTop: 15
-                        }}></View>
-                    </>
+                    </View>
+                </>
             }
+
+
         </View >
     )
 }
@@ -601,11 +362,12 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         borderRadius: 5,
         marginBottom: 10,
+        marginTop: 10,
         flexDirection: "row",
         justifyContent: 'flex-start'
     },
     eye_cont: {
-        width: "25%",
+        width: width / 4.5,
         height: "100%",
         justifyContent: "flex-end",
         alignItems: "center",

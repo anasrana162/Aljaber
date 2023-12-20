@@ -28,21 +28,9 @@ class ProductDetails extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            product_details: '',
-            images: [],
-            description: '',
-            main_info_temp: null,
-            quantity: 1,
-            option_package_size: null,
-            option_power: null,
-            option_cyl: null,
-            option_axes: null,
-            option_addition: null,
-            optionKey: 0,
-            bigImage: "",
-            openBigImageModal: false,
-            configurable_product_options: null,
-            selectedCPO: { "title": "Blue", "value_index": 7 },
+
+
+
             //Power Options
             // Left Power
             selectedItemLeftPower: {
@@ -175,15 +163,34 @@ class ProductDetails extends Component {
             product_varients: null,
             product_varient_selected: null,
             varient_selected: false,
-            media_gallery_entries: [],
             imageKey: 0,
-            leftEyeQuantity: 1,
-            rigthEyeQuantity: 1,
+
             cartLoader: false,
             eyedir: '',
             dropdown: false,
             optionSelected: null,
+
+            //new states
+            product_options: [],
+            media_gallery_entries: [],
+            selectedCPO: [{ "value_index": 0, "value_name": "Select" }],// configurable product options
             checked: false,
+            product_details: '',
+            description: '',
+            quantity: 1,
+            bigImage: "",
+            openBigImageModal: false,
+            description: '',
+            main_info_temp: null,
+            configurable_product_options: null,
+            option_selected: [],
+            custom_options: [],
+            custom_options_left: [],
+            custom_options_right: [],
+            selectedItemLeft: [],
+            selectedItemRight: [],
+            leftEyeQuantity: 1,
+            rigthEyeQuantity: 1,
         };
     }
 
@@ -332,12 +339,12 @@ class ProductDetails extends Component {
             // this is for loader skeleton 
 
 
-            console.log("No Issue")
+            // console.log("No Issue")
 
             this.getDescription('prop')
             this.checkOptions('prop')
             this.getMain_Info('prop')
-            this.checkVarients('prop')
+            // this.checkVarients('prop')
             this.productImages("prop")
             this.check_Configurable_Product_Options()
 
@@ -361,6 +368,11 @@ class ProductDetails extends Component {
     check_Configurable_Product_Options = async () => {
         var { product_details: { extension_attributes } } = this.state
         if (extension_attributes?.configurable_product_options == undefined || extension_attributes?.configurable_product_options.length == 0) {
+            setImmediate(() => {
+                this.setState({
+                    loader: false,
+                })
+            })
             return console.log("No options for color custom options")
         } else {
             var { configurable_product_options } = extension_attributes
@@ -369,15 +381,21 @@ class ProductDetails extends Component {
             for (let cpo = 0; cpo < configurable_product_options.length; cpo++) {
                 // console.log("configurable_product_options[cpo]?.values", configurable_product_options[cpo]?.values)
                 for (let cpov = 0; cpov < configurable_product_options[cpo]?.values.length; cpov++) {
-                    var value_name = await axios.get(custom_api_url + `${configurable_product_options[cpo]?.label == "Color" ? "func=option_color&id=" : "func=option_label&id="}` + configurable_product_options[cpo]?.values[cpov]?.value_index)
+                    var value_name = await axios.get(custom_api_url + "func=option_label&id=" + configurable_product_options[cpo]?.values[cpov]?.value_index)
                     configurable_product_options[cpo].values[cpov].value_name = value_name?.data
+                    if (configurable_product_options[cpo]?.label == "Color") {
+                        var color_code = await axios.get(custom_api_url + "func=option_color&id=" + configurable_product_options[cpo]?.values[cpov]?.value_index)
+                        configurable_product_options[cpo].values[cpov].color_code = color_code?.data
+
+                    }
                     // console.log("value_name", value_name?.data)
                 }
             }
-            // console.log("configurable_product_options", configurable_product_options)
+            console.log("configurable_product_options", configurable_product_options)
             setImmediate(() => {
                 this.setState({
-                    configurable_product_options: configurable_product_options
+                    configurable_product_options: configurable_product_options,
+                    loader: false,
                 })
             })
 
@@ -396,44 +414,13 @@ class ProductDetails extends Component {
             this.checkCartScreenOption(product_details, options)
         }
 
-        var x = [];
+        setImmediate(() => {
+            this.setState({
+                product_options: options,
+            })
+        })
 
-        switch (key) {
-            case "prop":
-                x = options
-                break;
 
-            case "varient":
-                // x = this.state.product_varient_selected?.options
-                x = options
-        }
-
-        // console.log("OPtions For Product", x)
-
-        if (x.length == 0) {
-            return console.log("option are null")
-        }
-
-        for (let i = 0; i < x.length; i++) {
-
-            // console.log("CHeck TItle Options", x[i]?.title)
-            if (x[i]?.title == "PACKAGE SIZE") {
-                this.setState({ option_package_size: x[i] })
-            }
-            if (x[i]?.title == "POWER") {
-                this.setState({ option_power: x[i] })
-            }
-            if (x[i]?.title == "CYL") {
-                this.setState({ option_cyl: x[i] })
-            }
-            if (x[i]?.title == "AXES") {
-                this.setState({ option_axes: x[i] })
-            }
-            if (x[i]?.title == "ADDITION") {
-                this.setState({ option_addition: x[i] })
-            }
-
-        }
     }
     checkCartScreenOption = (product_details, options) => {
 
@@ -546,47 +533,47 @@ class ProductDetails extends Component {
         }
     }
 
-    checkVarients = async () => {
-        var { product_details: { product_varients } } = this.state
-        // console.log("product_details Images Length", media_gallery_entries.length)
-        // console.log("Product Varients", product_varients)
+    // checkVarients = async () => {
+    //     var { product_details: { product_varients } } = this.state
+    //     // console.log("product_details Images Length", media_gallery_entries.length)
+    //     console.log("Product Varients", product_varients)
 
-        if (product_varients?.length == 0) {
-            setImmediate(() => {
-                this.setState({
-                    loader: false,
-                })
-            })
-            return console.log("no varients")
-        }
+    //     if (product_varients?.length == 0) {
+    //         setImmediate(() => {
+    //             this.setState({
+    //                 loader: false,
+    //             })
+    //         })
+    //         return console.log("no varients")
+    //     }
 
-        for (let pv = 0; pv < product_varients?.length; pv++) {
-            // console.log("PRoduct Varients Item", product_varients[pv]?.id, "   ", product_varients[pv]?.name)
+    //     for (let pv = 0; pv < product_varients?.length; pv++) {
+    //         // console.log("PRoduct Varients Item", product_varients[pv]?.id, "   ", product_varients[pv]?.name)
 
-            for (let ca = 0; ca < product_varients[pv]?.custom_attributes?.length; ca++) {
-                if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
-                    // console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
+    //         for (let ca = 0; ca < product_varients[pv]?.custom_attributes?.length; ca++) {
+    //             if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
+    //                 // console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
 
-                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + product_varients[pv]?.custom_attributes[ca]?.value,)
-                        .then(async (data) => {
-                            // console.log("Color Code", data?.data)
-                            product_varients[pv].color = data?.data
-                        }).catch((err) => {
-                            console.log("Error Color APi", err)
-                        })
+    //                 await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + product_varients[pv]?.custom_attributes[ca]?.value,)
+    //                     .then(async (data) => {
+    //                         // console.log("Color Code", data?.data)
+    //                         product_varients[pv].color = data?.data
+    //                     }).catch((err) => {
+    //                         console.log("Error Color APi", err)
+    //                     })
+    //                 break;
+    //             }
+    //         }
 
-                }
-            }
+    //     }
 
-        }
+    //     setImmediate(() => {
+    //         this.setState({ product_varients: product_varients, loader: false })
+    //     })
 
-        setImmediate(() => {
-            this.setState({ product_varients: product_varients, loader: false })
-        })
+    //     // console.log("PRoduct Varients Item", product_varients[1]?.color, "   ", product_varients[1]?.name)
 
-        // console.log("PRoduct Varients Item", product_varients[1]?.color, "   ", product_varients[1]?.name)
-
-    }
+    // }
 
     productImages = (key) => {
         var { product_details: { media_gallery_entries } } = this.state
@@ -1116,6 +1103,7 @@ class ProductDetails extends Component {
     }
 
     checkMarked = (val) => {
+        console.log("VALED", val)
         setImmediate(() => {
             this.setState({
                 checked: val
@@ -1123,168 +1111,177 @@ class ProductDetails extends Component {
         })
     }
 
-    selectItem = (item, index, title) => {
-        var { finalItemLeftPower, finalItemRightPower, } = this.state
-        console.log(this.state.eyedir)
+    selectItem = (item, index, title, option_id) => {
+        var { finalItemLeftPower, finalItemRightPower, custom_options_left, custom_options_right, selectedCPO, selectedItemLeft, selectedItemRight } = this.state
+        // console.log(this.state.eyedir)
 
 
         switch (this.state.eyedir) {
-            case "leftPA":
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemLeftPackage: item, finalItemLeftPackage: {
-                            "option_id": this.state.option_package_size?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
+            case "left":
+                // console.log("Item in selectItem Left", item, `${"\n"}`, "Title:", title)
+
+                let check_already_selected_options_Left = ''
+                let temp1 = selectedItemLeft.filter((val, index) => {
+                    if (val?.title == title) {
+                        check_already_selected_options_Left = { "value": val, "index": index }
+                    }
+                })[0]
+
+                // console.log("check_already_selected_options_Left", check_already_selected_options_Left)
+
+                if (check_already_selected_options_Left?.value?.title == title) {
+                    // console.log("check_already_selected_options_Left?.value",check_already_selected_options_Left?.value)
+                    selectedItemLeft.splice(check_already_selected_options_Left?.index, 1)
+                    selectedItemLeft.push({ val: item, title: title })
+
+                    // let option_obj = {
+                    //     "option_id": option_id,
+                    //     "option_value": item?.option_type_id
+                    // }
+                    // custom_options_left.push(option_obj)
+                    setImmediate(() => {
+                        this.setState({
+                            selectedItemLeft,
+                            //  finalItemLeftPackage: {
+                            //     "option_id": this.state.option_package_size?.option_id,
+                            //     "option_value": item?.option_type_id
+                            // }, 
+                            // custom_options_left,
+                            dropdown: false,
+                        })
                     })
-                })
+                } else {
+                    selectedItemLeft.push({ val: item, title: title })
+                    let option_obj = {
+                        "option_id": option_id,
+                        "option_value": item?.option_type_id
+                    }
+                    custom_options_left.push(option_obj)
+                    setImmediate(() => {
+                        this.setState({
+                            selectedItemLeft,
+                            //  finalItemLeftPackage: {
+                            //     "option_id": this.state.option_package_size?.option_id,
+                            //     "option_value": item?.option_type_id
+                            // }, 
+                            custom_options_left,
+                            dropdown: false,
+                        })
+                    })
+                }
+
+
                 break;
+
+
+            case "right":
+                console.log("Item in selectItem Right", item)
+                let check_already_selected_options_Right = ''
+                let temp2 = selectedItemRight.filter((val, index) => {
+                    if (val?.title == title) {
+                        check_already_selected_options_Right = { "value": val, "index": index }
+                    }
+                })[0]
+
+                // console.log("check_already_selected_options_Right", check_already_selected_options_Right)
+
+                if (check_already_selected_options_Right?.value?.title == title) {
+                    // console.log("check_already_selected_options_Right?.value",check_already_selected_options_Right?.value)
+                    selectedItemRight.splice(check_already_selected_options_Right?.index, 1)
+                    selectedItemRight.push({ val: item, title: title })
+
+                    setImmediate(() => {
+                        this.setState({
+                            selectedItemRight,
+                            //  finalItemLeftPackage: {
+                            //     "option_id": this.state.option_package_size?.option_id,
+                            //     "option_value": item?.option_type_id
+                            // }, 
+                            // custom_options_right: selectedItemRight,
+                            dropdown: false,
+                        })
+                    })
+                } else {
+                    selectedItemRight.push({ val: item, title: title })
+                    let option_obj = {
+                        "option_id": option_id,
+                        "option_value": item?.option_type_id
+                    }
+                    custom_options_right.push(option_obj)
+                    setImmediate(() => {
+                        this.setState({
+                            selectedItemRight,
+                            //  finalItemLeftPackage: {
+                            //     "option_id": this.state.option_package_size?.option_id,
+                            //     "option_value": item?.option_type_id
+                            // }, 
+                            custom_options_right,
+                            dropdown: false,
+                        })
+                    })
+                }
+                break;
+
+
             case "CPO":
-                setImmediate(() => {
-                    this.setState({
-                        // selectedItemLeftPackage: item,
-                        selectedCPO_AddToCart: {
-                            "option_id": this.state.configurable_product_options?.attribute_id,
-                            "option_value": item?.value_index,
-                        },
-                        selectedCPO: {
-                            "title": item?.title,
-                            "value_index": item?.value_index,
-                        }, dropdown: false,
+
+                console.log("Item in selectItem CPO", item)
+                // Check for already existing title and replace it so there are
+                // no duplicate values of same title
+                let check_already_selected_options = ''
+                let temp = selectedCPO.filter((val, index) => {
+                    if (val?.title == title) {
+                        check_already_selected_options = { "value": val, "index": index }
+                    }
+                })[0]
+
+                if (check_already_selected_options?.value?.title == title) {
+
+                    selectedCPO.splice(check_already_selected_options?.index, 1)
+                    selectedCPO.push({ val: item, title: title })
+
+                    setImmediate(() => {
+                        this.setState({
+                            // selectedItemLeftPackage: item,
+                            // selectedCPO_AddToCart: {
+                            //     "option_id": this.state.configurable_product_options?.attribute_id,
+                            //     "option_value": item?.value_index,
+                            // },
+                            selectedCPO,
+                            dropdown: false,
+                        })
                     })
-                })
+
+                } else {
+
+                    selectedCPO.push({ val: item, title: title })
+                    setImmediate(() => {
+                        this.setState({
+                            // selectedItemLeftPackage: item,
+                            // selectedCPO_AddToCart: {
+                            //     "option_id": this.state.configurable_product_options?.attribute_id,
+                            //     "option_value": item?.value_index,
+                            // },
+                            selectedCPO,
+                            dropdown: false,
+                        })
+                    })
+                }
+
                 break;
 
-            case "leftPO":
-                console.log("leftPO", item)
-                // for (let lp = 0; lp < this.state.leftEyeQuantity; lp++) {
-                // finalItemLeftPower.push()
-                // }
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemLeftPower: item,
-                        finalItemLeftPower: {
-                            "option_id": this.state.option_power?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
 
-            case "leftADD":
-                console.log("leftADD", item)
-
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemLeftADDITION: item,
-                        finalItemLeftADDITION: {
-                            "option_id": this.state.option_addition?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
-
-            case "leftCYL":
-                console.log("leftCYL", item)
-
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemLeftCYL: item,
-                        finalItemLeftCYL: {
-                            "option_id": this.state.option_cyl?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
-
-            case "leftAXES":
-                console.log("leftAXES", item)
-
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemLeftAXES: item,
-                        finalItemLeftAXES: {
-                            "option_id": this.state.option_axes?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
-
-            case "rightPA":
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemRightPackage: item, finalItemRightPackage: {
-                            "option_id": this.state.option_package_size?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
-
-            case "rightPO":
-                console.log("rightPO", item)
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemRightPower: item,
-                        finalItemRightPower: {
-                            "option_id": this.state.option_power?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
-
-            case "rightADD":
-                console.log("rightADD", item)
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemRightADDITION: item,
-                        finalItemRightADDITION: {
-                            "option_id": this.state.option_addition?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
-
-            case "rightCYL":
-                console.log("rightCYL", item)
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemRightCYL: item,
-                        finalItemRightCYL: {
-                            "option_id": this.state.option_cyl?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
-
-            case "rightAXES":
-                console.log("rightAXES", item)
-                setImmediate(() => {
-                    this.setState({
-                        selectedItemRightAXES: item,
-                        finalItemRightAXES: {
-                            "option_id": this.state.option_axes?.option_id,
-                            "option_value": item?.option_type_id
-                        }, dropdown: false,
-                    })
-                })
-                break;
 
         }
     }
 
-    openDropDown = (val, eyedir) => {
-        console.log(eyedir, val)
+    openDropDown = (val, title, eyedir, option_id) => {
+        // console.log(title, ":  ", val, ", ", eyedir)
         setImmediate(() => {
-            this.setState({ dropdown: !this.state.dropdown, optionSelected: val, eyedir: eyedir })
+            this.setState({ dropdown: !this.state.dropdown, optionSelected: { "val": val, "title": title, option_id: option_id }, eyedir: eyedir })
         })
     }
+
     dismissModal = (key) => {
         switch (key) {
             case "eye":
@@ -1320,1350 +1317,1455 @@ class ProductDetails extends Component {
             this.productImages("varient")
         }, 1000)
     }
+    // addToCart = (product, index) => {
+
+    //     var { userData } = this.props
+    //     console.log("userData", userData?.token)
+    //     setImmediate(() => {
+    //         this.setState({
+    //             cartLoader: true
+    //         })
+    //     })
+
+    //     // product_varient_selected
+    //     var productToSend = ''
+    //     // if (this.state.varient_selected == true) {
+    //     //     productToSend = this.state.product_varient_selected
+
+    //     // } else {
+
+    //     if (product?.type == undefined) {
+    //         product.type = product?.product_type
+    //     }
+
+    //     productToSend = product
+    //     // }
+    //     if (userData?.token !== null || userData?.user?.cartID !== undefined) {
+    //         console.log("productToSend?.type_id", productToSend)
+
+    //         if (productToSend?.type == "configurable" || productToSend?.type == "simple") {
+
+    //             if (this.state.product_details?.options?.length == 0) {
+
+    //                 let obj = {
+    //                     "cartItem": {
+    //                         "sku": productToSend?.sku,
+    //                         "qty": this.state.quantity,
+    //                         "name": productToSend?.name,
+    //                         "price": productToSend?.price,
+    //                         "product_type": productToSend?.type_id,
+    //                         "quote_id": userData?.user?.cartID
+    //                     }
+    //                 }
+    //                 console.log("this product does not have options", obj)
+
+    //                 this.addToCartApi(obj)
+
+    //             } else {
+    //                 console.log("this product has options")
+    //                 let obj = {}
+    //                 // if it has same power than merge quantity
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemRightADDITION).length == 0 && // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+
+    //                                     ],
+    //                                     "configurable_item_options": [
+    //                                         this.state.selectedCPO_AddToCart,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     console.log("Only Powers and same powers", this.state.selectedCPO_AddToCart)
+
+    //                     this.addToCartApi(obj)
+
+    //                     // let obj2 = {
+    //                     //     "cartItem": {
+    //                     //         "sku": productToSend?.sku,
+    //                     //         "qty": this.state.rightEyeQuantity,
+    //                     //         "name": productToSend?.name,
+    //                     //         "price": productToSend?.price,
+    //                     //         "product_type": productToSend?.type_id,
+    //                     //         "quote_id": userData?.user?.cartID,
+    //                     //         "product_option": {
+    //                     //             "extension_attributes": {
+    //                     //                 "custom_options": this.state.finalItemRightPower
+    //                     //             }
+    //                     //         }
+    //                     //     }
+    //                     // }
+
+    //                     // console.log("this product does have options finalItemLeftPower", obj2)
+
+    //                     // this.addToCartApi(obj2)
+
+    //                     console.log("this product does have options Same Power", obj)
+    //                 }
+
+    //                 // if powers are different
+    //                 if (this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemRightADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+
+
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": this.state.product_details?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightPower
+    //                                     ],
+    //                                     "configurable_item_options": [
+    //                                         this.state.selectedCPO_AddToCart,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                     console.log("")
+    //                     console.log('')
+    //                     console.log("---------------------------------------")
+    //                     console.log("Before Going to API")
+    //                     console.log("")
+    //                     console.log("this product does have options finalItemRightPower", obj)
+    //                     console.log("")
+    //                     console.log("this product does have options finalItemRightPower ProductOption", obj?.cartItem?.product_option?.extension_attributes)
+    //                     console.log("")
+    //                     console.log("---------------------------------------")
+    //                     console.log("")
+    //                     console.log('')
+    //                     this.addToCartApi(obj)
+
+    //                     let obj2 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": this.state.product_details?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower
+    //                                     ],
+    //                                     "configurable_item_options": [
+    //                                         this.state.selectedCPO_AddToCart,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                     console.log("")
+    //                     console.log('')
+    //                     console.log("---------------------------------------")
+    //                     console.log("Before Going to API")
+    //                     console.log("")
+    //                     console.log("this product does have options finalItemLeftPower", obj2)
+    //                     console.log("")
+    //                     console.log("this product does have options finalItemLeftPower ProductOption", obj2?.cartItem?.product_option?.extension_attributes)
+    //                     console.log("")
+    //                     console.log("---------------------------------------")
+    //                     console.log("")
+    //                     console.log('')
+    //                     this.addToCartApi(obj2)
+    //                 }
+
+    //                 // POWER AND PACKAGES
+
+
+    //                 // Power and packages both are same
+    //                 if (this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
+    //                     this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemRightADDITION).length == 0 &&  // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftPackage,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     console.log("this product does have options Same Power ANd Package", obj)
+    //                 }
+
+    //                 // Power and packages both are diff
+    //                 if (this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value &&
+    //                     Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftPackage,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightPower,
+    //                                         this.state.finalItemRightPackage,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+    //                     console.log("this product does not have options Same Power ANd Package", obj, obj1)
+    //                 }
+
+    //                 // if both Power same and packages both are diff
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value &&
+    //                     Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftPackage,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightPower,
+    //                                         this.state.finalItemRightPackage,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+
+    //                     console.log("this product has Same Power ANd diff Package", obj, obj1)
+    //                 }
+
+    //                 // if product has diff power and same packages
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value &&
+    //                     Object.keys(this.state.finalItemRightPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
+    //                     Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftPackage,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightPower,
+    //                                         this.state.finalItemRightPackage,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+
+    //                     console.log("this product has Same Power ANd diff Package", obj, obj1)
+    //                 }
+
+
+    //                 // Power And Addition
+    //                 // Power and addition both are same
+    //                 if (this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     this.state.finalItemLeftADDITION?.option_value == this.state.finalItemRightADDITION?.option_value &&
+    //                     Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 && // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftADDITION,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     console.log("this product does have options Same Power ANd ADDITION", obj)
+    //                 }
+
+    //                 // Power and ADDITION both are diff
+    //                 if (this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     this.state.finalItemLeftADDITION?.option_value !== this.state.finalItemRightADDITION?.option_value &&
+    //                     Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 && // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftADDITION,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightPower,
+    //                                         this.state.finalItemRightADDITION,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+    //                     console.log("this product does not have options Same Power ANd ADDITION", obj, obj1)
+    //                 }
+
+    //                 // if both Power same and packages both are diff
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     this.state.finalItemLeftADDITION?.option_value !== this.state.finalItemRightADDITION?.option_value &&
+    //                     Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 &&  // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftADDITION,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightPower,
+    //                                         this.state.finalItemRightADDITION,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+
+    //                     console.log("this product has Same Power ANd diff ADDITION", obj, obj1)
+    //                 }
+
+    //                 // if product has diff power and same ADDITION
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     this.state.finalItemLeftADDITION?.option_value == this.state.finalItemRightADDITION?.option_value &&
+    //                     Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 &&  // because upper condition was running of Power and Packages
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftPower,
+    //                                         this.state.finalItemLeftADDITION,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightPower,
+    //                                         this.state.finalItemRightADDITION,
+
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+
+    //                     console.log("this product has Same Power ANd diff ADDITION", obj, obj1)
+    //                 }
+
+    //                 // conditions to put for AXES & CYL & POWER
+
+    //                 // AXES left/right Equal then && CYL (left/right not equal)1d / (left/right equal)2d &&  Power (left/right not equal)3d / (left/right equal)4d
+    //                 // AXES left/right not Equal then && CYL (left/right not equal)5d / (left/right equal)6 &&  Power (left/right not equal)7d / (left/right equal)8
+
+    //                 // CYL left/right Equal then && AXES (left/right not equal)9d / (left/right equal)10d && Power (left/right not equal)11d / (left/right equal)12d
+    //                 // CYL left/right not Equal then && AXES (left/right not equal)13d/ (left/right equal)14d && Power (left/right not equal)15d / (left/right equal)16d
+
+    //                 // POWER left/right Equal then && AXES (left/right not equal)17d / (left/right equal)18d && CYL (left/right not equal)19d / (left/right equal)20d
+    //                 // POWER left/right not Equal then && AXES (left/right not equal)21d / (left/right equal)22d && CYL (left/right not equal)23d / (left/right equal)24d
+
+
+    //                 // if Axes  left/right is equal with each other && CYL left/right is not equal with each other && POWER left/right is not equal with each other
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
+    //                     this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftAXES,
+    //                                         this.state.finalItemLeftCYL,
+    //                                         this.state.finalItemLeftPower,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightAXES,
+    //                                         this.state.finalItemRightCYL,
+    //                                         this.state.finalItemRightPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+
+    //                     console.log("this product has Same AXES ANd diff CYL AND diff Power", obj, obj1)
+    //                 }
+
+    //                 // if Axes  left/right is equal with each other && CYL left/right is equal with each other && POWER left/right is equal with each other
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
+    //                     this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftAXES,
+    //                                         this.state.finalItemLeftCYL,
+    //                                         this.state.finalItemLeftPower,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     console.log("this product has Same AXES, CYL And Power", obj)
+    //                 }
+
+
+    //                 // if Axes  left/right is not equal with each other && CYL left/right is not equal with each other && POWER left/right is not equal with each other
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
+    //                     this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftAXES,
+    //                                         this.state.finalItemLeftCYL,
+    //                                         this.state.finalItemLeftPower,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightAXES,
+    //                                         this.state.finalItemRightCYL,
+    //                                         this.state.finalItemRightPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+
+    //                     console.log("this product has diff AXES, CYL AND Power", obj, obj1)
+    //                 }
+
+
+    //                 // if CYL left/right is equal with each other  && AXES left/right is not equal with each other && POWER left/right is not equal with each other
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
+    //                     this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftAXES,
+    //                                         this.state.finalItemLeftCYL,
+    //                                         this.state.finalItemLeftPower,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightAXES,
+    //                                         this.state.finalItemRightCYL,
+    //                                         this.state.finalItemRightPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+    //                     console.log("this product has same CYL but diff AXES AND Power", obj, obj1)
+    //                 }
+
+    //                 // if CYL left/right is not equal with each other  && AXES left/right is equal with each other && POWER left/right is equal with each other
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
+    //                     this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftAXES,
+    //                                         this.state.finalItemLeftCYL,
+    //                                         this.state.finalItemLeftPower,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightAXES,
+    //                                         this.state.finalItemRightCYL,
+    //                                         this.state.finalItemRightPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+    //                     console.log("this product has same AXES and Power but diff CYL", obj, obj1)
+    //                 }
+    //                 // if POWER left/right is not equal with each other  && AXES left/right is equal with each other && CYL left/right is equal with each other
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
+    //                     this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
+    //                     this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftAXES,
+    //                                         this.state.finalItemLeftCYL,
+    //                                         this.state.finalItemLeftPower,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightAXES,
+    //                                         this.state.finalItemRightCYL,
+    //                                         this.state.finalItemRightPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+    //                     console.log("this product has same Power but diff CYL and AXES", obj, obj1)
+    //                 }
+
+    //                 // if POWER left/right is not equal with each other  && AXES left/right is equal with each other && CYL left/right is equal with each other
+    //                 if (
+    //                     this.state.checked == true &&
+    //                     this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
+    //                     this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
+    //                     this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
+    //                     Object.keys(this.state.finalItemRightCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.leftEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemLeftAXES,
+    //                                         this.state.finalItemLeftCYL,
+    //                                         this.state.finalItemLeftPower,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj)
+
+    //                     let obj1 = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.rigthEyeQuantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemRightAXES,
+    //                                         this.state.finalItemRightCYL,
+    //                                         this.state.finalItemRightPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     this.addToCartApi(obj1)
+
+    //                     console.log("this product has diff Power but same CYL and AXES", obj, obj1)
+    //                 }
+
+    //                 // Whole Product Options
+
+    //                 // PACKAGE SIZE && POWER
+
+    //                 if (
+    //                     this.state.checked == false &&
+    //                     this.state.option_power !== null &&
+    //                     this.state.option_package_size !== null &&
+    //                     Object.keys(this.state.finalItemPower).length !== 0 &&
+    //                     Object.keys(this.state.finalItemPackage).length !== 0 &&
+    //                     Object.keys(this.state.finalItemADDITION).length == 0   // because upper condition was running of Power and Packages
+
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.quantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemPackage,
+    //                                         this.state.finalItemPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     console.log("this product does have options finalItemPackage&Power", obj?.cartItem?.product_option?.extension_attributes)
+
+    //                     this.addToCartApi(obj)
+    //                 }
+
+
+    //                 // when there is only power
+    //                 if (
+    //                     this.state.checked == false &&
+    //                     this.state.option_power !== null &&
+    //                     this.state.option_package_size == null &&
+    //                     this.state.option_addition == null &&
+    //                     this.state.option_axes == null &&
+    //                     this.state.option_cyl == null &&
+    //                     Object.keys(this.state.finalItemPower).length !== 0 &&
+    //                     Object.keys(this.state.finalItemADDITION).length == 0   // because upper condition was running of Power and Packages
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.quantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                     // {
+    //                     //     "cartItem": {
+    //                     //         "sku": "Air-Optix-Plus-HydraGlyde",
+    //                     //         "qty": 2,
+    //                     //         "name": "Air Optix Plus HydraGlyde",
+    //                     //         "price": 195,
+    //                     //         "product_type": "simple",
+    //                     //         "quote_id": "135",
+    //                     //         "product_option": {
+    //                     //             "extension_attributes": {
+    //                     //                 "custom_options": [
+    //                     //                     {
+    //                     //                         "option_id": 74,
+    //                     //                         "option_value": 860
+    //                     //                     },
+    //                     //                     {
+    //                     //                         "option_id": 75,
+    //                     //                         "option_value": 861
+    //                     //                     }
+    //                     //                 ]
+    //                     //             }
+    //                     //         }
+    //                     //     }
+    //                     // }
+    //                     // { "cartItem": { "name": "Bio True 1-Day for Astigmatism", "price": 200, "product_option": { "extension_attributes": [{"option_id": 84, "option_value": 933}] }, "product_type": "simple", "qty": 2, "quote_id": 2848, "sku": "BT30-Astigmatism" } }
+
+    //                     console.log("this product does have options finalItemPower", obj?.cartItem?.product_option?.extension_attributes)
+
+    //                     this.addToCartApi(obj)
+
+    //                 }
+
+    //                 // when there is only package
+    //                 if (
+    //                     this.state.checked == false &&
+    //                     this.state.option_power == null &&
+    //                     this.state.option_package_size !== null &&
+    //                     this.state.option_addition == null &&
+    //                     this.state.option_axes == null &&
+    //                     this.state.option_cyl == null &&
+    //                     Object.keys(this.state.finalItemPackage).length !== 0
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.quantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemPackage
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     console.log("this product does have options finalItemPower", obj)
+
+    //                     this.addToCartApi(obj)
+
+    //                 }
+
+    //                 // Power && Addition
+    //                 if (
+    //                     this.state.checked == false &&
+    //                     this.state.option_power !== null &&
+    //                     this.state.option_addition !== null &&
+    //                     Object.keys(this.state.finalItemPower).length !== 0 &&
+    //                     Object.keys(this.state.finalItemADDITION).length !== 0 &&
+    //                     Object.keys(this.state.finalItemPackage).length == 0   // because upper condition was running of Power and Packages
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.quantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemADDITION,
+    //                                         this.state.finalItemPower
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     console.log("this product does have options finalItemAddition&Power", obj?.cartItem?.product_option?.extension_attributes)
+
+    //                     this.addToCartApi(obj)
+    //                 }
+
+    //                 // Power && CYL && AXES
+    //                 if (
+    //                     this.state.checked == false &&
+    //                     this.state.option_power !== null &&
+    //                     this.state.option_axes !== null &&
+    //                     this.state.option_cyl !== null &&
+    //                     this.state.option_addition == null &&
+    //                     Object.keys(this.state.finalItemPower).length !== 0 &&
+    //                     Object.keys(this.state.finalItemADDITION).length == 0 &&
+    //                     Object.keys(this.state.finalItemPackage).length == 0   // because upper condition was running of Power and Packages
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.quantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemPower,
+    //                                         this.state.finalItemCYL,
+    //                                         this.state.finalItemAXES,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     console.log("this product does have options finalItemPOwer&CYL&AXES", obj?.cartItem?.product_option?.extension_attributes)
+
+    //                     this.addToCartApi(obj)
+    //                 }
+
+    //                 // Power && CYL 
+    //                 if (
+    //                     this.state.checked == false &&
+    //                     this.state.option_power !== null &&
+    //                     this.state.option_axes == null &&
+    //                     this.state.option_cyl !== null &&
+    //                     this.state.option_addition == null &&
+    //                     Object.keys(this.state.finalItemPower).length !== 0 &&
+    //                     Object.keys(this.state.finalItemADDITION).length == 0 &&
+    //                     Object.keys(this.state.finalItemAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemPackage).length == 0   // because upper condition was running of Power and Packages
+    //                 ) {
+    //                     obj = {
+    //                         "cartItem": {
+    //                             "sku": productToSend?.sku,
+    //                             "qty": this.state.quantity,
+    //                             "name": productToSend?.name,
+    //                             "price": productToSend?.price,
+    //                             "product_type": productToSend?.type_id,
+    //                             "quote_id": userData?.user?.cartID,
+    //                             "product_option": {
+    //                                 "extension_attributes": {
+    //                                     "custom_options": [
+    //                                         this.state.finalItemPower,
+    //                                         this.state.finalItemCYL,
+    //                                     ]
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+
+    //                     console.log("this product does have options finalItemPOwer&CYL", obj?.cartItem?.product_option?.extension_attributes)
+
+    //                     this.addToCartApi(obj)
+    //                 }
+
+    //                 // when all conditions are null
+    //                 if (
+    //                     Object.keys(this.state.finalItemPower).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftPower).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightPower).length == 0 &&
+    //                     Object.keys(this.state.finalItemADDITION).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftADDITION).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightADDITION).length == 0 &&
+    //                     Object.keys(this.state.finalItemPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightPackage).length == 0 &&
+    //                     Object.keys(this.state.finalItemAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightAXES).length == 0 &&
+    //                     Object.keys(this.state.finalItemLeftCYL).length == 0 &&
+    //                     Object.keys(this.state.finalItemRightCYL).length == 0
+    //                     // &&
+    //                     // this.state.product_details?.options.length !== 0
+    //                 ) {
+    //                     setImmediate(() => {
+    //                         this.setState({
+    //                             cartLoader: false
+    //                         })
+    //                     })
+    //                     return alert("Please select Options for product")
+    //                 }
+
+    //             }
+
+    //         } else {
+    //             setImmediate(() => {
+    //                 this.setState({
+    //                     cartLoader: false
+    //                 })
+    //             })
+    //             // this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+    //             return alert("Please select a Product varient color!")
+    //         }
+
+    //     }
+
+    //     else {
+    //         alert("Please Login to your account first!")
+    //         setImmediate(() => {
+    //             this.setState({
+    //                 cartLoader: false
+    //             })
+    //         })
+    //         this.props.navigation.navigate("Account", { modal: "open" })
+    //     }
+
+    // }
+
     addToCart = (product, index) => {
 
-        var { userData } = this.props
-        console.log("userData", userData?.token)
-        setImmediate(() => {
-            this.setState({
-                cartLoader: true
-            })
-        })
+        var { userData: { token, user: { cartID } } } = this.props
 
-        // product_varient_selected
-        var productToSend = ''
-        // if (this.state.varient_selected == true) {
-        //     productToSend = this.state.product_varient_selected
+        if (this.state.product_details?.options?.length == 0) {
 
-        // } else {
+            let obj = {
+                "cartItem": {
+                    "sku": product?.sku,
+                    "qty": this.state.quantity,
+                    "name": product?.name,
+                    "price": product?.price,
+                    "product_type": product?.type_id,
+                    "quote_id": cartID
+                }
+            }
+            console.log("this product does not have options", obj)
 
-        if (product?.type == undefined) {
-            product.type = product?.product_type
-        }
+            this.addToCartApi(obj)
 
-        productToSend = product
-        // }
-        if (userData?.token !== null || userData?.user?.cartID !== undefined) {
-            console.log("productToSend?.type_id", productToSend)
+        } else {
+            let obj = {}
+            console.log("this.state.checked", typeof this.state.checked)
+            if (this.state.checked == true) {
 
-            if (productToSend?.type == "configurable" || productToSend?.type == "simple") {
+                console.log("Reached Here")
 
-                if (this.state.product_details?.options?.length == 0) {
-
-                    let obj = {
+                if (this.state.custom_options_left.length !== 0 && this.state.custom_options_right.length !== 0) {
+                    obj = {
                         "cartItem": {
-                            "sku": productToSend?.sku,
-                            "qty": this.state.quantity,
-                            "name": productToSend?.name,
-                            "price": productToSend?.price,
-                            "product_type": productToSend?.type_id,
-                            "quote_id": userData?.user?.cartID
+                            "sku": product?.sku,
+                            "qty": this.state.leftEyeQuantity,
+                            "name": product?.name,
+                            "price": product?.price,
+                            "product_type": product?.type_id,
+                            "quote_id": cartID,
+                            "product_option": {
+                                "extension_attributes": {
+                                    "custom_options": this.state.custom_options_left,
+
+                                }
+                            }
                         }
                     }
-                    console.log("this product does not have options", obj)
+                    console.log("obj for left", obj?.cartItem?.product_option?.extension_attributes)
 
                     this.addToCartApi(obj)
 
+                    obj = {
+                        "cartItem": {
+                            "sku": product?.sku,
+                            "qty": this.state.rigthEyeQuantity,
+                            "name": product?.name,
+                            "price": product?.price,
+                            "product_type": product?.type_id,
+                            "quote_id": cartID,
+                            "product_option": {
+                                "extension_attributes": {
+                                    "custom_options": this.state.custom_options_right,
+
+                                }
+                            }
+                        }
+                    }
+                    console.log("obj for right", obj?.cartItem?.product_option?.extension_attributes)
+
+                    this.addToCartApi(obj)
                 } else {
-                    console.log("this product has options")
-                    let obj = {}
-                    // if it has same power than merge quantity
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemRightPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-
-                                        ],
-                                        "configurable_item_options": [
-                                            this.state.selectedCPO_AddToCart,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        console.log("Only Powers and same powers", this.state.selectedCPO_AddToCart)
-
-                        this.addToCartApi(obj)
-
-                        // let obj2 = {
-                        //     "cartItem": {
-                        //         "sku": productToSend?.sku,
-                        //         "qty": this.state.rightEyeQuantity,
-                        //         "name": productToSend?.name,
-                        //         "price": productToSend?.price,
-                        //         "product_type": productToSend?.type_id,
-                        //         "quote_id": userData?.user?.cartID,
-                        //         "product_option": {
-                        //             "extension_attributes": {
-                        //                 "custom_options": this.state.finalItemRightPower
-                        //             }
-                        //         }
-                        //     }
-                        // }
-
-                        // console.log("this product does have options finalItemLeftPower", obj2)
-
-                        // this.addToCartApi(obj2)
-
-                        console.log("this product does have options Same Power", obj)
-                    }
-
-                    // if powers are different
-                    if (this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemRightPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemRightPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-
-
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": this.state.product_details?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightPower
-                                        ],
-                                        "configurable_item_options": [
-                                            this.state.selectedCPO_AddToCart,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                        console.log("")
-                        console.log('')
-                        console.log("---------------------------------------")
-                        console.log("Before Going to API")
-                        console.log("")
-                        console.log("this product does have options finalItemRightPower", obj)
-                        console.log("")
-                        console.log("this product does have options finalItemRightPower ProductOption", obj?.cartItem?.product_option?.extension_attributes)
-                        console.log("")
-                        console.log("---------------------------------------")
-                        console.log("")
-                        console.log('')
-                        this.addToCartApi(obj)
-
-                        let obj2 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": this.state.product_details?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower
-                                        ],
-                                        "configurable_item_options": [
-                                            this.state.selectedCPO_AddToCart,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                        console.log("")
-                        console.log('')
-                        console.log("---------------------------------------")
-                        console.log("Before Going to API")
-                        console.log("")
-                        console.log("this product does have options finalItemLeftPower", obj2)
-                        console.log("")
-                        console.log("this product does have options finalItemLeftPower ProductOption", obj2?.cartItem?.product_option?.extension_attributes)
-                        console.log("")
-                        console.log("---------------------------------------")
-                        console.log("")
-                        console.log('')
-                        this.addToCartApi(obj2)
-                    }
-
-                    // POWER AND PACKAGES
-
-
-                    // Power and packages both are same
-                    if (this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
-                        this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftPackage,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        console.log("this product does have options Same Power ANd Package", obj)
-                    }
-
-                    // Power and packages both are diff
-                    if (this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value &&
-                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftPackage,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightPower,
-                                            this.state.finalItemRightPackage,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-                        console.log("this product does not have options Same Power ANd Package", obj, obj1)
-                    }
-
-                    // if both Power same and packages both are diff
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        this.state.finalItemLeftPackage?.option_value !== this.state.finalItemRightPackage?.option_value &&
-                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftPackage,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightPower,
-                                            this.state.finalItemRightPackage,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-
-                        console.log("this product has Same Power ANd diff Package", obj, obj1)
-                    }
-
-                    // if product has diff power and same packages
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        this.state.finalItemLeftPackage?.option_value == this.state.finalItemRightPackage?.option_value &&
-                        Object.keys(this.state.finalItemRightPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&  // because lower condition was running of Power and ADDITION
-                        Object.keys(this.state.finalItemRightADDITION).length == 0 && // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftPackage,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightPower,
-                                            this.state.finalItemRightPackage,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-
-                        console.log("this product has Same Power ANd diff Package", obj, obj1)
-                    }
-
-
-                    // Power And Addition
-                    // Power and addition both are same
-                    if (this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        this.state.finalItemLeftADDITION?.option_value == this.state.finalItemRightADDITION?.option_value &&
-                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0 && // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity + this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftADDITION,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        console.log("this product does have options Same Power ANd ADDITION", obj)
-                    }
-
-                    // Power and ADDITION both are diff
-                    if (this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        this.state.finalItemLeftADDITION?.option_value !== this.state.finalItemRightADDITION?.option_value &&
-                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0 && // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftADDITION,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightPower,
-                                            this.state.finalItemRightADDITION,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-                        console.log("this product does not have options Same Power ANd ADDITION", obj, obj1)
-                    }
-
-                    // if both Power same and packages both are diff
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        this.state.finalItemLeftADDITION?.option_value !== this.state.finalItemRightADDITION?.option_value &&
-                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftADDITION,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightPower,
-                                            this.state.finalItemRightADDITION,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-
-                        console.log("this product has Same Power ANd diff ADDITION", obj, obj1)
-                    }
-
-                    // if product has diff power and same ADDITION
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        this.state.finalItemLeftADDITION?.option_value == this.state.finalItemRightADDITION?.option_value &&
-                        Object.keys(this.state.finalItemRightADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemRightPackage).length == 0 &&  // because upper condition was running of Power and Packages
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftPower,
-                                            this.state.finalItemLeftADDITION,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightPower,
-                                            this.state.finalItemRightADDITION,
-
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-
-                        console.log("this product has Same Power ANd diff ADDITION", obj, obj1)
-                    }
-
-                    // conditions to put for AXES & CYL & POWER
-
-                    // AXES left/right Equal then && CYL (left/right not equal)1d / (left/right equal)2d &&  Power (left/right not equal)3d / (left/right equal)4d
-                    // AXES left/right not Equal then && CYL (left/right not equal)5d / (left/right equal)6 &&  Power (left/right not equal)7d / (left/right equal)8
-
-                    // CYL left/right Equal then && AXES (left/right not equal)9d / (left/right equal)10d && Power (left/right not equal)11d / (left/right equal)12d
-                    // CYL left/right not Equal then && AXES (left/right not equal)13d/ (left/right equal)14d && Power (left/right not equal)15d / (left/right equal)16d
-
-                    // POWER left/right Equal then && AXES (left/right not equal)17d / (left/right equal)18d && CYL (left/right not equal)19d / (left/right equal)20d
-                    // POWER left/right not Equal then && AXES (left/right not equal)21d / (left/right equal)22d && CYL (left/right not equal)23d / (left/right equal)24d
-
-
-                    // if Axes  left/right is equal with each other && CYL left/right is not equal with each other && POWER left/right is not equal with each other
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
-                        this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftAXES,
-                                            this.state.finalItemLeftCYL,
-                                            this.state.finalItemLeftPower,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightAXES,
-                                            this.state.finalItemRightCYL,
-                                            this.state.finalItemRightPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-
-                        console.log("this product has Same AXES ANd diff CYL AND diff Power", obj, obj1)
-                    }
-
-                    // if Axes  left/right is equal with each other && CYL left/right is equal with each other && POWER left/right is equal with each other
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
-                        this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftAXES,
-                                            this.state.finalItemLeftCYL,
-                                            this.state.finalItemLeftPower,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        console.log("this product has Same AXES, CYL And Power", obj)
-                    }
-
-
-                    // if Axes  left/right is not equal with each other && CYL left/right is not equal with each other && POWER left/right is not equal with each other
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
-                        this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftAXES,
-                                            this.state.finalItemLeftCYL,
-                                            this.state.finalItemLeftPower,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightAXES,
-                                            this.state.finalItemRightCYL,
-                                            this.state.finalItemRightPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-
-                        console.log("this product has diff AXES, CYL AND Power", obj, obj1)
-                    }
-
-
-                    // if CYL left/right is equal with each other  && AXES left/right is not equal with each other && POWER left/right is not equal with each other
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
-                        this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftAXES,
-                                            this.state.finalItemLeftCYL,
-                                            this.state.finalItemLeftPower,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightAXES,
-                                            this.state.finalItemRightCYL,
-                                            this.state.finalItemRightPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-                        console.log("this product has same CYL but diff AXES AND Power", obj, obj1)
-                    }
-
-                    // if CYL left/right is not equal with each other  && AXES left/right is equal with each other && POWER left/right is equal with each other
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
-                        this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftAXES,
-                                            this.state.finalItemLeftCYL,
-                                            this.state.finalItemLeftPower,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightAXES,
-                                            this.state.finalItemRightCYL,
-                                            this.state.finalItemRightPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-                        console.log("this product has same AXES and Power but diff CYL", obj, obj1)
-                    }
-                    // if POWER left/right is not equal with each other  && AXES left/right is equal with each other && CYL left/right is equal with each other
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftAXES?.option_value == this.state.finalItemRightAXES?.option_value &&
-                        this.state.finalItemLeftCYL?.option_value == this.state.finalItemRightCYL?.option_value &&
-                        this.state.finalItemLeftPower?.option_value !== this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftAXES,
-                                            this.state.finalItemLeftCYL,
-                                            this.state.finalItemLeftPower,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightAXES,
-                                            this.state.finalItemRightCYL,
-                                            this.state.finalItemRightPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-                        console.log("this product has same Power but diff CYL and AXES", obj, obj1)
-                    }
-
-                    // if POWER left/right is not equal with each other  && AXES left/right is equal with each other && CYL left/right is equal with each other
-                    if (
-                        this.state.checked == true &&
-                        this.state.finalItemLeftAXES?.option_value !== this.state.finalItemRightAXES?.option_value &&
-                        this.state.finalItemLeftCYL?.option_value !== this.state.finalItemRightCYL?.option_value &&
-                        this.state.finalItemLeftPower?.option_value == this.state.finalItemRightPower?.option_value &&
-                        Object.keys(this.state.finalItemRightCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length !== 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length !== 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.leftEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemLeftAXES,
-                                            this.state.finalItemLeftCYL,
-                                            this.state.finalItemLeftPower,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj)
-
-                        let obj1 = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.rigthEyeQuantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemRightAXES,
-                                            this.state.finalItemRightCYL,
-                                            this.state.finalItemRightPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        this.addToCartApi(obj1)
-
-                        console.log("this product has diff Power but same CYL and AXES", obj, obj1)
-                    }
-
-                    // Whole Product Options
-
-                    // PACKAGE SIZE && POWER
-
-                    if (
-                        this.state.checked == false &&
-                        this.state.option_power !== null &&
-                        this.state.option_package_size !== null &&
-                        Object.keys(this.state.finalItemPower).length !== 0 &&
-                        Object.keys(this.state.finalItemPackage).length !== 0 &&
-                        Object.keys(this.state.finalItemADDITION).length == 0   // because upper condition was running of Power and Packages
-
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.quantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemPackage,
-                                            this.state.finalItemPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        console.log("this product does have options finalItemPackage&Power", obj?.cartItem?.product_option?.extension_attributes)
-
-                        this.addToCartApi(obj)
-                    }
-
-
-                    // when there is only power
-                    if (
-                        this.state.checked == false &&
-                        this.state.option_power !== null &&
-                        this.state.option_package_size == null &&
-                        this.state.option_addition == null &&
-                        this.state.option_axes == null &&
-                        this.state.option_cyl == null &&
-                        Object.keys(this.state.finalItemPower).length !== 0 &&
-                        Object.keys(this.state.finalItemADDITION).length == 0   // because upper condition was running of Power and Packages
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.quantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                        // {
-                        //     "cartItem": {
-                        //         "sku": "Air-Optix-Plus-HydraGlyde",
-                        //         "qty": 2,
-                        //         "name": "Air Optix Plus HydraGlyde",
-                        //         "price": 195,
-                        //         "product_type": "simple",
-                        //         "quote_id": "135",
-                        //         "product_option": {
-                        //             "extension_attributes": {
-                        //                 "custom_options": [
-                        //                     {
-                        //                         "option_id": 74,
-                        //                         "option_value": 860
-                        //                     },
-                        //                     {
-                        //                         "option_id": 75,
-                        //                         "option_value": 861
-                        //                     }
-                        //                 ]
-                        //             }
-                        //         }
-                        //     }
-                        // }
-                        // { "cartItem": { "name": "Bio True 1-Day for Astigmatism", "price": 200, "product_option": { "extension_attributes": [{"option_id": 84, "option_value": 933}] }, "product_type": "simple", "qty": 2, "quote_id": 2848, "sku": "BT30-Astigmatism" } }
-
-                        console.log("this product does have options finalItemPower", obj?.cartItem?.product_option?.extension_attributes)
-
-                        this.addToCartApi(obj)
-
-                    }
-
-                    // when there is only package
-                    if (
-                        this.state.checked == false &&
-                        this.state.option_power == null &&
-                        this.state.option_package_size !== null &&
-                        this.state.option_addition == null &&
-                        this.state.option_axes == null &&
-                        this.state.option_cyl == null &&
-                        Object.keys(this.state.finalItemPackage).length !== 0
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.quantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemPackage
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        console.log("this product does have options finalItemPower", obj)
-
-                        this.addToCartApi(obj)
-
-                    }
-
-                    // Power && Addition
-                    if (
-                        this.state.checked == false &&
-                        this.state.option_power !== null &&
-                        this.state.option_addition !== null &&
-                        Object.keys(this.state.finalItemPower).length !== 0 &&
-                        Object.keys(this.state.finalItemADDITION).length !== 0 &&
-                        Object.keys(this.state.finalItemPackage).length == 0   // because upper condition was running of Power and Packages
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.quantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemADDITION,
-                                            this.state.finalItemPower
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        console.log("this product does have options finalItemAddition&Power", obj?.cartItem?.product_option?.extension_attributes)
-
-                        this.addToCartApi(obj)
-                    }
-
-                    // Power && CYL && AXES
-                    if (
-                        this.state.checked == false &&
-                        this.state.option_power !== null &&
-                        this.state.option_axes !== null &&
-                        this.state.option_cyl !== null &&
-                        this.state.option_addition == null &&
-                        Object.keys(this.state.finalItemPower).length !== 0 &&
-                        Object.keys(this.state.finalItemADDITION).length == 0 &&
-                        Object.keys(this.state.finalItemPackage).length == 0   // because upper condition was running of Power and Packages
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.quantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemPower,
-                                            this.state.finalItemCYL,
-                                            this.state.finalItemAXES,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        console.log("this product does have options finalItemPOwer&CYL&AXES", obj?.cartItem?.product_option?.extension_attributes)
-
-                        this.addToCartApi(obj)
-                    }
-
-                    // Power && CYL 
-                    if (
-                        this.state.checked == false &&
-                        this.state.option_power !== null &&
-                        this.state.option_axes == null &&
-                        this.state.option_cyl !== null &&
-                        this.state.option_addition == null &&
-                        Object.keys(this.state.finalItemPower).length !== 0 &&
-                        Object.keys(this.state.finalItemADDITION).length == 0 &&
-                        Object.keys(this.state.finalItemAXES).length == 0 &&
-                        Object.keys(this.state.finalItemPackage).length == 0   // because upper condition was running of Power and Packages
-                    ) {
-                        obj = {
-                            "cartItem": {
-                                "sku": productToSend?.sku,
-                                "qty": this.state.quantity,
-                                "name": productToSend?.name,
-                                "price": productToSend?.price,
-                                "product_type": productToSend?.type_id,
-                                "quote_id": userData?.user?.cartID,
-                                "product_option": {
-                                    "extension_attributes": {
-                                        "custom_options": [
-                                            this.state.finalItemPower,
-                                            this.state.finalItemCYL,
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-
-                        console.log("this product does have options finalItemPOwer&CYL", obj?.cartItem?.product_option?.extension_attributes)
-
-                        this.addToCartApi(obj)
-                    }
-
-                    // when all conditions are null
-                    if (
-                        Object.keys(this.state.finalItemPower).length == 0 &&
-                        Object.keys(this.state.finalItemLeftPower).length == 0 &&
-                        Object.keys(this.state.finalItemRightPower).length == 0 &&
-                        Object.keys(this.state.finalItemADDITION).length == 0 &&
-                        Object.keys(this.state.finalItemLeftADDITION).length == 0 &&
-                        Object.keys(this.state.finalItemRightADDITION).length == 0 &&
-                        Object.keys(this.state.finalItemPackage).length == 0 &&
-                        Object.keys(this.state.finalItemLeftPackage).length == 0 &&
-                        Object.keys(this.state.finalItemRightPackage).length == 0 &&
-                        Object.keys(this.state.finalItemAXES).length == 0 &&
-                        Object.keys(this.state.finalItemCYL).length == 0 &&
-                        Object.keys(this.state.finalItemLeftAXES).length == 0 &&
-                        Object.keys(this.state.finalItemRightAXES).length == 0 &&
-                        Object.keys(this.state.finalItemLeftCYL).length == 0 &&
-                        Object.keys(this.state.finalItemRightCYL).length == 0
-                        // &&
-                        // this.state.product_details?.options.length !== 0
-                    ) {
-                        setImmediate(() => {
-                            this.setState({
-                                cartLoader: false
-                            })
-                        })
-                        return alert("Please select Options for product")
-                    }
-
+                    alert("Please Select Values for Left and Right Eye")
                 }
 
             } else {
-                setImmediate(() => {
-                    this.setState({
-                        cartLoader: false
-                    })
-                })
-                // this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                return alert("Please select a Product varient color!")
+                if (this.state.custom_options.length !== 0) {
+
+                    obj = {
+                        "cartItem": {
+                            "sku": product?.sku,
+                            "qty": this.state.quantity,
+                            "name": product?.name,
+                            "price": product?.price,
+                            "product_type": product?.type,
+                            "quote_id": cartID,
+                            "product_option": {
+                                "extension_attributes": {
+                                    "custom_options": this.state.custom_options,
+
+                                }
+                            }
+                        }
+                    }
+
+                    console.log("when checked false  obj", obj?.cartItem?.product_option?.extension_attributes)
+                    this.addToCartApi(obj)
+                } else {
+                    alert("Select Options for Product")
+                }
+
             }
 
+
         }
 
-        else {
-            alert("Please Login to your account first!")
-            setImmediate(() => {
-                this.setState({
-                    cartLoader: false
-                })
-            })
-            this.props.navigation.navigate("Account", { modal: "open" })
-        }
 
     }
 
@@ -2673,9 +2775,9 @@ class ProductDetails extends Component {
         console.log("---------------------------------------")
         console.log("Before Going to API in FUnc")
         console.log("")
-        console.log("this product does have options finalItemLeftPower", obj)
+        console.log("this product does have options ", obj)
         console.log("")
-        console.log("this product does have options finalItemLeftPower ProductOption", obj?.cartItem?.product_option?.extension_attributes)
+        console.log("obj extension_attributes", obj?.cartItem?.product_option?.extension_attributes)
         console.log("")
         console.log("---------------------------------------")
         console.log("")
@@ -2715,64 +2817,45 @@ class ProductDetails extends Component {
         })
     }
 
-    setWholeItemSelected = (item, key) => {
-        switch (key) {
-            case "POWER":
-                setImmediate(() => {
-                    this.setState({
-                        finalItemPower: {
-                            "option_id": this.state.option_power?.option_id,
-                            "option_value": item?.option_type_id
-                        }
-                    })
-                })
-                break;
+    setWholeItemSelected = async (item, option_id) => {
 
-            case "PACKAGE SIZE":
-                setImmediate(() => {
-                    this.setState({
-                        finalItemPackage: {
-                            "option_id": this.state.option_package_size?.option_id,
-                            "option_value": item?.option_type_id
-                        }
-                    })
-                })
-                break;
-
-            case "ADDITION":
-                setImmediate(() => {
-                    this.setState({
-                        finalItemADDITION: {
-                            "option_id": this.state.option_addition?.option_id,
-                            "option_value": item?.option_type_id
-                        }
-                    })
-                })
-                break;
-
-            case "CYL":
-                setImmediate(() => {
-                    this.setState({
-                        finalItemCYL: {
-                            "option_id": this.state.option_cyl?.option_id,
-                            "option_value": item?.option_type_id
-                        }
-                    })
-                })
-                break;
-
-            case "AXES":
-                setImmediate(() => {
-                    this.setState({
-                        finalItemAXES: {
-                            "option_id": this.state.option_axes?.option_id,
-                            "option_value": item?.option_type_id
-                        }
-                    })
-                })
-                break;
-
+        var { custom_options, option_selected } = this.state
+        let obj = {
+            "option_id": option_id,
+            "option_value": item?.option_type_id,
         }
+        // console.log("setWholeItemSelected", obj, option_id)
+        // custom_options.push(obj)
+        var check_already_selected_options = ""
+        var temp = custom_options.filter((val, index) => {
+            if (val?.option_id == option_id) {
+                check_already_selected_options = { "value": val, "index": index }
+            }
+        })
+
+        // console.log("check_already_selected_options", check_already_selected_options)
+
+        // if option_id already exist for example for Power it will replace it with new if users selects new value
+        if (option_id == check_already_selected_options?.value?.option_id) {
+
+            custom_options.splice(check_already_selected_options?.index, 1)
+            custom_options.push(obj)
+            setImmediate(() => {
+                this.setState({
+                    custom_options,
+                })
+            });
+        } else {
+            custom_options.push(obj)
+
+            setImmediate(() => {
+                this.setState({
+                    custom_options,
+                })
+            });
+        }
+        console.log("custom_options", custom_options)
+
     }
 
 
@@ -2808,7 +2891,7 @@ class ProductDetails extends Component {
             <View style={styles.mainContainer}>
                 {this.state.loader && <Loading />}
                 {/* Header */}
-                <HomeHeader />
+                <HomeHeader navProps={this.props.navigation} />
 
                 <ScrollView
                     showsVerticalScrollIndicator={false}
@@ -2926,6 +3009,16 @@ class ProductDetails extends Component {
                     <Options
                         configurable_product_options={this.state.configurable_product_options}
                         checkMarked={(val) => this.checkMarked(val)}
+                        product_options={this.state.product_options}
+                        leftEyeQuantity={this.state.leftEyeQuantity}
+                        rigthEyeQuantity={this.state.rigthEyeQuantity}
+                        dropdown={this.state.dropdown}
+                        selectedCPO={this.state.selectedCPO}
+                        selectedItemRight={this.state.selectedItemRight}
+                        selectedItemLeft={this.state.selectedItemLeft}
+                        onChangeText={(val, key) => this.onQuantityChange(val, key)}
+                        openDropDown={(val, title, eyedir, option_id) => this.openDropDown(val, title, eyedir, option_id)}
+                        setWholeItemSelected={(item, option_id) => this.setWholeItemSelected(item, option_id)}
                     />
 
                     {/* <Options
@@ -3029,19 +3122,19 @@ class ProductDetails extends Component {
                             <View style={[styles?.dropDown_style, {
                                 zIndex: 300,
                                 width: width - 30,
-                                height: this.state.optionSelected?.values?.length >= 5 ? 150 : null,
+                                height: this.state.optionSelected?.val?.values?.length >= 5 ? 150 : null,
                             }]}>
                                 <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
                                     {
 
-                                        this.state.optionSelected?.values?.map((item, index) => {
+                                        this.state.optionSelected?.val?.values?.map((item, index) => {
                                             return (
                                                 <TouchableOpacity
                                                     key={String(index)}
-                                                    onPress={() => this.selectItem(item, index, item?.title)}
+                                                    onPress={() => this.selectItem(item, index, this.state.optionSelected?.title,this.state.optionSelected?.option_id)}
                                                     style={styles?.dropDown_item_style}>
 
-                                                    < Text style={styles.dropDown_item_text}>{item?.title}</Text>
+                                                    < Text style={styles.dropDown_item_text}>{item?.value_name == undefined ? item?.title : item?.value_name}</Text>
                                                 </TouchableOpacity>
                                             )
                                         })

@@ -13,15 +13,13 @@ const OptionDropdown = ({
     setWholeItemSelected, getItemDefault }) => {
 
     const [selectedItem, setSelectedItem] = useState(
-        Object.keys(getItemDefault).length == 0 ?
-            {
-                "title": "--Please Select--",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null
-            } :
-            getItemDefault
+        {
+            "title": "--Please Select--",
+            "sort_order": 0,
+            "price": 0,
+            "price_type": "",
+            "option_type_id": null
+        } 
     )
     const [dropdown, setDropdown] = useState(false)
 
@@ -46,15 +44,15 @@ const OptionDropdown = ({
                 <View style={[styles?.dropDown_style, {
                     position: checked == false ? null : "absolute",
                     zIndex: 200,
-                    height: data?.values?.length >= 5 ? 150 : null,
+                    height: data?.length >= 5 ? 150 : null,
                 }]}>
                     <ScrollView style={{ width: "100%" }} nestedScrollEnabled>
                         {
-                            data?.values?.map((item, index) => {
+                            data.map((item, index) => {
                                 return (
                                     <TouchableOpacity
                                         key={String(index)}
-                                        onPress={() => selectItem(item, title)}
+                                        onPress={() => selectItem(item)}
                                         style={styles?.dropDown_item_style}>
                                         {selectedItem?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />}
                                         {selectedItem?.title == item?.title && <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />}
