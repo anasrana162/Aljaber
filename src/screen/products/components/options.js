@@ -103,7 +103,7 @@ const Options = ({
                                                     // console.log("data_name", val)
                                                     return (
                                                         <TouchableOpacity
-                                                            // onPress={() => selectedVarient(data, index)}
+                                                            onPress={() => selectedVarient(val, index, data?.attribute_id, data?.label)}
                                                             key={String(index)}
                                                             style={[styles.color_cont, {
                                                                 width: data?.label == "Color" ? 30 : null,
@@ -141,7 +141,7 @@ const Options = ({
                                     checked={checked}
                                     title={data?.title}
                                     data={data?.values}
-                                    setWholeItemSelected={(item) => setWholeItemSelected(item, data?.option_id)}
+                                    setWholeItemSelected={(item) => setWholeItemSelected(item, data?.option_id,)}
                                 // getItemDefault={finalCartItemPackage}
                                 />
                             )
@@ -261,7 +261,7 @@ const Options = ({
                                                 setRigthEyeQuantity(val.toString())
                                             }}
                                             keyboardType='number-pad'
-                                            autoFocus={true}
+
                                         />
                                     </View>
                                 </View>
