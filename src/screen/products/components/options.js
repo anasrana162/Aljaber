@@ -37,6 +37,7 @@ const Options = ({
     leftEyeQuantity,
     selectedVarient,
     setWholeItemSelected,
+    cartCIO_Defaults,
     selectedCPO,
     selectedItemRight,
     selectedItemLeft,
@@ -142,7 +143,7 @@ const Options = ({
                                     title={data?.title}
                                     data={data?.values}
                                     setWholeItemSelected={(item) => setWholeItemSelected(item, data?.option_id,)}
-                                // getItemDefault={finalCartItemPackage}
+                                    getItemDefault={cartCIO_Defaults}
                                 />
                             )
                         })

@@ -4,7 +4,7 @@ const width = Dimensions.get("screen").width
 import RenderHtml from 'react-native-render-html';
 import Review from './components/review';
 import Main_Info from './components/main_info';
-const DetailsTabNav = ({ navProps, details_tab, ProductName, main_infor }) => {
+const DetailsTabNav = ({ navProps, details_tab, productName, nickName, productId, customerId,  main_infor }) => {
 
     const [details, setDetails] = useState(false)
     const [main_info, setMain_info] = useState(true)
@@ -86,7 +86,12 @@ const DetailsTabNav = ({ navProps, details_tab, ProductName, main_infor }) => {
                     />}
             </View>}
 
-            {review && <Review ProductName={ProductName} />}
+            {review && <Review
+                productName={productName}
+                nickName={nickName}
+                productId={productId}
+                customerId={customerId}
+            />}
 
             {main_info && <Main_Info data={main_infor == null ? [] : main_infor} />}
 

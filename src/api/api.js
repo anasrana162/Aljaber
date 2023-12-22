@@ -13,6 +13,12 @@ export default axios.create({
 });
 
 export const custom_api_url = "https://aljaberoptical.com/pub/script/custom_api.php?"
+export const basis_auth = {
+  Username: "apiuser",
+  Password: "Pakistani2023"
+}
+
+// export const basicAuth = 'Basic ' + btoa("apiuser" + ':' + "Pakistani2023");
 
 // admin credentials
 // "username": "manager",

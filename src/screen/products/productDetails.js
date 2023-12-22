@@ -191,6 +191,7 @@ class ProductDetails extends Component {
             custom_options_right: [],
             selectedItemLeft: [],
             selectedItemRight: [],
+            cartCIO_Defaults: [],
             leftEyeQuantity: 1,
             rightEyeQuantity: 1,
         };
@@ -204,7 +205,7 @@ class ProductDetails extends Component {
     getProductDetails = async () => {
         var { product_details, product_details: { sku }, screenName } = this.props.route.params
         var { userData: { admintoken, allproducts } } = this.props
-        console.log("product_details", sku)
+        // console.log("product_details", sku)
 
 
         var tempPRoducts = []
@@ -380,7 +381,7 @@ class ProductDetails extends Component {
                     // console.log("value_name", value_name?.data)
                 }
             }
-            console.log("configurable_product_options", configurable_product_options)
+            // console.log("configurable_product_options", configurable_product_options)
             setImmediate(() => {
                 this.setState({
                     configurable_product_options: configurable_product_options,
@@ -411,164 +412,58 @@ class ProductDetails extends Component {
 
 
     }
-    checkCartScreenOption = (product_details, options) => {
+    checkCartScreenOption = (product_details_recieved, options) => {
+        var { custom_options, cartCIO_Defaults } = this.state
 
-
-        console.log("product_details Cart ", product_details, "       ", options)
+        console.log("product_details Cart ", product_details_recieved, `${"\n"}`, "       ", options)
         setImmediate(() => {
-            this.setState({ quantity: product_details?.qty })
+            this.setState({ quantity: product_details_recieved?.qty })
         })
-        if (product_details?.product_option != undefined) {
+        if (product_details_recieved?.product_option != undefined) {
 
-            console.log("product_details Cart extension_attributes", product_details?.product_option?.extension_attributes)
-            var custom_options = product_details?.product_option?.extension_attributes?.custom_options
-            // let titles = []
-            // options.filter((data) => {
-            //     titles.push(data?.title)
-            // })
+            console.log("product_details Cart extension_attributes", product_details_recieved?.product_option?.extension_attributes)
+            var custom_options_cio = product_details_recieved?.product_option?.extension_attributes?.custom_options
+
             for (let i = 0; i < options?.length; i++) {
 
-                console.log("")
-                console.log("-----------------------")
-                console.log("options  ", options[i])
-                console.log("-----------------------")
-                console.log("")
-                for (let k = 0; k < custom_options.length; k++) {
-                    if (options[i]?.title == custom_options[k]?.option_title) {
+                // console.log("")
+                // console.log("-----------------------")
+                // console.log("options  ", options[i])
+                // console.log("-----------------------")
+                // console.log("")
+                for (let k = 0; k < custom_options_cio.length; k++) {
+                    if (options[i]?.title == custom_options_cio[k]?.option_title) {
+                        console.log("")
+                        console.log("-----------------------")
                         console.log("Option Picked:     ", options[i]?.title)
-                        if (custom_options[k]?.option_title == "PACKAGE SIZE") {
-                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
-                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
-                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
-                            setImmediate(() => {
-                                this.setState({
-                                    optionKey: this.state.optionKey + 1,
-                                    finalCartItemPackage: value_name,
-                                    finalItemPackage: {
-                                        "option_id": options[i]?.option_id,
-                                        "option_value": value_name?.option_type_id
-                                    }
-                                })
-                            })
-                            break;
+                        console.log("custom_options_cio[i]", custom_options_cio[i])
+                        console.log("-----------------------")
+                        console.log("")
+
+                        let obj = {
+                            "option_id": custom_options_cio[i]?.option_id,
+                            "option_value": custom_options_cio[i]?.option_value,
                         }
-                        if (custom_options[k]?.option_title == "POWER") {
-                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
-                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
-                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
-                            setImmediate(() => {
-                                this.setState({
-                                    optionKey: this.state.optionKey + 1,
-                                    finalCartItemPower: value_name,
-                                    finalItemPower: {
-                                        "option_id": options[i]?.option_id,
-                                        "option_value": value_name?.option_type_id
-                                    }
-                                })
-                            })
-                            break;
+                        console.log("custom_options_cio[i] obj push", obj)
+                        custom_options.push(obj)
+
+                        let obj1 = {
+                            "option_title": custom_options_cio[i]?.option_title,
+                            "option_value_name": custom_options_cio[i]?.option_value_name
                         }
-                        if (custom_options[k]?.option_title == "CYL") {
-                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
-                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
-                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
-                            setImmediate(() => {
-                                this.setState({
-                                    optionKey: this.state.optionKey + 1,
-                                    finalCartItemCYL: value_name,
-                                    finalItemCYL: {
-                                        "option_id": options[i]?.option_id,
-                                        "option_value": value_name?.option_type_id
-                                    }
-                                })
-                            })
-                            break;
-                        }
-                        if (custom_options[k]?.option_title == "AXES") {
-                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
-                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
-                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
-                            setImmediate(() => {
-                                this.setState({
-                                    optionKey: this.state.optionKey + 1,
-                                    finalCartItemAXES: value_name,
-                                    finalItemAXES: {
-                                        "option_id": options[i]?.option_id,
-                                        "option_value": value_name?.option_type_id
-                                    }
-                                })
-                            })
-                            break;
-                        }
-                        if (custom_options[k]?.option_title == "ADDITION") {
-                            let value_name = options[i]?.values.filter((data) => data?.option_type_id == custom_options[k]?.option_value)[0]
-                            console.log("value_name: ", value_name, "  Title|||| ", custom_options[k]?.option_title)
-                            console.log("titles and values: ", custom_options[k]?.option_title, " ", value_name)
-                            setImmediate(() => {
-                                this.setState({
-                                    optionKey: this.state.optionKey + 1,
-                                    finalCartItemADDITION: value_name,
-                                    finalItemADDITION: {
-                                        "option_id": options[i]?.option_id,
-                                        "option_value": value_name?.option_type_id
-                                    }
-                                })
-                            })
-                            break;
-                        }
+                        console.log("custom_options_cio[i] obj1 push", obj1)
+                        cartCIO_Defaults.push(obj1)
+
                     }
                 }
             }
         }
     }
 
-    // checkVarients = async () => {
-    //     var { product_details: { product_varients } } = this.state
-    //     // console.log("product_details Images Length", media_gallery_entries.length)
-    //     console.log("Product Varients", product_varients)
 
-    //     if (product_varients?.length == 0) {
-    //         setImmediate(() => {
-    //             this.setState({
-    //                 loader: false,
-    //             })
-    //         })
-    //         return console.log("no varients")
-    //     }
-
-    //     for (let pv = 0; pv < product_varients?.length; pv++) {
-    //         // console.log("PRoduct Varients Item", product_varients[pv]?.id, "   ", product_varients[pv]?.name)
-
-    //         for (let ca = 0; ca < product_varients[pv]?.custom_attributes?.length; ca++) {
-    //             if (product_varients[pv]?.custom_attributes[ca]?.attribute_code == 'color') {
-    //                 // console.log("Value iD", product_varients[pv]?.custom_attributes[ca]?.value)
-
-    //                 await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_color&id=' + product_varients[pv]?.custom_attributes[ca]?.value,)
-    //                     .then(async (data) => {
-    //                         // console.log("Color Code", data?.data)
-    //                         product_varients[pv].color = data?.data
-    //                     }).catch((err) => {
-    //                         console.log("Error Color APi", err)
-    //                     })
-    //                 break;
-    //             }
-    //         }
-
-    //     }
-
-    //     setImmediate(() => {
-    //         this.setState({ product_varients: product_varients, loader: false })
-    //     })
-
-    //     // console.log("PRoduct Varients Item", product_varients[1]?.color, "   ", product_varients[1]?.name)
-
-    // }
 
     productImages = (key) => {
         var { product_details: { media_gallery_entries } } = this.state
-
-        // console.log("media_gallery_entries", media_gallery_entries)
-
         switch (key) {
             case "prop":
                 setImmediate(() => {
@@ -579,8 +474,6 @@ class ProductDetails extends Component {
                 break;
 
             case "varient":
-                // x = custom_attributes
-                // console.log("media_gallery_entries varient", this.state.product_varient_selected?.media_gallery_entries)
                 setImmediate(() => {
                     this.setState({
                         media_gallery_entries: [...this.state.product_varient_selected?.media_gallery_entries, ...media_gallery_entries],
@@ -1042,7 +935,7 @@ class ProductDetails extends Component {
     plusOne = () => {
         var { product_details: { extension_attributes: { stock_item } }, quantity } = this.state
         var qty = stock_item?.qty
-        console.log("qty", qty, " ", quantity)
+        // console.log("qty", qty, " ", quantity)
         if (quantity <= qty) {
             quantity = quantity + 1
             setImmediate(() => {
@@ -1058,7 +951,7 @@ class ProductDetails extends Component {
 
     minusOne = () => {
         var { quantity } = this.state
-        console.log("qty", " ", quantity)
+        // console.log("qty", " ", quantity)
         if (quantity == 1) {
             return alert("Minimum quantity is 1")
         } else {
@@ -1082,7 +975,7 @@ class ProductDetails extends Component {
                 break;
 
             case 'right':
-                console.log("RIgth Quantity", val, "   ", key)
+                // console.log("RIgth Quantity", val, "   ", key)
                 setImmediate(() => {
                     this.setState({
                         rightEyeQuantity: val,
@@ -1094,7 +987,7 @@ class ProductDetails extends Component {
     }
 
     checkMarked = (val) => {
-        console.log("VALED", val)
+        // console.log("VALED", val)
         setImmediate(() => {
             this.setState({
                 checked: val
@@ -1109,7 +1002,7 @@ class ProductDetails extends Component {
 
         switch (this.state.eyedir) {
             case "left":
-                console.log("Item in selectItem Left", item, `${"\n"}`, "Title:", title)
+                // console.log("Item in selectItem Left", item, `${"\n"}`, "Title:", title)
                 let check_cl_array_index = ''
                 let check_already_selected_options_Left = ''
                 let temp1 = selectedItemLeft.filter((val, index) => {
@@ -1132,12 +1025,12 @@ class ProductDetails extends Component {
                             check_cl_array_index = index
                         }
                     })
-                    console.log("custom_options_left before splice", custom_options_left)
+                    // console.log("custom_options_left before splice", custom_options_left)
 
                     custom_options_left.splice(check_cl_array_index, 1)
-                    console.log("custom_options_left after splice", custom_options_left)
+                    // console.log("custom_options_left after splice", custom_options_left)
                     custom_options_left.push(option_obj)
-                    console.log("custom_options_left after push", custom_options_left)
+                    // console.log("custom_options_left after push", custom_options_left)
                     check_cl_array_index = ''
                     check_already_selected_options_Left = ''
                     setImmediate(() => {
@@ -1168,7 +1061,7 @@ class ProductDetails extends Component {
 
 
             case "right":
-                console.log("Item in selectItem Right", item)
+                // console.log("Item in selectItem Right", item)
                 let check_already_selected_options_Right = ''
                 let check_cr_array_index = ''
                 let temp2 = selectedItemRight.filter((val, index) => {
@@ -1190,9 +1083,9 @@ class ProductDetails extends Component {
                             check_cr_array_index = index
                         }
                     })
-                    console.log("custom_options_right before splice", custom_options_right)
+                    // console.log("custom_options_right before splice", custom_options_right)
                     custom_options_right.splice(check_cr_array_index, 1)
-                    console.log("custom_options_right after splice", custom_options_right)
+                    // console.log("custom_options_right after splice", custom_options_right)
                     custom_options_right.push(option_obj)
                     check_cr_array_index = ''
                     check_already_selected_options_Right = ''
@@ -1434,10 +1327,10 @@ class ProductDetails extends Component {
 
         } else {
             let obj = {}
-            console.log("this.state.checked", typeof this.state.checked)
+            // console.log("this.state.checked", typeof this.state.checked)
             if (this.state.checked == true) {
                 let breaker = false
-                console.log("Reached Here", this.state.custom_options_left.length, " ", this.state.custom_options_right.length)
+                // console.log("Reached Here", this.state.custom_options_left.length, " ", this.state.custom_options_right.length)
 
                 if (this.state.custom_options_left.length !== 0 && this.state.custom_options_right.length !== 0) {
                     let check = false;
@@ -1470,7 +1363,7 @@ class ProductDetails extends Component {
                     // }
                     for (let l = 0; l < this.state.selectedItemLeft.length; l++) {
                         var findRight = this.state.selectedItemRight.filter((data) => data?.val?.option_type_id == this.state.selectedItemLeft[l]?.val?.option_type_id)[0]
-                        console.log("findRight", findRight)
+                        // console.log("findRight", findRight)
                         if (findRight == undefined) {
                             check = false
                             break;
@@ -1480,7 +1373,7 @@ class ProductDetails extends Component {
                     }
                     // const equalValues = (this.state.custom_options_left.length === this.state.custom_options_right.length) &&
                     //     this.state.custom_options_left.every((value, index) => value.val?.option_type_id === this.state.custom_options_right[index]?.val?.option_type_id);
-                    console.log("check", check)
+                    // console.log("check", check)
                     if (check == true
                     ) {
                         obj = {
@@ -1503,7 +1396,7 @@ class ProductDetails extends Component {
                         this.addToCartApi(obj)
                         // break;
                     }
-                     else {
+                    else {
 
                         obj = {
                             "cartItem": {
@@ -1687,6 +1580,11 @@ class ProductDetails extends Component {
             media_gallery_entries,
             // product_details: { },
         } = this.state
+
+        var { userData: { user,admintoken,token } } = this.props
+
+        // console.log("USER OBJECT:", user)
+
         const tagsStyles = {
             body: {
                 color: "black",
@@ -1831,6 +1729,7 @@ class ProductDetails extends Component {
                         selectedItemLeft={this.state.selectedItemLeft}
                         onChangeText={(val, key) => this.onQuantityChange(val, key)}
                         openDropDown={(val, title, eyedir, option_id) => this.openDropDown(val, title, eyedir, option_id)}
+                        cartCIO_Defaults={this.state.cartCIO_Defaults}
                         setWholeItemSelected={(item, option_id) => this.setWholeItemSelected(item, option_id)}
                         selectedVarient={(data, index, attribute_id, title) => this.selectedVarient(data, index, attribute_id, title)}
                     />
@@ -1842,7 +1741,9 @@ class ProductDetails extends Component {
                     <DetailsTabNav
                         navProps={this.props.navigation}
                         details_tab={this.state.description}
-                        ProductName={product_details?.name}
+                        productName={product_details?.name}
+                        nickName={user?.firstname}
+                        productId={product_details?.id}
                         main_infor={this.state.main_info_temp}
                     />
 

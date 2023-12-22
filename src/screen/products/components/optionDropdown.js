@@ -15,18 +15,21 @@ const OptionDropdown = ({
     const [selectedItem, setSelectedItem] = useState(
         {
             "title": "--Please Select--",
-            "sort_order": 0,
-            "price": 0,
-            "price_type": "",
-            "option_type_id": null
-        } 
+        }
     )
+    var [cartDefaultItem, setCartDefaultItem] = useState("")
     const [dropdown, setDropdown] = useState(false)
 
     const selectItem = (item, key,) => {
         console.log("item", item)
         setWholeItemSelected(item, key)
         setSelectedItem(item)
+    }
+
+    if (getItemDefault.length != 0) {
+        var filter = getItemDefault.filter((val) => val?.option_title == title)[0]
+        // console.log("Filter", filter)
+        cartDefaultItem = filter?.option_value_name;
     }
 
     // console.log("getItemDefault",getItemDefault)
@@ -37,7 +40,13 @@ const OptionDropdown = ({
             <TouchableOpacity
                 onPress={() => setDropdown(!dropdown)}
                 style={[styles?.dropdown_cont, style1]}>
-                <Text style={styles.selectedItem_text}>{selectedItem?.title}</Text>
+                <Text style={styles.selectedItem_text}>{cartDefaultItem == "" ?
+                    selectedItem?.title
+                    :
+                    selectedItem?.title == "--Please Select--" ?
+                        cartDefaultItem
+                        :
+                        selectedItem?.title}</Text>
                 <MaterialIcons name="keyboard-arrow-down" size={24} color="#020621" style={{ marginRight: 10 }} />
             </TouchableOpacity>
             {dropdown &&

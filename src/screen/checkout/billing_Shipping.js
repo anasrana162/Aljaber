@@ -44,8 +44,6 @@ class Billing_Shipping extends Component {
             saveToAddressBook: false,
             addressAdded: false,
             addressToEdit: '',
-
-
         };
     }
 
@@ -125,7 +123,6 @@ class Billing_Shipping extends Component {
     }
 
     selectAddress = (item, index) => {
-
         this.setState({
             selectedAddress: item,
             selectedAddressIndex: index
@@ -133,44 +130,9 @@ class Billing_Shipping extends Component {
     }
 
     addNewAddress = () => {
-        //     {  "addressInformation": {
-        //         "shipping_address": {
-        //          "region": "Sharjah",
-        //       "region_id": 509,
-        //       "region_code": "Sharjah",
-        //       "country_id": "AE",
-        //       "street": [
-        //         "1235 Oak Ave"
-        //       ],
-        //       "postcode": "75190",
-        //       "city": "Sharjah",
-        //           "email": "ayaz@a2zcreatorz.com",
-        //           "firstname": "Ayaz",
-        //           "lastname": "Ahmed",
-        //           "telephone": "8141102201"
-        //     },
-        //     "billing_address": {
-        //         "region": "Sharjah",
-        //          "region_id": 509,
-        //          "region_code": "Sharjah",
-        //          "country_id": "AE",
-        //          "street": [
-        //             "1236 Oak Ave"
-        //           ],
-        //           "postcode": "75190",
-        //           "city": "Sharjah",
-        //           "email": "ayaz@a2zcreatorz.com",
-        //           "firstname": "Ayaz",
-        //           "lastname": "Ahmed",
-        //           "telephone": "8141102202"
-        //     },
-        //     "shipping_carrier_code": "flatrate",
-        //     "shipping_method_code": "flatrate"
-        //     }
-        //   }
 
         var { addresses, address, addressLine1, addressLine2, firstName, lastName, city, countrySelected, provinceSelected, zipCode, phone, region } = this.state
-
+        var { userData: { user, admintoken, token } } = this.props
         if (addressLine1 !== "") {
             address.push(addressLine1)
         }
@@ -208,73 +170,68 @@ class Billing_Shipping extends Component {
         }
 
         if (this.state.saveToAddressBook == true) {
-            let { userData: { user, token } } = this.props
-            // console.log("userData", user)
+
             let obj = {
-                "addressInformation": {
-                    "shipping_address": {
-                        "region": region == "" ? provinceSelected?.title : region,
-                        "region_id": 0,
-                        "region_code": region == "" ? provinceSelected?.title : region,
-                        "country_id": countrySelected?.country_id,
-                        "street": address,
-                        "postcode": zipCode,
-                        "city": city,
-                        "email": user?.email,
-                        "firstname": user?.firstname,
-                        "lastname": user?.lastname,
-                        "telephone": phone
-                    },
-                    "billing_address": {
-                        "region": region == "" ? provinceSelected?.title : region,
-                        "region_id": 0,
-                        "region_code": region == "" ? provinceSelected?.title : region,
-                        "country_id": countrySelected?.country_id,
-                        "street": address,
-                        "postcode": zipCode,
-                        "city": city,
-                        "email": user?.email,
-                        "firstname": user?.firstname,
-                        "lastname": user?.lastname,
-                        "telephone": phone
-                    },
-                    "shipping_carrier_code": "flatrate",
-                    "shipping_method_code": "flatrate"
+                "defaultShipping": true,
+                "defaultBilling": true,
+                "firstname": firstName,
+                "lastname": lastName,
+                "region": {
+                    "regionCode": countrySelected?.country_id,
+                    "region": region == "" ? provinceSelected?.title : region,
+                    "regionId": 0
+                },
+                "postcode": zipCode,
+                "street": address,
+                "city": city,
+                "telephone": phone,
+                "countryId": countrySelected?.country_id
+
+            }
+            let temp_arr = []
+            temp_arr.push(obj)
+
+            var all_addresses = [...user?.addresses, ...temp_arr]
+            let final_obj = {
+                "customer": {
+                    "addresses": all_addresses
                 }
             }
-            console.log("Customer Token", token)
-            console.log("obj created", obj)
 
-            api.post("carts/mine/shipping-information", obj,
+            console.log("Addres to add in address Book", all_addresses)
+
+            api.put("customers/" + user?.id,
+                final_obj,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${admintoken}`,
                     },
-                })
-                .then((res) => {
-
-                    console.log("res", res?.data)
-                    // Adding added address to state to show in list
-                    let obj = {
-                        "city": city,
-                        "country_id": countrySelected?.country_id,
-                        "status": "added",
-                        "firstname": firstName,
-                        "lastname": lastName,
-                        "region": {
-                            "region": region == "" ? provinceSelected?.title : region,
-                        },
-                        "street": address,
-                        "telephone": phone
-                    }
-                    addresses.push(obj)
-                    setImmediate(() => {
-                        this.setState({
-                            addresses
-                        })
+                }
+            ).then((res) => {
+                console.log("Res customer profile update API (Save to address Book):", res?.data)
+                let obj = {
+                    "city": city,
+                    "country_id": countrySelected?.country_id,
+                    "status": "added",
+                    "firstname": firstName,
+                    "lastname": lastName,
+                    "region": {
+                        "region": region == "" ? provinceSelected?.title : region,
+                    },
+                    "street": address,
+                    "telephone": phone
+                }
+                addresses.push(obj)
+                setImmediate(() => {
+                    this.setState({
+                        addresses
                     })
-                    // this.checkAddress()
                 })
+            }).catch((err) => {
+                console.log("Err customer profile update API (Save to address Book)", err?.response)
+            })
+
+
 
 
         } else {
@@ -381,6 +338,77 @@ class Billing_Shipping extends Component {
             countrySelected: country,
             phone: item?.item?.telephone,
         })
+    }
+
+
+    onNext = () => {
+
+        let { userData: { user, token } } = this.props
+
+        var { addresses, address, addressLine1, addressLine2, firstName, lastName, city, countrySelected, provinceSelected, zipCode, phone, region } = this.state
+
+        if (addressLine1 !== "") {
+            address.push(addressLine1)
+        }
+        if (addressLine2 !== "") {
+            address.push(addressLine2)
+        }
+        setImmediate(() => {
+            this.setState({
+                address
+            })
+        })
+
+        // console.log("userData", user)
+        let obj = {
+            "addressInformation": {
+                "shipping_address": {
+                    "region": region == "" ? provinceSelected?.title : region,
+                    "region_id": 0,
+                    "region_code": region == "" ? provinceSelected?.title : region,
+                    "country_id": countrySelected?.country_id,
+                    "street": address,
+                    "postcode": zipCode,
+                    "city": city,
+                    "email": user?.email,
+                    "firstname": user?.firstname,
+                    "lastname": user?.lastname,
+                    "telephone": phone
+                },
+                "billing_address": {
+                    "region": region == "" ? provinceSelected?.title : region,
+                    "region_id": 0,
+                    "region_code": region == "" ? provinceSelected?.title : region,
+                    "country_id": countrySelected?.country_id,
+                    "street": address,
+                    "postcode": zipCode,
+                    "city": city,
+                    "email": user?.email,
+                    "firstname": user?.firstname,
+                    "lastname": user?.lastname,
+                    "telephone": phone
+                },
+                "shipping_carrier_code": "flatrate",
+                "shipping_method_code": "flatrate"
+            }
+        }
+        console.log("Customer Token", token)
+        console.log("obj created", obj)
+
+        api.post("carts/mine/shipping-information", obj,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then((res) => {
+
+                console.log("res", res?.data)
+                // Adding added address to state to show in list
+
+                // this.checkAddress()
+            })
+
     }
 
 
@@ -520,11 +548,11 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         fontSize: 14
     },
-    shipping_method_title:{
+    shipping_method_title: {
         color: "black",
         fontWeight: "600",
         fontSize: 16,
-        marginTop:20,
+        marginTop: 20,
     },
     add_new_address_btn: {
         width: 150,
