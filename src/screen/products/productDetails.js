@@ -29,135 +29,6 @@ class ProductDetails extends Component {
         super(props);
         this.state = {
 
-
-
-            //Power Options
-            // Left Power
-            selectedItemLeftPower: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemLeftPower: {},
-            // Right Power
-            selectedItemRightPower: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemRightPower: {},
-            // Power Whole
-            finalItemPower: {},
-            finalCartItemPower: {},
-
-            // Package Size options
-            // Package Left
-            selectedItemLeftPackage: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemLeftPackage: {},
-            // Package Right
-            selectedItemRightPackage: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemRightPackage: {},
-            // Package whole
-            finalItemPackage: {},
-            finalCartItemPackage: {},
-
-            //CYL Options
-            // Left CYL
-            selectedItemLeftCYL: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemLeftCYL: {},
-            // Right CYL
-            selectedItemRightCYL: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemRightCYL: {},
-            // CYL Whole
-            finalItemCYL: {},
-            finalCartItemCYL: {},
-
-            //AXES Options
-            // Left AXES
-            selectedItemLeftAXES: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemLeftAXES: {},
-            // Right AXES
-            selectedItemRightAXES: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemRightAXES: {},
-            // AXES Whole
-            finalItemAXES: {},
-            finalCartItemAXES: {},
-
-
-            //ADDITION Options
-            // Left ADDITION
-            selectedItemLeftADDITION: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemLeftADDITION: {},
-            // Right ADDITION
-            selectedItemRightADDITION: {
-                "title": "Select",
-                "sort_order": 0,
-                "price": 0,
-                "price_type": "",
-                "option_type_id": null,
-
-            },
-            finalItemRightADDITION: {},
-            // ADDITION Whole
-            finalItemADDITION: {},
-            finalCartItemADDITION: {},
-
-
             // Options Ended
 
             product_varients: null,
@@ -194,6 +65,7 @@ class ProductDetails extends Component {
             cartCIO_Defaults: [],
             leftEyeQuantity: 1,
             rightEyeQuantity: 1,
+            more_info_loader: false,
         };
     }
 
@@ -517,6 +389,11 @@ class ProductDetails extends Component {
         var { product_details: { custom_attributes } } = this.state
         const { userData: { admintoken }, } = this.props
 
+        setImmediate(() => {
+            this.setState({
+                more_info_loader: true
+            })
+        })
         var { main_info_temp } = this.state
         var x = '';
 
@@ -928,7 +805,7 @@ class ProductDetails extends Component {
         // console.log("Items Array:", items)
 
         setImmediate(() => {
-            this.setState({ main_info_temp: items })
+            this.setState({ main_info_temp: items, more_info_loader: false })
         })
     }
 
@@ -1581,7 +1458,7 @@ class ProductDetails extends Component {
             // product_details: { },
         } = this.state
 
-        var { userData: { user,admintoken,token } } = this.props
+        var { userData: { user, admintoken, token } } = this.props
 
         // console.log("USER OBJECT:", user)
 
@@ -1738,14 +1615,17 @@ class ProductDetails extends Component {
                     <StoreFeatures />
 
                     {/* DetailsNav */}
-                    <DetailsTabNav
-                        navProps={this.props.navigation}
-                        details_tab={this.state.description}
-                        productName={product_details?.name}
-                        nickName={user?.firstname}
-                        productId={product_details?.id}
-                        main_infor={this.state.main_info_temp}
-                    />
+                    {this.state.more_info_loader ?
+                        <ActivityIndicator size={"small"} color="black" style={{marginVertical:10,}}/>
+                        :
+                        <DetailsTabNav
+                            navProps={this.props.navigation}
+                            details_tab={this.state.description}
+                            productName={product_details?.name}
+                            nickName={user?.firstname}
+                            productId={product_details?.id}
+                            main_infor={this.state.main_info_temp}
+                        />}
 
                 </ScrollView>
 

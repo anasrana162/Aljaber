@@ -19,14 +19,23 @@ export default class HomeHeader extends Component {
                     </TouchableOpacity> */}
 
                     {/**logo */}
-                    <Image source={require('../../../../assets/Al-Jabir-name.png')}
-                        style={styles.logo}
-                    />
+                    <TouchableOpacity
+                        style={{
+                            position: "absolute",
+                            left: 10,
+                        }}
+                        onPress={() => navProps.navigate("HomeScreen")}
+                    >
+
+                        <Image source={require('../../../../assets/Al-Jabir-name.png')}
+                            style={styles.logo}
+                        />
+                    </TouchableOpacity>
 
                     {/** Search icon Button */}
                     <TouchableOpacity
-                    onPress={() => navProps.navigate("Search")}
-                     style={styles.searchIcon}>
+                        onPress={() => navProps.navigate("Search")}
+                        style={styles.searchIcon}>
                         <Ionicons name="search" size={30} color="#020621" />
                     </TouchableOpacity>
 
@@ -73,8 +82,7 @@ const styles = StyleSheet.create({
         height: 20
     },
     logo: {
-        position: "absolute",
-        left: 10,
+
         width: 70,
         height: 50
     },

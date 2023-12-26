@@ -496,17 +496,17 @@ class HomeScreen extends Component {
                         // storing products with its detail in array
                         var brand = res?.data?.custom_attributes.filter((val) => val?.attribute_code == "brands")[0]
                         // console.log("Brand",brand)
-                        
+
                         await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + brand.value,).then(async (data) => {
                             res.data.brand = data?.data
                             // console.log("res?.data", res?.data?.brand)
 
                             store_product.push(res?.data)
-                        }).catch((err)=>{
+                        }).catch((err) => {
                             console.log("Brand value error random products", err)
                         })
-                  
-             
+
+
                     } else {
                         // console.log(" adding Index 1")
                         // index = index + 1
@@ -606,13 +606,20 @@ class HomeScreen extends Component {
                     <Swiper data={sliderImages} />
 
                     {/* * Default Categories */}
-                    {this.state.loader == false && <DefaultCategories
+                    {/* {this.state.loader == false && <DefaultCategories
                         data={this.state.defaultCategories1}
                         navProps={this.props.navigation}
                         firstSubItem={this.state.firstSubItem}
                         admintoken={this.props.userData.admintoken}
-                    />}
+                    />} */}
 
+                    {/** Categories like men, women etc */}
+                    <HomeCategories
+                        // data={this.state.topCategoryData == null ? [] : this.state.topCategoryData[0]?.children_data}
+                        data={this.state.topCategoryData}
+                        mainCatPos={this.state.topCategoryData == null ? null : this.state.topCategoryData[0]?.position}
+                        navProps={this.props.navigation}
+                    />
                     <ProductList
                         screenName="Home"
                         data={this.state.randomProducts}
@@ -622,13 +629,6 @@ class HomeScreen extends Component {
                     />
 
 
-                    {/** Categories like men, women etc */}
-                    <HomeCategories
-                        // data={this.state.topCategoryData == null ? [] : this.state.topCategoryData[0]?.children_data}
-                        data={this.state.topCategoryData}
-                        mainCatPos={this.state.topCategoryData == null ? null : this.state.topCategoryData[0]?.position}
-                        navProps={this.props.navigation}
-                    />
 
                     <StoreFeatures screenName={"home"} />
 

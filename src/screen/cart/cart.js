@@ -589,7 +589,7 @@ class Cart extends Component {
 
                             {/* Checkout Button */}
                             <TouchableOpacity
-                                onPress={() => this.props.navigation.navigate('Billing_Shipping')}
+                                onPress={() => this.props.navigation.navigate('Billing_Shipping', { subtotal: subtotal, cartItems: cartItems })}
                                 style={styles.checkout_btn}>
                                 <Text style={[styles.text_style, { fontSize: 16, color: "white", fontWeight: "600" }]}>Checkout</Text>
                             </TouchableOpacity>
