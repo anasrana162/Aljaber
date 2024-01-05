@@ -13,7 +13,7 @@ import Contact_us from '../screen/account/contact_us';
 import Cart from '../screen/cart/cart';
 import Search from '../screen/search/search';
 import Billing_Shipping from '../screen/checkout/billing_Shipping';
-
+import Review_Payment from '../screen/checkout/review_Payment';
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -31,6 +31,7 @@ export default class Navigation extends Component {
                     <Stack.Screen name="HomeScreen" component={HomeScreen} />
                     <Stack.Screen name="Cart" component={Cart} />
                     <Stack.Screen name="Billing_Shipping" component={Billing_Shipping} />
+                    <Stack.Screen name="Review_Payment" component={Review_Payment} />
                     <Stack.Screen name="Search" component={Search} />
                     <Stack.Screen name="Account" component={Account} />
                     <Stack.Screen name="About_us" component={About_us} />

@@ -1,4 +1,4 @@
-import { Text, StyleSheet, View, Dimensions, NativeModules, ScrollView, ActivityIndicator, Alert, Image, TouchableOpacity, FlatList } from 'react-native'
+import { Text, StyleSheet, View, Dimensions, NativeModules, ScrollView, ActivityIndicator, Alert, Image, TouchableOpacity, FlatList, TextInput } from 'react-native'
 import React, { Component } from 'react'
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -45,7 +45,8 @@ class Cart extends Component {
             countrySelected: "",
             provinces: [],
             provinceSelected: "",
-            shipping_tax_key: 0
+            shipping_tax_key: 0,
+            couponCode: "",
 
         };
     }
@@ -508,6 +509,26 @@ class Cart extends Component {
         })
     }
 
+    applyCoupon = () => {
+        var { userData: { admintoken,token } } = this.props
+
+        console.log("this.state.couponCode",this.state.couponCode)
+        console.log("this.state.cartData?.id",this.state.cartData?.id)
+        console.log("admintoken",admintoken)
+
+        api.put('carts/' + this.state.cartData?.id + '/coupons/' + this.state.couponCode,{}, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            },
+        }).then((res) => {
+            console.log("Apply coupon API Result", res?.data)
+        }).catch((err) => {
+            console.log("Apply coupon API Error", err.response?.data)
+            alert(err.response?.data?.message)
+        })
+
+    }
+
 
     //this component was placed here because it was re-rendering when state was updated 
     ListFooterComponent = () => {
@@ -519,11 +540,7 @@ class Cart extends Component {
 
                 <ScrollView>
 
-                    <TouchableOpacity
-                        onPress={() => this.updateCart()}
-                        style={styles.updateCartBtn}>
-                        {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 16, color: "white" }]}>Update Cart</Text>}
-                    </TouchableOpacity>
+
 
                     {/* Summary Container */}
 
@@ -587,33 +604,65 @@ class Cart extends Component {
                                 <Text style={[styles.text_style, { fontSize: 18, fontWeight: "700", color: "black" }]}>AED {flatrate + subtotal} </Text>
                             </View>
 
-                            {/* Checkout Button */}
-                            <TouchableOpacity
-                                onPress={() => this.props.navigation.navigate('Billing_Shipping', { subtotal: subtotal, cartItems: cartItems })}
-                                style={styles.checkout_btn}>
-                                <Text style={[styles.text_style, { fontSize: 16, color: "white", fontWeight: "600" }]}>Checkout</Text>
-                            </TouchableOpacity>
+                            <View style={{
+                                width: width - 40,
+                                height: 40,
+                                backgroundColor: "white",
+                                flexDirection: "row",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                marginTop: 20,
+                                alignSelf: "center"
+                            }}>
+                                <TextInput
+                                    value={this.state.couponCode}
+                                    style={styles.couponTxtInp}
+                                    placeholder='Enter discount code'
+                                    placeholderTextColor={"rgba(189, 189, 189)"}
+                                    onChangeText={(txt) => this.setState({ couponCode: txt })}
+                                />
+                                <TouchableOpacity
+                                    onPress={() => this.applyCoupon()}
+                                    style={styles.applyCoupon}>
+                                    <Text style={[styles.text_style, { fontSize: 14, color: "white", fontWeight: "600" }]}>Apply Discount</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={{ flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-around" }}>
+                                {/* Update Cart */}
+                                <TouchableOpacity
+                                    onPress={() => this.updateCart()}
+                                    style={styles.updateCartBtn}>
+                                    {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 16, color: "white" }]}>Update Cart</Text>}
+                                </TouchableOpacity>
+                                {/* Checkout Button */}
+                                <TouchableOpacity
+                                    onPress={() => this.props.navigation.navigate('Billing_Shipping', { subtotal: subtotal, cartItems: cartItems })}
+                                    style={styles.checkout_btn}>
+                                    <Text style={[styles.text_style, { fontSize: 16, color: "white", fontWeight: "600" }]}>Checkout</Text>
+                                </TouchableOpacity>
+                            </View>
                         </>
                     }
 
 
 
-                    <Text style={[styles.text_style, {
+                    {/* <Text style={[styles.text_style, {
                         color: "black",
                         fontSize: 20,
                         alignSelf: "flex-start",
                         marginTop: 20,
                         marginBottom: -20,
                         marginLeft: 20,
-                    }]}>Recommended for you</Text>
+                    }]}>Recommended for you</Text> */}
                     {/* Recommended Products */}
-                    <ProductList
+                    {/* <ProductList
                         screenName="Cart"
                         data={randomProducts}
                         loaderDot={loaderDot}
                         navProps={this.props.navigation}
                         addToCart={(product, index) => this.addToCart(product, index)}
-                    />
+                    /> */}
                 </ScrollView>
 
             </View >
@@ -711,8 +760,8 @@ class Cart extends Component {
 
                         {/* Price Item */}
                         <View style={styles.small_box}>
-                            <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600" }]}>Price</Text>
-                            <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", marginTop: 10 }]}>AED {item?.item?.price}</Text>
+                            <Text style={[styles.text_style, { fontSize: 14, fontWeight: "600" }]}>Price</Text>
+                            <Text style={[styles.text_style, { fontSize: 14, fontWeight: "400", marginTop: 5 }]}>AED {item?.item?.price}</Text>
                         </View>
 
                         {/* Quantity */}
@@ -741,13 +790,13 @@ class Cart extends Component {
 
                         {/* Subtotal */}
                         <View style={styles.small_box}>
-                            <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600" }]}>Subtotal</Text>
-                            <Text style={[styles.text_style, { fontSize: 15, marginTop: 10 }]}>AED {item?.item?.subtotal}</Text>
+                            <Text style={[styles.text_style, { fontSize: 14, fontWeight: "600" }]}>Subtotal</Text>
+                            <Text style={[styles.text_style, { fontSize: 14, marginTop: 5 }]}>AED {item?.item?.subtotal}</Text>
                         </View>
                     </View>
 
                     {/* Wishlist, remove, Edit */}
-                    <View style={[styles.flatList_innerCont, { marginTop: 10, justifyContent: "space-between" }]}>
+                    <View style={[styles.flatList_innerCont, { marginTop: 0, justifyContent: "space-between" }]}>
                         <TouchableOpacity>
                             <Text style={[styles.text_style, { fontSize: 14, padding: 10, }]}>Move to Wishlist</Text>
                         </TouchableOpacity>
@@ -821,6 +870,20 @@ const styles = StyleSheet.create({
 
         elevation: 6,
     },
+    couponTxtInp: {
+        width: "60%",
+        height: "100%",
+        paddingLeft: 10,
+        color: "black",
+        borderWidth: 0.5,
+    },
+    applyCoupon: {
+        width: "40%",
+        height: "100%",
+        backgroundColor: "#020621",
+        justifyContent: "center",
+        alignItems: "center",
+    },
     header_comp: {
         width: width,
         justifyContent: "center",
@@ -850,7 +913,7 @@ const styles = StyleSheet.create({
 
     flatList_Cont: {
         width: width - 20,
-        // height: 200,
+        height: 220,
         // borderTopWidth: 1,
         borderBottomWidth: 0.5,
         marginTop: 10,
@@ -873,13 +936,14 @@ const styles = StyleSheet.create({
     },
     updateCartBtn: {
         width: 120,
-        height: 45,
+        height: 40,
         backgroundColor: "#020621",
+        marginTop: 20,
+        marginBottom: 10,
         borderRadius: 5,
         justifyContent: "center",
         alignItems: "center",
-        alignSelf: "center",
-        marginTop: 20,
+        alignSelf: "center"
     },
 
     small_box: {

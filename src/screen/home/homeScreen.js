@@ -153,10 +153,11 @@ class HomeScreen extends Component {
     }
 
     componentDidMount = () => {
+        // this.adminApi()     
         this.props.navigation.addListener('focus', async () => { this.adminApi(), this.loginUser() });
-        // this.adminApi()
         this.getDefaultCategories()
         this.unsubscribe()
+
 
 
         // 
@@ -278,7 +279,7 @@ class HomeScreen extends Component {
 
     getDefaultCategories = async () => {
 
-        const { actions, userData } = this.props
+        const { actions, userData:{admintoken} } = this.props
         var { categoryApiCounter, adminToken } = this.state
         setImmediate(() => {
             this.setState({ loader: true })
@@ -287,7 +288,7 @@ class HomeScreen extends Component {
 
             await api.get('categories', {
                 headers: {
-                    Authorization: `Bearer ${adminToken}`,
+                    Authorization: `Bearer ${admintoken}`,
                 },
             }).then((res) => {
                 //console.log("User Data:", res?.data)

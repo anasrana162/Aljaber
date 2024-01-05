@@ -28,6 +28,7 @@ class Billing_Shipping extends Component {
             addressEmpty: false,
             countries: [],
             countrySelected: '',
+            countryParams:"",
             provinces: [],
             provinceSelected: "",
             selectedAddress: {},
@@ -50,6 +51,8 @@ class Billing_Shipping extends Component {
             isShippingFree: false,
             orderSummaryOpen: false,
             shippingSelected: false,
+            selectFirstTimeAddress: true,
+            loadNext: false,
         };
     }
 
@@ -110,7 +113,7 @@ class Billing_Shipping extends Component {
 
     checkAddress = () => {
         var { userData } = this.props
-        console.log("Addresses:  ", userData?.user?.addresses)
+        // console.log("Addresses:  ", userData?.user?.addresses)
         // console.log("Addresses:  ", userData?.cartitems)
         if (userData?.user?.addresses?.length == 0) {
             setImmediate(() => {
@@ -144,6 +147,7 @@ class Billing_Shipping extends Component {
             selectedAddress: item,
             selectedAddressIndex: index,
             shippingSelected: false,
+            countryParams:country
         })
     }
 
@@ -363,59 +367,50 @@ class Billing_Shipping extends Component {
 
         let { userData: { user, token } } = this.props
 
-        var { addresses, address, addressLine1, addressLine2, firstName, lastName, city, countrySelected, provinceSelected, zipCode, phone, region } = this.state
+        var { selectedAddress, selectedAddress: { city, country_id, region, region_code, region_id, postcode, telephone, street }, isShippingFree } = this.state
 
-        if (addressLine1 !== "") {
-            address.push(addressLine1)
-        }
-        if (addressLine2 !== "") {
-            address.push(addressLine2)
-        }
+        this.setState({ loadNext: true })
 
         if (this.state.shippingSelected == false) {
+            this.setState({ loadNext: false })
             return alert("Please Select Shipping!")
         }
 
-        setImmediate(() => {
-            this.setState({
-                address
-            })
-        })
 
-        // console.log("userData", user)
+        console.log("selectedAddress", selectedAddress)
         let obj = {
             "addressInformation": {
                 "shipping_address": {
-                    "region": region == "" ? provinceSelected?.title : region,
-                    "region_id": 0,
-                    "region_code": region == "" ? provinceSelected?.title : region,
-                    "country_id": countrySelected?.country_id,
-                    "street": address,
-                    "postcode": zipCode,
+                    "region": region?.region,
+                    "region_id": region_id,
+                    "region_code": region?.region_code,
+                    "country_id": country_id,
+                    "street": street,
+                    "postcode": postcode,
                     "city": city,
                     "email": user?.email,
                     "firstname": user?.firstname,
                     "lastname": user?.lastname,
-                    "telephone": phone
+                    "telephone": telephone
                 },
                 "billing_address": {
-                    "region": region == "" ? provinceSelected?.title : region,
-                    "region_id": 0,
-                    "region_code": region == "" ? provinceSelected?.title : region,
-                    "country_id": countrySelected?.country_id,
-                    "street": address,
-                    "postcode": zipCode,
+                    "region": region?.region,
+                    "region_id": region_id,
+                    "region_code": region?.region_code,
+                    "country_id": country_id,
+                    "street": street,
+                    "postcode": postcode,
                     "city": city,
                     "email": user?.email,
                     "firstname": user?.firstname,
                     "lastname": user?.lastname,
-                    "telephone": phone
+                    "telephone": telephone
                 },
-                "shipping_carrier_code": "flatrate",
-                "shipping_method_code": "flatrate"
+                "shipping_carrier_code": isShippingFree == false ? "flatrate" : "freeshipping",
+                "shipping_method_code": isShippingFree == false ? "flatrate" : "freeshipping"
             }
         }
-        console.log("Customer Token", token)
+        // console.log("Customer Token", token)
         console.log("obj created", obj)
 
         api.post("carts/mine/shipping-information", obj,
@@ -426,10 +421,15 @@ class Billing_Shipping extends Component {
             })
             .then((res) => {
 
-                console.log("res", res?.data)
-                // Adding added address to state to show in list
+                console.log("res shipping information API", this.state.countryParams)
+                this.setState({ loadNext: false })
+
+                this.props.navigation.navigate("Review_Payment", { order_summary: res?.data, billing_shipping_address: obj, country: this.state.countryParams })
 
                 // this.checkAddress()
+            }).catch((err) => {
+                this.setState({ loadNext: false })
+                console.log("shipping information API ERR", err)
             })
 
     }
@@ -441,9 +441,13 @@ class Billing_Shipping extends Component {
         var { orderSummaryOpen, firstName, lastName, addressLine1, addressLine2, city, region, countrySelected, phone, zipCode, newAddressModal, provinces, countries } = this.state
 
         const renderItem = (item) => {
-            // console.log("Item", item)
+            // console.log("Item", item?.index)
             var country = this.state.countries.filter((data) => data?.country_id == item?.item?.country_id)[0]
             // console.log("COuntry", country)
+            if (item?.index == 0 && this.state.selectFirstTimeAddress == true) {
+                this.setState({ selectFirstTimeAddress: false })
+                this.selectAddress(item?.item, item?.index, country?.country)
+            }
             return (
                 <TouchableOpacity
                     onPress={() => this.selectAddress(item?.item, item?.index, country?.country)}
@@ -569,8 +573,14 @@ class Billing_Shipping extends Component {
                             </View>
 
                             {/* Next Button */}
-                            <TouchableOpacity style={styles.nextBtn}>
-                                <Text style={[styles.text_style, { color: "white", fontSize: 16 }]}>Next</Text>
+                            <TouchableOpacity
+                                onPress={() => this.onNext()}
+                                style={styles.nextBtn}>
+                                {this.state.loadNext ?
+                                    <ActivityIndicator size={"large"} color={"white"} />
+                                    :
+                                    <Text style={[styles.text_style, { color: "white", fontSize: 16 }]}>Next</Text>
+                                }
                             </TouchableOpacity>
 
 
@@ -614,7 +624,7 @@ class Billing_Shipping extends Component {
 
                                 {cartItems.map((item, index) => {
                                     return (
-                                        <View style={styles.order_summary_item}>
+                                        <View key={index} style={styles.order_summary_item}>
                                             <Image
                                                 source={{ uri: imageUrl + item?.image }}
                                                 resizeMode='contain'

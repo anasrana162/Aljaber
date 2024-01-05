@@ -174,7 +174,35 @@ class App extends Component {
         break;
     }
   }
+  componentDidMount=()=>{
+    this.adminApi()
+  }
+  adminApi = async () => {
 
+    // console.log(this.props)
+    const { actions } = this.props
+    var { adminTokenCounter } = this.state
+
+    await api.post('integration/admin/token', {
+        "username": "apiuser",
+        "password": "Pakistani2023"
+    }).then((res) => {
+        console.log("Admin Api res: ||||| App.js ", res?.data)
+        if (res?.data) {
+
+                actions.adminToken(res?.data)
+
+
+        }
+    })
+        .catch((err) => {
+            console.log("Admin Api Error", err)
+            console.log("Admin Api Error", err?.response)
+
+           
+            // this.checkAdminToken()
+        })
+}
 
   render() {
     return (
