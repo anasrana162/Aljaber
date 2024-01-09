@@ -28,7 +28,7 @@ class Billing_Shipping extends Component {
             addressEmpty: false,
             countries: [],
             countrySelected: '',
-            countryParams:"",
+            countryParams: "",
             provinces: [],
             provinceSelected: "",
             selectedAddress: {},
@@ -133,7 +133,7 @@ class Billing_Shipping extends Component {
 
     selectAddress = (item, index, country) => {
         var { subtotal } = this.props?.route?.params
-        console.log("Selected Address: ", item)
+        // console.log("Selected Address: ", item)
         if ((item?.country_id == "AE" || country == "United Arab Emirates") && subtotal >= 150) {
             this.setState({
                 isShippingFree: true
@@ -147,7 +147,7 @@ class Billing_Shipping extends Component {
             selectedAddress: item,
             selectedAddressIndex: index,
             shippingSelected: false,
-            countryParams:country
+            countryParams: country
         })
     }
 
@@ -365,8 +365,8 @@ class Billing_Shipping extends Component {
 
     onNext = () => {
 
-        let { userData: { user, token } } = this.props
 
+        let { userData: { user, token } } = this.props
         var { selectedAddress, selectedAddress: { city, country_id, region, region_code, region_id, postcode, telephone, street }, isShippingFree } = this.state
 
         this.setState({ loadNext: true })
@@ -411,7 +411,6 @@ class Billing_Shipping extends Component {
             }
         }
         // console.log("Customer Token", token)
-        console.log("obj created", obj)
 
         api.post("carts/mine/shipping-information", obj,
             {
@@ -424,7 +423,11 @@ class Billing_Shipping extends Component {
                 console.log("res shipping information API", this.state.countryParams)
                 this.setState({ loadNext: false })
 
-                this.props.navigation.navigate("Review_Payment", { order_summary: res?.data, billing_shipping_address: obj, country: this.state.countryParams })
+                this.props.navigation.navigate("Review_Payment", {
+                    order_summary: res?.data,
+                    billing_shipping_address: obj,
+                    country: this.state.countryParams,
+                })
 
                 // this.checkAddress()
             }).catch((err) => {
@@ -443,9 +446,8 @@ class Billing_Shipping extends Component {
         const renderItem = (item) => {
             // console.log("Item", item?.index)
             var country = this.state.countries.filter((data) => data?.country_id == item?.item?.country_id)[0]
-            // console.log("COuntry", country)
-            if (item?.index == 0 && this.state.selectFirstTimeAddress == true) {
-                this.setState({ selectFirstTimeAddress: false })
+            if (item?.index == 0 && this.state.selectFirstTimeAddress == true && country != undefined) {
+                this.setState({ selectFirstTimeAddress: false, })
                 this.selectAddress(item?.item, item?.index, country?.country)
             }
             return (

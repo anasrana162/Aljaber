@@ -47,6 +47,8 @@ class Cart extends Component {
             provinceSelected: "",
             shipping_tax_key: 0,
             couponCode: "",
+            loaderEdit: false,
+            itemToEditSelected: ""
 
         };
     }
@@ -57,6 +59,7 @@ class Cart extends Component {
         this.getCartData()
         this.getCartItemDetails()
         this.getCountries()
+        // console.log("USER DATA", this.props.userData.user)
     }
 
     refresh = () => {
@@ -68,7 +71,7 @@ class Cart extends Component {
     getCountries = () => {
 
         api.get("aljaber/getallcountry").then((result) => {
-            console.log("Get Country Api Result: ", result?.data)
+            // console.log("Get Country Api Result: ", result?.data)
             setImmediate(() => {
                 this.setState({ countries: result?.data })
             })
@@ -248,14 +251,14 @@ class Cart extends Component {
 
     deleteCartItem = (product) => {
         var { userData: { token, admintoken, allproducts } } = this.props
-        console.log("Delete Item PRoduct", token)
+        // console.log("Delete Item PRoduct", token)
         api.delete("carts/" + product?.quote_id + "/items/" + product?.item_id, {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
         })
             .then((res) => {
-                console.log("Delete cart item Api Res ", res?.data)
+                // console.log("Delete cart item Api Res ", res?.data)
                 this.refresh()
                 alert("Item Removed")
             }).catch((err) => {
@@ -296,7 +299,7 @@ class Cart extends Component {
     addToCart = (product, index) => {
 
         var { userData } = this.props
-        console.log("userData", userData?.token)
+        // console.log("userData", userData?.token)
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
@@ -314,14 +317,14 @@ class Cart extends Component {
                             "quote_id": userData?.user?.cartID
                         }
                     }
-                    console.log("this product does not have options", obj)
+                    // console.log("this product does not have options", obj)
 
                     api.post("carts/mine/items", obj, {
                         headers: {
                             Authorization: `Bearer ${userData?.token}`,
                         },
                     }).then((response) => {
-                        console.log("Add to cart Item API response : ", response?.data)
+                        // console.log("Add to cart Item API response : ", response?.data)
                     }).catch((err) => {
                         console.log("Add to cart item api error:  ", err.response)
                     })
@@ -404,7 +407,7 @@ class Cart extends Component {
             return console.log("working updateCart FUnc")
         }
         for (let i = 0; i < updateCartItems.length; i++) {
-            console.log("updateCartItems OBJ", updateCartItems[i])
+            // console.log("updateCartItems OBJ", updateCartItems[i])
             if (cartItems[updateCartItems[i]?.index]?.item_id == updateCartItems[i]?.item_id) {
                 var obj = { "cartItem": cartItems[updateCartItems[i]?.index] }
                 // delete obj?.cartItem?.item_id;
@@ -413,7 +416,7 @@ class Cart extends Component {
                 if (cartItems[updateCartItems[i]?.index]?.product_option !== undefined) {
 
                     for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options.length; u++) {
-                        console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u])
+                        // console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u])
                         delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_title
                         delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_value_name
                     }
@@ -421,14 +424,14 @@ class Cart extends Component {
                     if (cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options == undefined) {
                     } else {
                         for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options.length; u++) {
-                            console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u])
+                            // console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u])
                             delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_title
                             delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_value_name
                         }
 
                     }
                 }
-                console.log("Final OBJ", cartItems[updateCartItems[i]?.index].product_option?.extension_attributes)
+                // console.log("Final OBJ", cartItems[updateCartItems[i]?.index].product_option?.extension_attributes)
 
                 await api.post("carts/mine/items", obj, {
                     headers: {
@@ -436,7 +439,7 @@ class Cart extends Component {
                     },
                 }).then((response) => {
 
-                    console.log("Update Cart Item API response : ", response?.data)
+                    // console.log("Update Cart Item API response : ", response?.data)
                     if (i == updateCartItems.length - 1) {
                         setImmediate(() => {
                             this.setState({
@@ -467,7 +470,7 @@ class Cart extends Component {
     itemSelectedFromShipping_Tax = (val, key) => {
         switch (key) {
             case "country":
-                console.log("Vale Selected Country:  ", val)
+                // console.log("Vale Selected Country:  ", val)
                 if (val?.country_id == "AE") {
                     this.setState({
                         countrySelected: val,
@@ -488,7 +491,7 @@ class Cart extends Component {
                 this.getProvinces(val)
                 break;
             case "province":
-                console.log("Vale Selected Province:  ", val)
+                // console.log("Vale Selected Province:  ", val)
                 this.setState({
                     provinceSelected: val,
                     // shipping_tax_key: this.state.shipping_tax_key + 1,
@@ -500,7 +503,7 @@ class Cart extends Component {
     getProvinces = (val) => {
 
         api.get("aljaber/getallregionbycid?country_id=" + val?.country_id).then((result) => {
-            console.log("Get Provinces Api Result: ", result?.data)
+            // console.log("Get Provinces Api Result: ", result?.data)
             setImmediate(() => {
                 this.setState({ provinces: result?.data })
             })
@@ -510,23 +513,32 @@ class Cart extends Component {
     }
 
     applyCoupon = () => {
-        var { userData: { admintoken,token } } = this.props
+        var { userData: { admintoken, token } } = this.props
 
-        console.log("this.state.couponCode",this.state.couponCode)
-        console.log("this.state.cartData?.id",this.state.cartData?.id)
-        console.log("admintoken",admintoken)
+        // console.log("this.state.couponCode", this.state.couponCode)
+        // console.log("this.state.cartData?.id", this.state.cartData?.id)
+        // console.log("admintoken", admintoken)
 
-        api.put('carts/' + this.state.cartData?.id + '/coupons/' + this.state.couponCode,{}, {
+        api.put('carts/' + this.state.cartData?.id + '/coupons/' + this.state.couponCode, {}, {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
         }).then((res) => {
-            console.log("Apply coupon API Result", res?.data)
+            // console.log("Apply coupon API Result", res?.data)
         }).catch((err) => {
             console.log("Apply coupon API Error", err.response?.data)
             alert(err.response?.data?.message)
         })
 
+    }
+    onEditItem = async (item) => {
+        // console.log("Item", item?.item)
+        this.setState({ loaderEdit: true, itemToEditSelected: item?.item?.item_id })
+        var result = await api.get(custom_api_url + "func=get_cart_item_image&item_id=" + item?.item?.item_id)
+        // console.log("result API", result?.data)
+        item.item.sku = result?.data?.parent_sku
+        this.setState({ loaderEdit: false })
+        this.props.navigation.navigate("ProductDetails", { product_details: item.item, product_index: item?.index, screenName: "Cart" })
     }
 
 
@@ -604,7 +616,9 @@ class Cart extends Component {
                                 <Text style={[styles.text_style, { fontSize: 18, fontWeight: "700", color: "black" }]}>AED {flatrate + subtotal} </Text>
                             </View>
 
-                            <View style={{
+                            {/* Coupon Code */}
+
+                            {/* <View style={{
                                 width: width - 40,
                                 height: 40,
                                 backgroundColor: "white",
@@ -626,7 +640,7 @@ class Cart extends Component {
                                     style={styles.applyCoupon}>
                                     <Text style={[styles.text_style, { fontSize: 14, color: "white", fontWeight: "600" }]}>Apply Discount</Text>
                                 </TouchableOpacity>
-                            </View>
+                            </View> */}
 
                             <View style={{ flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-around" }}>
                                 {/* Update Cart */}
@@ -637,9 +651,9 @@ class Cart extends Component {
                                 </TouchableOpacity>
                                 {/* Checkout Button */}
                                 <TouchableOpacity
-                                    onPress={() => this.props.navigation.navigate('Billing_Shipping', { subtotal: subtotal, cartItems: cartItems })}
+                                    onPress={() => this.props.navigation.navigate('Billing_Shipping', { subtotal: subtotal, cartItems: cartItems, })}
                                     style={styles.checkout_btn}>
-                                    <Text style={[styles.text_style, { fontSize: 16, color: "white", fontWeight: "600" }]}>Checkout</Text>
+                                    <Text style={[styles.text_style, { fontSize: 16, color: "white", fontWeight: "600" }]}>Proceed</Text>
                                 </TouchableOpacity>
                             </View>
                         </>
@@ -802,8 +816,12 @@ class Cart extends Component {
                         </TouchableOpacity>
 
                         <View style={[styles.flatList_innerCont, { justifyContent: "space-between", width: 60, }]}>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate("ProductDetails", { product_details: item?.item, product_index: item?.index, screenName: "Cart" })}>
-                                <FontAwesome5 name='pencil-alt' size={18} color='#020621' style={{ padding: 5 }} />
+                            <TouchableOpacity
+                                disabled={this.state.loaderEdit}
+                                onPress={() => this.onEditItem(item)}>
+                                {this.state.loaderEdit && this.state.itemToEditSelected == item?.item?.item_id ?
+                                    <ActivityIndicator size={"small"} color="#020621" />
+                                    : <FontAwesome5 name='pencil-alt' size={18} color='#020621' style={{ padding: 5 }} />}
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => this.deleteCartItem(item?.item)}>
                                 <Entypo name='cross' size={24} color='#020621' style={{ padding: 5 }} />
