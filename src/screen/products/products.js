@@ -394,7 +394,7 @@ class Products extends Component {
                 Authorization: `Bearer ${admintoken}`,
             },
         })
-        console.log("Result For Custom Attributes", result?.data?.items.length)
+        // console.log("Result For Custom Attributes", result?.data?.items.length)
         result.data.items = result?.data?.items.reverse()
         for (let rdi = 0; rdi < result?.data?.items.length; rdi++) {
 
@@ -607,7 +607,7 @@ class Products extends Component {
                     obj.product_ids.push(product?.id)
                     contact_lens_diameter?.value?.push(obj)
                     this.setState({ contact_lens_diameter })
-                    console.log(contact_lens_diameter)
+                    // console.log(contact_lens_diameter)
                 }
 
             }
@@ -1580,7 +1580,7 @@ class Products extends Component {
     }
 
     openFilterBoard = () => {
-        console.log("opening")
+        // console.log("opening")
         setImmediate(() => {
             this.setState({
                 filterBoardOpen: !this.state.filterBoardOpen
@@ -1591,7 +1591,7 @@ class Products extends Component {
     addToCart = (product, index) => {
 
         var { userData } = this.props
-        console.log("userData", userData?.token)
+        // console.log("userData", userData?.token)
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
@@ -1609,20 +1609,20 @@ class Products extends Component {
                             "quote_id": userData?.user?.cartID
                         }
                     }
-                    console.log("this product does not have options", obj)
+                    // console.log("this product does not have options", obj)
 
                     api.post("carts/mine/items", obj, {
                         headers: {
                             Authorization: `Bearer ${userData?.token}`,
                         },
                     }).then((response) => {
-                        console.log("Add to cart Item API response : ", response?.data)
+                        // console.log("Add to cart Item API response : ", response?.data)
                     }).catch((err) => {
                         console.log("Add to cart item api error:  ", err)
                     })
 
                 } else {
-                    console.log("this product has options")
+                    // console.log("this product has options")
                     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                     return alert("Please select a Product Options!")
                 }

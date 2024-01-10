@@ -52,30 +52,35 @@ const Options = ({
 
     return (
         <View style={styles.mainContainer}>
-            <View style={styles.checkBox_cont} >
-                {checked ?
-                    <TouchableOpacity
-                        onPress={() => {
-                            setChecked(!checked)
-                            checkMarked(!checked)
-                        }}
-                    >
-                        <Fontisto name="checkbox-active" size={20} color="#020621" />
-                    </TouchableOpacity>
-                    :
-                    <TouchableOpacity
-                        onPress={() => {
-                            setChecked(!checked)
-                            checkMarked(!checked)
-                        }}
-                    >
-                        <Fontisto name="checkbox-passive" size={20} color="#020621" />
-                    </TouchableOpacity>
-                }
-                <Text style={styles?.checkBox_text}>I NEED 2 DIFFERENT POWERS FOR MY LENSES</Text>
+
+            {
+               (product_options == null || product_options == undefined || product_options.length == 0) ? <>
+                </> :
+                    <View style={styles.checkBox_cont} >
+                        {checked ?
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setChecked(!checked)
+                                    checkMarked(!checked)
+                                }}
+                            >
+                                <Fontisto name="checkbox-active" size={20} color="#020621" />
+                            </TouchableOpacity>
+                            :
+                            <TouchableOpacity
+                                onPress={() => {
+                                    setChecked(!checked)
+                                    checkMarked(!checked)
+                                }}
+                            >
+                                <Fontisto name="checkbox-passive" size={20} color="#020621" />
+                            </TouchableOpacity>
+                        }
+                        <Text style={styles?.checkBox_text}>I NEED 2 DIFFERENT POWERS FOR MY LENSES</Text>
 
 
-            </View>
+                    </View>
+            }
 
             {/* Configurable Product Options */}
             {(configurable_product_options == null || configurable_product_options == undefined || configurable_product_options.length == 0) ?

@@ -484,7 +484,9 @@ class Billing_Shipping extends Component {
                     {/* Title */}
                     <Text style={styles.header_comp_title}>Shipping Address</Text>
                 </View>
-                <ScrollView>
+                <ScrollView 
+                showsVerticalScrollIndicator={true}
+                style={{marginBottom:100}} >
 
 
                     {this.state.addressEmpty == true ?
@@ -749,7 +751,8 @@ const styles = StyleSheet.create({
         paddingTop: 0,
         paddingBottom: 10,
         position: "absolute",
-        top: 0
+        top: 0,
+        zIndex:200,
     },
 
     header_comp_title: {
@@ -765,6 +768,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignSelf: 'center',
         marginTop: 40,
+        marginBottom: 40,
         borderRadius: 5,
     },
     itemCont: {

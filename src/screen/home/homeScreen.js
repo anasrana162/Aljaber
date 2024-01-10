@@ -137,7 +137,7 @@ class HomeScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            defaultCategories: null,
+            defaultCategories: this.props.userData?.defaultcategory,
             loader: false,
             loaderDot: false,
             categoryApiCounter: 0,
@@ -148,17 +148,16 @@ class HomeScreen extends Component {
             tempArray: [],
             firstSubItem: null,
             randomProducts: null,
-            topCategoryData: [],
+            topCategoryData: this.props.userData?.topcatdata,
         };
     }
 
     componentDidMount = () => {
         // this.adminApi()     
         this.props.navigation.addListener('focus', async () => { this.adminApi(), this.loginUser() });
-        this.getDefaultCategories()
+        // this.getDefaultCategories()
+        this.randomProducts()
         this.unsubscribe()
-
-
 
         // 
     }
@@ -223,20 +222,23 @@ class HomeScreen extends Component {
         }
     }
 
-    fetchAllProductsForSearch = async () => {
-        var { actions } = this.props
-        var fetchProducts = await api.get(custom_api_url + "func=get_all_products")
-        let products = []
-        for (let i = 0; i < fetchProducts?.data.length; i++) {
-            if (fetchProducts?.data[i].type == "configurable" || fetchProducts?.data[i].type == "simple" && fetchProducts?.data[i].visibility == 4) {
-                products.push(fetchProducts?.data[i])
-            }
-        }
+    // fetchAllProductsForSearch = async () => {
+    //     var { actions } = this.props
+    //     var fetchProducts = await api.get(custom_api_url + "func=get_all_products")
+    //     let products = []
+    //     for (let i = 0; i < fetchProducts?.data.length; i++) {
+    //         if (fetchProducts?.data[i].type == "configurable" || fetchProducts?.data[i].type == "simple" && fetchProducts?.data[i].visibility == 4) {
+    //             products.push(fetchProducts?.data[i])
+    //         }
+    //     }
 
-        actions?.searchProducts(products)
-        // console.log("Fetched products final:", products)
+    //     actions?.searchProducts(products)
+    //     // console.log("Fetched products final:", products)
 
-    }
+    // }
+    //     componentWillUnmount=()=>{
+    // this.unsubscribe()
+    //     }
 
     adminApi = async () => {
 
@@ -279,7 +281,7 @@ class HomeScreen extends Component {
 
     getDefaultCategories = async () => {
 
-        const { actions, userData:{admintoken} } = this.props
+        const { actions, userData: { admintoken } } = this.props
         var { categoryApiCounter, adminToken } = this.state
         setImmediate(() => {
             this.setState({ loader: true })
@@ -303,7 +305,8 @@ class HomeScreen extends Component {
                     setTimeout(() => {
                         this.loginUser()
                         this.defaultCategories()
-                        this.fetchAllProductsForSearch()
+                        this.topCategoryData()
+                        // this.fetchAllProductsForSearch()
                         this.randomProducts()
                     }, 500)
 
@@ -370,7 +373,7 @@ class HomeScreen extends Component {
             firstSubItem: tempArr[0]
         });
         // this.topCatData(tempArr)
-        this.topCategoryData()
+        // this.topCategoryData()
     }
 
     unsubscribe = NetInfo.addEventListener(state => {
@@ -403,6 +406,10 @@ class HomeScreen extends Component {
                     Authorization: `Bearer ${admintoken}`,
                 }
             }).then((res) => {
+                if (topCategory[i]?.id == 122) {
+                    topCategoryData.push(topCategory[i])
+                    
+                }
                 for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
                     if (res?.data?.custom_attributes[r].attribute_code == "image") {
                         topCategory[i].image = res?.data?.custom_attributes[r].value
@@ -413,7 +420,7 @@ class HomeScreen extends Component {
                     // thats why in the array imagelink is manually given so it is also pushed in the array
                     // as it is without any modification like above rest which have attribute code image
                     if (topCategory[i]?.id == 122) {
-                        topCategoryData.push(topCategory[i])
+                        // topCategoryData.push(topCategory[i])
                         break;
                     }
                 }
@@ -464,7 +471,8 @@ class HomeScreen extends Component {
 
         // Generate random Index number to store some from huge amount of products
         // console.log("Stored Products length", sku_arr?.length)
-
+        var { actions } = this.props
+        actions?.allProducts(temp_sku_arr)
         var store_product = []
         var index = 15
         var store_index = []
@@ -525,7 +533,7 @@ class HomeScreen extends Component {
 
         setImmediate(() => {
             var { actions } = this.props
-            actions?.allProducts(temp_sku_arr)
+            // actions?.allProducts(temp_sku_arr)
             actions?.randomProducts(store_product)
             this.setState(
                 {

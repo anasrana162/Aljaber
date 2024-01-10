@@ -25,8 +25,8 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
 
     const onEndReached = () => {
         setSlicedLoader(true)
-        console.log("END Reached")
-        console.log("Data length", data?.length)
+        // console.log("END Reached")
+        // console.log("Data length", data?.length)
 
         if (data?.length <= slicedLength) {
             console.log("no data to reload")

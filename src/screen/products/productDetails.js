@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Image, View, Dimensions, Modal, NativeModules, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Text, StyleSheet, Image, View, Dimensions, Modal, NativeModules, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native'
 import React, { Component } from 'react'
 import RenderHtml from 'react-native-render-html';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -30,7 +30,7 @@ class ProductDetails extends Component {
         this.state = {
 
             // Options Ended
-
+            varient_brand: "",
             product_varients: null,
             product_varient_selected: null,
             varient_selected: false,
@@ -66,6 +66,7 @@ class ProductDetails extends Component {
             leftEyeQuantity: 1,
             rightEyeQuantity: 1,
             more_info_loader: false,
+            refreshing: false,
         };
     }
 
@@ -96,13 +97,13 @@ class ProductDetails extends Component {
 
             // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
             // on the screen as it is not in the main body of the object
-
+            var bigcheck = false
             for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
 
                 // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
 
                 if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-
+                    bigcheck = true
                     await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
                         prod.data.brand = data?.data
 
@@ -120,12 +121,23 @@ class ProductDetails extends Component {
 
                         if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
 
+                            setImmediate(() => {
+                                this.setState({
+                                    product_details: prod?.data,
+                                })
+                            })
+
                             // Checking value of configurable_product_links (product Varients)
                             for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
 
                                 // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
-                                const selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
-
+                                var selected_products = ""
+                                if (allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0] == undefined) {
+                                    alert("Error Fetching Data check network connection")
+                                    this.props.navigation.pop()
+                                } else {
+                                    selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
+                                }
                                 // Condition
                                 if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
 
@@ -187,21 +199,28 @@ class ProductDetails extends Component {
                                         console.log("Configurable Product Details Api Error", err)
                                     })
 
+                                    console.log("CHeck", check)
                                     // this condition break the loop from further adding more products
                                     if (check == true) {
+
                                         break;
                                     }
                                 } else {
+
                                 }
                             }
+
                         }
                     }).catch((err) => {
                         console.log("DAta for Brands Api errr", err)
                     })
                     break;
                 }
+                if (bigcheck == true) {
+                    break;
+                }
             }
-
+            // this.createVarients()
             this.getDescription('prop')
             this.checkOptions('prop')
             this.getMain_Info('prop')
@@ -209,13 +228,16 @@ class ProductDetails extends Component {
             this.productImages("prop")
             this.check_Configurable_Product_Options()
 
+
         }).catch((err) => {
             console.log("Product Detail Api error on:  ", sku, err)
             alert("Error Fetching Data Try again")
+            this.props.navigation.pop()
             // this.getProductDetails()
             return setImmediate(() => {
                 this.setState({
-                    loader: false
+                    loader: false,
+                    refreshing: false
                 })
 
             })
@@ -225,6 +247,91 @@ class ProductDetails extends Component {
 
     }
 
+
+    // createVarients = async () => {
+    //     var { product_details } = this.state
+    //     var { userData: { admintoken, allproducts } } = this.props
+    //     var tempPRoducts = []
+    //     // Checking value of configurable_product_links (product Varients)
+    //     var check = false
+    //     for (let tp = 0; tp < product_details?.extension_attributes?.configurable_product_links?.length; tp++) {
+
+    //         // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
+    //         const selected_products = allproducts.filter((value) => value?.id == product_details?.extension_attributes?.configurable_product_links[tp])[0]
+
+    //         // Condition
+    //         if (product_details?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
+
+    //             // if id's match then the value "sku" is picked up from the matching product object and then we run an api
+    //             // to fetch details for the varient because they are not in the products object from all products api
+
+    //             // Api for fetching product details
+
+    //             await api.get('/products/' + selected_products?.sku, {
+    //                 headers: {
+    //                     Authorization: `Bearer ${admintoken}`,
+    //                 },
+    //             }).then(async (cfPD) => {
+
+    //                 // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
+    //                 // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
+    //                 // long process already done above to save time while fetching for its main version of product
+
+    //                 // cfPD.data.brand = data?.data // brand value
+    //                 cfPD.data.parent_product_id = product_details?.id
+    //                 cfPD.data.options = product_details?.options
+    //                 cfPD.data.type_id = product_details?.type_id
+    //                 // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
+    //                 // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
+    //                 // together
+    //                 // console.log("cfPD?.data", cfPD?.data)
+
+    //                 tempPRoducts.push(cfPD?.data)
+
+    //                 // here's the condition once the configurable_product_links array reach its end
+    //                 if (tp == product_details?.extension_attributes?.configurable_product_links?.length - 1) {
+
+    //                     //we also change the value of price of the main product because products with type_id have "0" price
+    //                     // so we take a price from its varient overwrite (Note price of all vareints are same)
+    //                     product_details.price = cfPD.data?.price
+
+    //                     // then we create an of product_varients and push into main product's object to show and display the varients in
+    //                     // product details screen
+    //                     product_details.product_varients = tempPRoducts
+
+    //                     // then we push this product into main products array with all of these things so it can be displayed
+    //                     // in the Products Detail screen
+
+    //                     setImmediate(() => {
+    //                         this.setState({
+    //                             product_details
+    //                         })
+    //                     })
+
+    //                     // Emptying the temporary array that we pushed products varients so the varients of other products
+    //                     // dont get added in the other products
+    //                     tempPRoducts = []
+
+    //                     // setting value of check to true from false to break the loop once it reaches its end
+    //                     check = true
+    //                 }
+
+    //             }).catch((err) => {
+    //                 console.log("Configurable Product Details Api Error", err)
+    //             })
+
+    //             console.log("CHeck", check)
+    //             // this condition break the loop from further adding more products
+
+    //         } else{
+
+    //         }
+    //         if (check == true) {
+
+    //             break;
+    //         }
+    //     }
+    // }
 
 
     check_Configurable_Product_Options = async () => {
@@ -254,11 +361,14 @@ class ProductDetails extends Component {
                 }
             }
             // console.log("configurable_product_options", configurable_product_options)
+
             setImmediate(() => {
                 this.setState({
                     configurable_product_options: configurable_product_options,
                     loader: false,
+                    refreshing: false
                 })
+
             })
 
 
@@ -287,13 +397,13 @@ class ProductDetails extends Component {
     checkCartScreenOption = (product_details_recieved, options) => {
         var { custom_options, cartCIO_Defaults } = this.state
 
-        console.log("product_details Cart ", product_details_recieved, `${"\n"}`, "       ", options)
+        // console.log("product_details Cart ", product_details_recieved, `${"\n"}`, "       ", options)
         setImmediate(() => {
             this.setState({ quantity: product_details_recieved?.qty })
         })
         if (product_details_recieved?.product_option != undefined) {
 
-            console.log("product_details Cart extension_attributes", product_details_recieved?.product_option?.extension_attributes)
+            // console.log("product_details Cart extension_attributes", product_details_recieved?.product_option?.extension_attributes)
             var custom_options_cio = product_details_recieved?.product_option?.extension_attributes?.custom_options
 
             for (let i = 0; i < options?.length; i++) {
@@ -305,25 +415,25 @@ class ProductDetails extends Component {
                 // console.log("")
                 for (let k = 0; k < custom_options_cio.length; k++) {
                     if (options[i]?.title == custom_options_cio[k]?.option_title) {
-                        console.log("")
-                        console.log("-----------------------")
-                        console.log("Option Picked:     ", options[i]?.title)
-                        console.log("custom_options_cio[i]", custom_options_cio[i])
-                        console.log("-----------------------")
-                        console.log("")
+                        // console.log("")
+                        // console.log("-----------------------")
+                        // console.log("Option Picked:     ", options[i]?.title)
+                        // console.log("custom_options_cio[i]", custom_options_cio[i])
+                        // console.log("-----------------------")
+                        // console.log("")
 
                         let obj = {
                             "option_id": custom_options_cio[i]?.option_id,
                             "option_value": custom_options_cio[i]?.option_value,
                         }
-                        console.log("custom_options_cio[i] obj push", obj)
+                        // console.log("custom_options_cio[i] obj push", obj)
                         custom_options.push(obj)
 
                         let obj1 = {
                             "option_title": custom_options_cio[i]?.option_title,
                             "option_value_name": custom_options_cio[i]?.option_value_name
                         }
-                        console.log("custom_options_cio[i] obj1 push", obj1)
+                        // console.log("custom_options_cio[i] obj1 push", obj1)
                         cartCIO_Defaults.push(obj1)
 
                     }
@@ -331,8 +441,6 @@ class ProductDetails extends Component {
             }
         }
     }
-
-
 
     productImages = (key) => {
         var { product_details: { media_gallery_entries } } = this.state
@@ -1093,15 +1201,16 @@ class ProductDetails extends Component {
         // select Varient Functionality
 
         var attribute_code = await axios.get(custom_api_url + "func=attribute_code&id=" + attribute_id)
-        // console.log("attribute_code:", attribute_code?.data)
+        console.log("attribute_code:", attribute_code?.data)
 
-        if (product_varients == undefined) {
-            console.log("this has no varients")
+        if (product_varients == undefined || product_varients.length == 0) {
+            alert("Cannot select varient please check network connection")
+            return console.log("this has no varients")
         } else {
 
             for (let pd = 0; pd < product_varients.length; pd++) {
-                // console.log("product_varients", product_varients[pd])
                 var { custom_attributes } = product_varients[pd]
+                console.log("product_varients", custom_attributes)
 
                 var filter = custom_attributes.filter((val, index) =>
                     val?.attribute_code == attribute_code?.data && val?.value == data?.value_index)[0]
@@ -1198,7 +1307,7 @@ class ProductDetails extends Component {
                     "quote_id": cartID
                 }
             }
-            console.log("this product does not have options", obj)
+            // console.log("this product does not have options", obj)
 
             this.addToCartApi(obj)
 
@@ -1291,8 +1400,8 @@ class ProductDetails extends Component {
                                 }
                             }
                         }
-                        console.log("obj for left", obj?.cartItem)
-                        console.log("obj for left", obj?.cartItem?.product_option?.extension_attributes)
+                        // console.log("obj for left", obj?.cartItem)
+                        // console.log("obj for left", obj?.cartItem?.product_option?.extension_attributes)
 
                         this.addToCartApi(obj)
 
@@ -1312,8 +1421,8 @@ class ProductDetails extends Component {
                                 }
                             }
                         }
-                        console.log("obj for right", obj?.cartItem)
-                        console.log("obj for right", obj?.cartItem?.product_option?.extension_attributes)
+                        // console.log("obj for right", obj?.cartItem)
+                        // console.log("obj for right", obj?.cartItem?.product_option?.extension_attributes)
 
                         this.addToCartApi(obj)
                     }
@@ -1341,9 +1450,14 @@ class ProductDetails extends Component {
                         }
                     }
 
-                    console.log("when checked false  obj", obj?.cartItem?.product_option?.extension_attributes)
+                    // console.log("when checked false  obj", obj?.cartItem?.product_option?.extension_attributes)
                     this.addToCartApi(obj)
                 } else {
+                    setImmediate(() => {
+                        this.setState({
+                            loader: false,
+                        })
+                    })
                     alert("Select Options for Product")
                 }
 
@@ -1356,18 +1470,18 @@ class ProductDetails extends Component {
     }
 
     addToCartApi = async (obj) => {
-        console.log("")
-        console.log('')
-        console.log("---------------------------------------")
-        console.log("Before Going to API in FUnc")
-        console.log("")
-        console.log("this product does have options ", obj)
-        console.log("")
-        console.log("obj extension_attributes", obj?.cartItem?.product_option?.extension_attributes)
-        console.log("")
-        console.log("---------------------------------------")
-        console.log("")
-        console.log('')
+        // console.log("")
+        // console.log('')
+        // console.log("---------------------------------------")
+        // console.log("Before Going to API in FUnc")
+        // console.log("")
+        // console.log("this product does have options ", obj)
+        // console.log("")
+        // console.log("obj extension_attributes", obj?.cartItem?.product_option?.extension_attributes)
+        // console.log("")
+        // console.log("---------------------------------------")
+        // console.log("")
+        // console.log('')
         var { userData } = this.props
         await api.post("carts/mine/items", obj, {
             headers: {
@@ -1375,16 +1489,16 @@ class ProductDetails extends Component {
             },
         }).then((response) => {
             alert("Product Added to Cart")
-            console.log("")
-            console.log("---------------------------------------")
-            console.log("")
-            console.log("API RESPONSE")
-            console.log('')
-            console.log("Add to cart Item API response : ", response?.data)
-            console.log("")
-            console.log("---------------------------------------")
-            console.log("")
-            console.log('')
+            // console.log("")
+            // console.log("---------------------------------------")
+            // console.log("")
+            // console.log("API RESPONSE")
+            // console.log('')
+            // console.log("Add to cart Item API response : ", response?.data)
+            // console.log("")
+            // console.log("---------------------------------------")
+            // console.log("")
+            // console.log('')
             setImmediate(() => {
                 this.setState({
                     cartLoader: false,
@@ -1485,6 +1599,17 @@ class ProductDetails extends Component {
 
                 <ScrollView
                     showsVerticalScrollIndicator={false}
+                    refreshControl={
+
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                this.setState({ refreshing: true })
+                                this.getProductDetails()
+                            }}
+                        />
+
+                    }
                     style={{ width: width - 20, }}>
 
                     <ImageCarousel
@@ -1616,7 +1741,7 @@ class ProductDetails extends Component {
 
                     {/* DetailsNav */}
                     {this.state.more_info_loader ?
-                        <ActivityIndicator size={"small"} color="black" style={{marginVertical:10,}}/>
+                        <ActivityIndicator size={"small"} color="black" style={{ marginVertical: 10, }} />
                         :
                         <DetailsTabNav
                             navProps={this.props.navigation}

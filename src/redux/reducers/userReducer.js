@@ -1,5 +1,5 @@
 import {
-    LANGUAGE, TOKEN, USER, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
+    LANGUAGE, TOKEN, USER, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT, TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
     SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
@@ -14,6 +14,7 @@ const initialState = {
     admintoken: null,
     defaultcategory: null,
     createddefaultcategory: null,
+    topcatdata: null,
     allproducts: null,
     cartitems: null,
     searchproducts: null,
@@ -70,6 +71,11 @@ const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 createddefaultcategory: action.payload
+            }
+        case TOPCATDATA:
+            return {
+                ...state,
+                topcatdata: action.payload
             }
         case ALLPRODUCTS:
             return {

@@ -31,7 +31,7 @@ class Categories extends Component {
     defaultCategories = () => {
         const { userData: { createddefaultcategory } } = this.props
 
-        console.log("userData", createddefaultcategory)
+        // console.log("userData", createddefaultcategory)
         setImmediate(() => {
 
             this.setState({
@@ -101,7 +101,8 @@ class Categories extends Component {
                             // console.log("Item",item?.item?.name)
                             return (
                                 <>
-                                    {item?.item?.is_active == true &&
+                                    {/* item?.index != 0 this condition is for hiding shop by brand */}
+                                    {item?.item?.is_active == true && item?.index != 0 &&
                                         <TouchableOpacity
 
                                             onPress={() => this.selectedItems(item?.item, index, 'main')}
@@ -142,7 +143,7 @@ class Categories extends Component {
                     <View style={styles.flatList_outerCont_sub}>
                         {
                             this.state.selectedCat?.children_data.map((item, index) => {
-                                console.log(item)
+                                // console.log(item)
                                 switch (item?.id) {
                                     case 81:
                                         item.is_active = false
@@ -217,12 +218,13 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start"
     },
     inner_main: {
-        width: width,
+        width: width-20,
         alignSelf: "center",
-        marginTop: 20,
+        marginTop: 30,
         // marginRight: 200,
         // flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        marginBottom:10
     },
     default_category_cont: {
         width: 110,

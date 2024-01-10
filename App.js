@@ -4,7 +4,7 @@ import { ProgressBar } from 'react-native-paper';
 // Command Appcenter Push: appcenter codepush release-react -a a2zcreatorzz-gmail.com/Al-Jaber_Android -d Staging
 // COmmand Appcenter Push IOS:appcenter codepush release-react -a a2zcreatorzz-gmail.com/Al-Jaber_IOS -d Staging
 
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 {/* {---------------Code Push----------------} */ }
 import codePush from 'react-native-code-push';
@@ -32,11 +32,60 @@ import {
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 const { StatusBarManager } = NativeModules;
 import Navigation from './src/navigation/navigation';
-import api from './src/api/api';
+import api, { custom_api_url } from './src/api/api';
 import NetInfo from "@react-native-community/netinfo";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Loading from './src/components_reusable/loading';
 
 const width = Dimensions.get("screen").width
+
+var topCategory = [
+  {
+    "id": 42,
+    "parent_id": 26,
+    "name": "Men",
+    "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/man-cat.jpg",
+    "is_active": true,
+    "position": 1,
+    "level": 3,
+    "product_count": 175,
+    "children_data": []
+  },
+  {
+    "id": 43,
+    "parent_id": 26,
+    "name": "Women",
+    "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/women-cat.jpg",
+    "is_active": true,
+    "position": 2,
+    "level": 3,
+    "product_count": 209,
+    "children_data": []
+  },
+  {
+    "id": 44,
+    "parent_id": 26,
+    "name": "Kids",
+    "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/kid-cat.jpg",
+    "is_active": true,
+    "position": 3,
+    "level": 3,
+    "product_count": 97,
+    "children_data": []
+  },
+  {
+    "id": 122,
+    "parent_id": 102,
+    "name": "Acessories",
+    "main_menu_image": "https://aljaberoptical.com/media/wysiwyg/smartwave/porto/theme_assets/images/resource/sunglasses-cat.jpg",
+    "is_active": true,
+    "image": "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg",
+    "position": 1,
+    "level": 3,
+    "product_count": 41,
+    "children_data": []
+  },
+]
 
 class App extends Component {
 
@@ -44,7 +93,9 @@ class App extends Component {
     super(props);
     this.state = {
       adminToken: null,
+      loader: false,
       adminTokenCounter: 0,
+      categoryApiCounter: 0,
       network: true,
       syncMessage: 'Loading',
       progress: null,
@@ -55,7 +106,13 @@ class App extends Component {
       update: false,
     };
   }
+  componentDidMount = () => {
+    this.adminApi()
+    this.loginUser()
+    this.fetchAllProductsForSearch()
+  }
 
+  // ---------Code Push Start-----------//
   syncImmediate() {
     this.setState({ updateProcess: true });
     codePush.sync(
@@ -73,7 +130,6 @@ class App extends Component {
       this.codePushDownloadDidProgress.bind(this),
     );
   }
-
   codePushDownloadDidProgress(progress) {
     const downloaded = Math.round(
       (progress?.receivedBytes / progress?.totalBytes) * 100,
@@ -81,7 +137,6 @@ class App extends Component {
     console.log('downloaded', downloaded);
     this.setState({ progress, downloading: true, downloaded: downloaded });
   }
-
   codePushStatusDidChange(syncStatus) {
     switch (syncStatus) {
       case codePush.SyncStatus.CHECKING_FOR_UPDATE:
@@ -174,35 +229,226 @@ class App extends Component {
         break;
     }
   }
-  componentDidMount=()=>{
-    this.adminApi()
-  }
+  // ---------Code Push END-----------//
+
   adminApi = async () => {
 
     // console.log(this.props)
     const { actions } = this.props
     var { adminTokenCounter } = this.state
-
+    setImmediate(() => {
+      this.setState({ loader: true })
+    })
     await api.post('integration/admin/token', {
-        "username": "apiuser",
-        "password": "Pakistani2023"
+      "username": "apiuser",
+      "password": "Pakistani2023"
     }).then((res) => {
-        console.log("Admin Api res: ||||| App.js ", res?.data)
-        if (res?.data) {
+      console.log("Admin Api res: ||||| App.js ", res?.data)
+      if (res?.data) {
 
-                actions.adminToken(res?.data)
+        actions.adminToken(res?.data)
+        this.setState({ adminToken: res?.data })
+        this.getDefaultCategories()
+      }
+    })
+      .catch((err) => {
+        console.log("Admin Api Error", err)
+        console.log("Admin Api Error", err?.response)
 
+
+        // this.checkAdminToken()
+      })
+  }
+  loginUser = async () => {
+
+    var { actions } = this.props
+
+    var LoginData = await AsyncStorage.getItem("@aljaber_userLoginData")
+    var objLoginData = JSON.parse(LoginData)
+    console.log("LoginData", objLoginData)
+    if (objLoginData !== null) {
+
+      var customerToken = await api.post('integration/customer/token', {
+        username: objLoginData?.username,
+        password: objLoginData?.password,
+      })
+
+      // console.log("customerToken", customerToken?.data)
+      if (customerToken?.data !== "") {
+        const res = await api.post(
+          "carts/mine",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${customerToken?.data}`,
+              "Content-Type": "application/json",
+            },
+          }
+        ).then((result) => {
+
+
+          // console.log("========Success ALJEBER============ Home", result?.data);
+
+          api.get('customers/me', {
+            headers: {
+              Authorization: `Bearer ${customerToken?.data}`,
+            },
+          }).then((user_data) => {
+
+
+            if (user_data?.data) {
+              // console.log("TOKEN GENERATED============Home",)
+              actions.userToken(customerToken?.data)
+              user_data.data.cartID = result?.data
+              actions.user(user_data?.data)
+
+            }
+          }).catch((err) => {
+            alert("Network Error Code: (cd1)")
+            console.log("customer data Api error HOme: ", err?.response)
+
+          })
+        }).catch((err) => {
+          console.log("Error AddtoCart ID API Home:", err?.message)
+
+        })
+      }
+    }
+    else {
+      console.log("No credentials found for login")
+    }
+  }
+  fetchAllProductsForSearch = async () => {
+    var { actions } = this.props
+    var fetchProducts = await api.get(custom_api_url + "func=get_all_products")
+    let products = []
+    for (let i = 0; i < fetchProducts?.data.length; i++) {
+      if (fetchProducts?.data[i].type == "configurable" || fetchProducts?.data[i].type == "simple" && fetchProducts?.data[i].visibility == 4) {
+        products.push(fetchProducts?.data[i])
+      }
+    }
+
+    actions?.searchProducts(products)
+    // console.log("Fetched products final:", products)
+
+  }
+  getDefaultCategories = async () => {
+
+    const { actions } = this.props
+    var { categoryApiCounter, adminToken } = this.state
+   
+    if (this.state.network == true) {
+
+      await api.get('categories', {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      }).then((res) => {
+        //console.log("User Data:", res?.data)
+
+        actions.defaultCategories(res?.data)
+        // this.loginUser()
+        this.defaultCategories()
+        this.topCategoryData()
+        // this.fetchAllProductsForSearch()
+        // this.randomProducts()
+
+      }).catch((err) => {
+        //alert("Network Error Code: (CAT#1)")
+        console.log("categories Api error: ", err)
+        setTimeout(() => {
+
+          if (categoryApiCounter == 3) {
+            RNRestart.restart();
+          } else {
+
+            categoryApiCounter = categoryApiCounter + 1
+            this.setState({ categoryApiCounter })
+            this.adminApi()
+          }
+        }, 3000);
+
+      })
+    }
+    // }
+  }
+  defaultCategories = () => {
+    const { actions, userData: { defaultcategory, admintoken } } = this.props
+
+    var { children_data } = defaultcategory
+    // console.log("tempArray1", children_data)
+    actions?.createdDefaultCategories(children_data)
+
+    // this to to hide some categories ID's are specified in switch
+    // var tempArr = []
+    // for (let i = 0; i < children_data?.length; i++) {
+    //     switch (children_data[i].id) {
+    //         case 50:
+    //             children_data[i].is_active = false
+    //             break;
+    //         case 72:
+    //             children_data[i].is_active = false
+    //             break;
+    //         case 89:
+    //             children_data[i].is_active = false
+    //             break;
+    //         case 128:
+    //             children_data[i].is_active = false
+    //             break;
+
+    //         default:
+    //             // /children_data[i].is_active = true
+    //             tempArr.push(children_data[i])
+    //             break;
+    //     }
+    // }
+    // this.setState({
+    //     defaultCategories1: tempArr,
+    //     firstSubItem: tempArr[0]
+    // });
+    // this.topCatData(tempArr)
+    // this.topCategoryData()
+  }
+  topCategoryData = async () => {
+    var { userData: { admintoken }, actions } = this.props
+    var { adminToken } = this.state
+    var topCategoryData = []
+    for (let i = 0; i < topCategory.length; i++) {
+      // this api is being used for taking out image link for product screen top image
+      await api.get("categories/" + topCategory[i]?.id, {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        }
+      }).then((res) => {
+        if (topCategory[i]?.id == 122) {
+          topCategoryData.push(topCategory[i])
 
         }
+        for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+          if (res?.data?.custom_attributes[r].attribute_code == "image") {
+            topCategory[i].image = res?.data?.custom_attributes[r].value
+            topCategoryData.push(topCategory[i])
+            break;
+          }
+          // this cndition is for Acessories because it doenst have a attribute code "image" so there is no image link and
+          // thats why in the array imagelink is manually given so it is also pushed in the array
+          // as it is without any modification like above rest which have attribute code image
+          if (topCategory[i]?.id == 122) {
+            // topCategoryData.push(topCategory[i])
+            break;
+          }
+        }
+      }).catch((err) => {
+        console.log("fetching Image link api error Homescreen ", err)
+      })
+    }
+    actions.topCatData(topCategoryData)
+    setImmediate(() => {
+      this.setState({
+        loader: false,
+      })
     })
-        .catch((err) => {
-            console.log("Admin Api Error", err)
-            console.log("Admin Api Error", err?.response)
-
-           
-            // this.checkAdminToken()
-        })
-}
+  }
 
   render() {
     return (
@@ -219,10 +465,16 @@ class App extends Component {
             backgroundColor={"#020621"}
             translucent
           />}
+          {this.state.loader == true ?
+            <>
+              <Loading />
+            </>
+            :
+            <Navigation />
+          }
 
 
 
-          <Navigation />
 
           {/* Code Push Update Modal */}
 

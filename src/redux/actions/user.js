@@ -1,5 +1,5 @@
 import {
-    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
+    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT,TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
     SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
@@ -35,6 +35,12 @@ export function defaultCategories(defaultcategory) {
     return {
         type: DEFAULTCAT,
         payload: defaultcategory
+    }
+}
+export function topCatData(topcatdata) {
+    return {
+        type: TOPCATDATA,
+        payload: topcatdata
     }
 }
 
