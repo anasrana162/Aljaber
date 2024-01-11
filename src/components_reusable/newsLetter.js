@@ -4,7 +4,7 @@ import api, { custom_api_url } from '../api/api'
 const width = Dimensions.get("screen").width
 
 
-const NewsLetter = ({ screenName, props: { userData: { admintoken } } }) => {
+const NewsLetter = ({ innerMainStyle,paraStyle,txtInpStyle,style,screenName, props: { userData: { admintoken } } }) => {
 
     const [email, setEmail] = React.useState('')
 
@@ -20,21 +20,21 @@ const NewsLetter = ({ screenName, props: { userData: { admintoken } } }) => {
     }
 
     return (
-        <View style={styles.mainContainer}>
-            <View style={styles.inner_mainContainer}>
+        <View style={[styles.mainContainer,style]}>
+            <View style={[styles.inner_mainContainer,innerMainStyle]}>
 
                 {/* Title */}
                 <Text style={styles.title}>NewsLetter</Text>
 
                 {/* Paragraph */}
-                <Text style={styles.para}>Be the first to know about our amazing store and online offers</Text>
+                <Text style={[styles.para,paraStyle]}>Be the first to know about our amazing store and online offers</Text>
 
                 {/* TextInput Email */}
                 <TextInput
                     placeholder='Email'
                     placeholderTextColor={"#bbb"}
                     // value={}
-                    style={styles.txtinp}
+                    style={[styles.txtinp,txtInpStyle]}
                     onChangeText={(txt) => setEmail(txt.toLowerCase())}
                 />
 
@@ -67,8 +67,8 @@ const styles = StyleSheet.create({
     inner_mainContainer: {
         width: "90%",
         // height: "100%",
-        marginTop: 30,
-        backgroundColor: "#dce3fc",
+        marginVertical: 30,
+        // backgroundColor: "#dce3fc",
         justifyContent: "flex-start",
         alignItems: "flex-start",
 
@@ -100,6 +100,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginTop: 10,
-        marginBottom: 30,
+        // marginBottom: 30,
     }
 })

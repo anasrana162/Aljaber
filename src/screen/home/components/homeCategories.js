@@ -90,7 +90,7 @@ const HomeCategories = ({ data, navProps, mainCatPos }) => {
                             <View
                                 key={String(index)}
                             >
-                                {item?.is_active == true &&
+                                {item?.is_active == true && index != 4 &&
                                     <TouchableOpacity
 
                                         onPress={() => selectedItems(item, index)}

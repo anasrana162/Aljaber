@@ -336,7 +336,7 @@ class App extends Component {
 
     const { actions } = this.props
     var { categoryApiCounter, adminToken } = this.state
-   
+
     if (this.state.network == true) {
 
       await api.get('categories', {
@@ -420,21 +420,19 @@ class App extends Component {
           Authorization: `Bearer ${adminToken}`,
         }
       }).then((res) => {
-        if (topCategory[i]?.id == 122) {
-          topCategoryData.push(topCategory[i])
-
-        }
         for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
-          if (res?.data?.custom_attributes[r].attribute_code == "image") {
-            topCategory[i].image = res?.data?.custom_attributes[r].value
-            topCategoryData.push(topCategory[i])
-            break;
-          }
+          
           // this cndition is for Acessories because it doenst have a attribute code "image" so there is no image link and
           // thats why in the array imagelink is manually given so it is also pushed in the array
           // as it is without any modification like above rest which have attribute code image
           if (topCategory[i]?.id == 122) {
-            // topCategoryData.push(topCategory[i])
+            topCategoryData.push(topCategory[i])
+            break;
+          }
+
+          if (res?.data?.custom_attributes[r].attribute_code == "image") {
+            topCategory[i].image = res?.data?.custom_attributes[r].value
+            topCategoryData.push(topCategory[i])
             break;
           }
         }

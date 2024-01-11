@@ -8,6 +8,7 @@ import AuthSelector from './components/authSelector';
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Information from './components/information';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../api/api';
 
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
@@ -16,12 +17,18 @@ const height = Dimensions.get("screen").height
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
+import NewsLetter from '../../components_reusable/newsLetter';
 
 class Account extends Component {
     constructor(props) {
         super(props);
         this.state = {
             authModal: false,
+            def_ship_add: "",
+            def_bill_add: "",
+            def_ship_add_found: false,
+            def_bill_add_found: false,
+            countries: [],
         };
     }
 
@@ -45,6 +52,18 @@ class Account extends Component {
         }
 
     }
+    getCountries = () => {
+
+        api.get("aljaber/getallcountry").then((result) => {
+            console.log("Get Country Api Result: ", result?.data)
+            setImmediate(() => {
+                this.setState({ countries: result?.data })
+            })
+        }).catch(err => {
+            console.log("Get Country Api Error: ", err)
+        })
+
+    }
 
     Logout = () => {
         var { actions } = this.props
@@ -53,6 +72,7 @@ class Account extends Component {
             // console.log("Actions Redex", actions)
             actions.userToken("")
             actions.adminToken("")
+            actions.user("")
             AsyncStorage.setItem("@aljaber_userLoginData", "")
         }, 1000)
 
@@ -73,43 +93,249 @@ class Account extends Component {
 
     componentDidMount = () => {
         this.checkProps()
+        this.getCountries()
+        this.getDefaultAddresses()
+    }
+    // checkUserData = () => {
+    //     var { userData: { user } } = this.props
+
+    //     if (Object.keys(user)?.length == 0) {
+    //         setImmediate(() => {
+    //             this.setState({
+    //                 authModal: true
+    //             })
+    //         })
+    //     } else {
+    //         setImmediate(() => {
+    //             this.setState({
+    //                 authModal: false
+    //             })
+    //         })
+    //     }
+
+    // }
+
+    getDefaultAddresses = () => {
+        var { userData: { user: { default_billing, default_shipping, addresses } } } = this.props
+
+        for (let a = 0; a < addresses?.length; a++) {
+            if (addresses[a].id = default_billing) {
+
+                this.setState({
+                    def_bill_add: addresses[a],
+                    def_bill_add_found: true,
+                })
+
+            }
+            if (addresses[a].id = default_shipping) {
+                this.setState({
+                    def_ship_add: addresses[a],
+                    def_ship_add_found: true,
+                })
+            }
+            if (this.state.def_bill_add_found == true && this.state.def_ship_add_found == true) {
+                // beaking loop if both addresses are found
+                break;
+            }
+        }
+
     }
 
     render() {
+        var { userData: { user } } = this.props
+        var country_def_bill_add = ""
+        var country_ship_add = ""
+        if (this.state.def_ship_add != "") {
+
+            country_ship_add = this.state.countries.filter((item) => {
+                if (item?.country_id == this.state.def_ship_add?.country_id) {
+                    console.log("working")
+                    return item?.country.toString()
+                }
+            })[0]
+        }
+        if (this.state.def_bill_add != "") {
+
+            country_def_bill_add == this.state.countries.filter((item) => {
+                if (item?.country_id == this.state.def_bill_add?.country_id) {
+                    console.log("working")
+                    return item?.country.toString()
+                }
+            })[0]
+        }
+        console.log("country_ship_add , country_def_bill_add", country_ship_add)
         return (
             <View style={styles.mainContainer}>
+                {Object.keys(user)?.length == 0 || user == "" ?
+                    <>
+                        <View style={styles.header_comp}>
+                            {/** Title screen */}
+                            <Text style={styles.heading}>My Account</Text>
+                        </View>
+                        {/** Modal for login/register */}
 
-                {/* <View style={styles.colorView}></View> */}
 
-                <ScrollView style={{ width: "100%", }}>
+                        {/* <View style={styles.modal_cont}>                               */}
+                        {/** Login or Register */}
+                        <AuthSelector
+                            props={this.props}
+                            style={{ backgroundColor: "#f0f0f0", marginTop: 120 }}
+                        />
+                        {/* </View> */}
 
-                    <View style={styles.inner_cont_main}>
 
 
-                        {/** Title screen */}
-                        <Text style={styles.heading}>Your Account</Text>
+                    </>
+                    :
+                    <>
+                        <View style={styles.header_comp}>
+                            {/** Title screen */}
+                            <Text style={styles.heading}>My Account</Text>
+                        </View>
+                        {/* <View style={styles.colorView}></View> */}
 
-                        {/**login/Register Button */}
-                        <TouchableOpacity
+                        <ScrollView style={{ width: "100%", }}>
+
+                            <View style={styles.inner_cont_main}>
+
+                                {/** Account Information */}
+                                <Text style={[styles.subHeading, { marginTop: 30 }]}>Account Information</Text>
+
+                                {/* Contact Information Block */}
+                                <View style={styles.blockContainer}>
+                                    {/* Upper Conatiner */}
+                                    <View style={styles.upper_block_cont}>
+                                        <Text style={styles.upper_block_text}>CONTACT INFORMATION</Text>
+                                    </View>
+                                    {/* middle Conatiner */}
+                                    <View style={styles.middle_block_cont}>
+                                        <Text style={styles.middle_block_text}>{user?.firstname} {user?.lastname}</Text>
+                                        <Text style={styles.middle_block_text}>{user?.email}</Text>
+                                       
+                                    </View>
+                                    {/* Lower Conatiner */}
+                                    <View style={styles.lower_block_cont}>
+                                        <TouchableOpacity style={{ padding: 10 }}>
+                                            <Text style={styles.lower_block_text}>Edit</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
+                                {/* NewsLetters Block */}
+                                <View style={[styles.blockContainer, { marginTop: 40 }]}>
+                                    {/* Upper Conatiner */}
+                                    <View style={styles.upper_block_cont}>
+                                        <Text style={styles.upper_block_text}>NEWSLETTERS</Text>
+                                    </View>
+                                    {/* middle Conatiner */}
+                                    <View style={styles.middle_block_cont}>
+                                        {
+                                            user?.extension_attributes?.is_subscribed ?
+                                                <Text style={styles.middle_block_text}>You are subscribed to "General Subscription".</Text>
+                                                :
+                                                <NewsLetter
+                                                    props={this.props}
+                                                    style={{ backgroundColor: "white", marginLeft: -5, width: width - 60, }}
+                                                    innerMainStyle={{ marginVertical: 10 }}
+                                                    txtInpStyle={{ width: width - 80 }}
+                                                    paraStyle={{ width: width - 80 }}
+                                                />
+                                        }
+                                        {/* <Text style={styles.middle_block_text}>{user?.email}</Text> */}
+                                    </View>
+                                    {/* Lower Conatiner */}
+                                    <View style={styles.lower_block_cont}>
+                                        <TouchableOpacity style={{ padding: 10 }}>
+                                            <Text style={styles.lower_block_text}>Edit</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+
+
+                                {/** Address Book */}
+                                <Text style={[styles.subHeading, { marginTop: 30 }]}>Address Book</Text>
+
+                                {
+                                    this.state.def_ship_add == "" ? <></> :
+                                        <>
+                                            {/* default Shipping Address Block */}
+                                            < View style={[styles.blockContainer, { marginTop: 20 }]}>
+                                                {/* Upper Conatiner */}
+                                                <View style={styles.upper_block_cont}>
+                                                    <Text style={styles.upper_block_text}>DEFAULT SHIPPING ADDRESS</Text>
+
+                                                </View>
+                                                {/* middle Conatiner */}
+                                                <View style={styles.middle_block_cont}>
+
+                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{user?.firstname} {user?.lastname}</Text>
+                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_ship_add?.street[0]}</Text>
+                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_ship_add?.region?.region}, {this.state.def_ship_add?.postcode}</Text>
+                                                    <Text style={styles.middle_block_text}>{(country_ship_add == "" || country_ship_add == undefined) ? "" : country_ship_add?.country}</Text>
+                                                    <Text style={styles.middle_block_text}>T: {this.state.def_ship_add?.telephone}</Text>
+                                                </View>
+                                                {/* Lower Conatiner */}
+                                                <View style={styles.lower_block_cont}>
+                                                    <TouchableOpacity style={{ padding: 10 }}>
+                                                        <Text style={styles.lower_block_text}>Edit Address</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </View>
+                                        </>
+
+                                }
+                                {
+                                    this.state.def_bill_add == "" ? <></> :
+                                        <>
+                                            {/* default Shipping Address Block */}
+                                            < View style={[styles.blockContainer, { marginTop: 40 }]}>
+                                                {/* Upper Conatiner */}
+                                                <View style={styles.upper_block_cont}>
+                                                    <Text style={styles.upper_block_text}>DEFAULT BILLING ADDRESS</Text>
+
+                                                </View>
+                                                {/* middle Conatiner */}
+                                                <View style={styles.middle_block_cont}>
+
+                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{user?.firstname} {user?.lastname}</Text>
+                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_bill_add?.street[0]}</Text>
+                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_bill_add?.region?.region}, {this.state.def_ship_add?.postcode}</Text>
+                                                    <Text style={styles.middle_block_text}>{(country_def_bill_add == "" || country_def_bill_add == undefined) ? "" : country_def_bill_add?.country}</Text>
+                                                    <Text style={styles.middle_block_text}>T: {this.state.def_bill_add?.telephone}</Text>
+                                                </View>
+                                                {/* Lower Conatiner */}
+                                                <View style={styles.lower_block_cont}>
+                                                    <TouchableOpacity style={{ padding: 10 }}>
+                                                        <Text style={styles.lower_block_text}>Edit Address</Text>
+                                                    </TouchableOpacity>
+                                                </View>
+                                            </View>
+                                        </>
+
+                                }
+
+
+                                {/**login/Register Button */}
+                                {/* <TouchableOpacity
                             onPress={() => this.closeAuthModalHandler("open")}
                             activeOpacity={0.8}
                             style={styles.login_reg_btn}
                         >
                             <Text style={styles.log_reg_btn_text}>Login / Register</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
 
-                        {/** Order Track */}
-                        <Text style={styles.track_order_text}>Track your orders and check out quicker</Text>
-                        <OrderList Logout={() => this.Logout()} navProps={this.props.navigation} />
+                                {/** Order Track */}
+                                {/* <Text style={styles.track_order_text}>Track your orders and check out quicker</Text>
+                                <OrderList Logout={() => this.Logout()} navProps={this.props.navigation} /> */}
 
-                        {/** Settings */}
-                        <Settings />
+                                {/** Settings */}
+                                {/* <Settings /> */}
 
-                        {/** Infromation */}
-                        <Information navProps={this.props.navigation} />
+                                {/** Infromation */}
+                                {/* <Information navProps={this.props.navigation} /> */}
 
-                        {/** logo copyright */}
-                        <Image
+                                {/** logo copyright */}
+                                {/* <Image
                             source={require("../../../assets/aljabirlogo.png")}
                             style={{ width: 130, height: 130 }}
                         />
@@ -123,19 +349,20 @@ class Account extends Component {
                             <FontAwesome name="youtube-play" size={34} color="#3F51B5" />
                         </View>
 
-                        <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 20 }} />
-                    </View>
+                        <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 20 }} /> */}
+                            </View>
 
-                </ScrollView>
+                        </ScrollView>
 
-                {/** Tab Navigator Custom */}
-                <TabNavigator screenName={"account"} navProps={this.props.navigation} />
-
+                        {/** Tab Navigator Custom */}
+                        <TabNavigator screenName={"account"} navProps={this.props.navigation} />
+                    </>
+                }
                 {/** Modal for login/register */}
                 <Modal
                     animationType='slide'
                     transparent={true}
-                    visible={this.state.authModal}
+                    visible={false}
                     onRequestClose={() => this.closeAuthModalHandler("close")}
                     style={{ justifyContent: "flex-end", alignItems: "center" }}
                 >
@@ -174,7 +401,7 @@ class Account extends Component {
 
                 </Modal>
 
-            </View>
+            </View >
 
         )
     }
@@ -186,17 +413,78 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: width,
         height: height,
-        backgroundColor: "white"
+        backgroundColor: "#f0f0f0"
     },
+    // modal_cont: {
+    //     width: width,
+    //     backgroundColor: "#fff",
+    //     height: height - 100,
+    //     borderTopRightRadius: 40,
+    //     borderTopLeftRadius: 40,
+    //     zIndex: 200,
+    //     position: "absolute",
+    //     bottom: 0
+    // },
     modal_cont: {
         width: width,
-        backgroundColor: "#fff",
+        backgroundColor: "#f0f0f0",
         height: height - 100,
         borderTopRightRadius: 40,
         borderTopLeftRadius: 40,
         zIndex: 200,
         position: "absolute",
         bottom: 0
+    },
+    blockContainer: {
+        width: width - 40,
+        flexDirection: "column",
+        justifyContent: "space-between",
+        alignItems: "center",
+        borderRadius: 10,
+        overflow: "hidden",
+        marginTop: 20,
+    },
+    upper_block_cont: {
+        width: "100%",
+        height: 40,
+        justifyContent: "center",
+        alignItems: "flex-start",
+        backgroundColor: "#020621"
+    },
+    upper_block_text: {
+        fontSize: 16,
+        fontWeight: "600",
+        color: "white",
+        marginLeft: 10,
+    },
+    middle_block_cont: {
+        width: "100%",
+        paddingVertical: 20,
+        justifyContent: "center",
+        alignItems: "flex-start",
+        backgroundColor: "#ffffff"
+    },
+    middle_block_text: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "#020621",
+        marginLeft: 10,
+        marginBottom: 5,
+    },
+    lower_block_text: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: "white",
+        marginLeft: 10,
+        textDecorationLine: "underline"
+    },
+    lower_block_cont: {
+        width: "100%",
+        height: 40,
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        backgroundColor: "#020621"
     },
     modal_crossBtn_logo: {
         flexDirection: "row",
@@ -211,22 +499,37 @@ const styles = StyleSheet.create({
         height: 20
     },
     inner_cont_main: {
-        marginBottom: 150,
+        marginBottom: 700,
         alignItems: "center",
         width: width - 20,
         height: height,
         alignSelf: "center",
-        backgroundColor: "white",
+        backgroundColor: "#f0f0f0",
         marginTop: Platform.OS == "ios" ? 10 : 20,
     },
     heading: {
-        fontSize: 28,
+        fontSize: 24,
+        color: "white",
+        fontWeight: "600",
+
+    },
+    header_comp: {
+        width: width,
+        justifyContent: "center",
+        backgroundColor: "#020621",
+        alignItems: "center",
+        paddingTop: 0,
+        paddingBottom: 10
+    },
+    subHeading: {
+        fontSize: 18,
         color: "#020621",
         fontWeight: "600",
-        alignSelf: "flex-start"
+        alignSelf: "flex-start",
+        marginTop: 10,
     },
     login_reg_btn: {
-        width: width - 40,
+        width: width - 160,
         height: 45,
         borderRadius: 15,
         marginTop: 20,
@@ -244,7 +547,7 @@ const styles = StyleSheet.create({
 
     },
     log_reg_btn_text: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: "500",
         color: "white",
     },

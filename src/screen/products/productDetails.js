@@ -54,6 +54,7 @@ class ProductDetails extends Component {
             description: '',
             main_info_temp: null,
             configurable_product_options: null,
+            configurable_product_options_loader: false,
             option_selected: [],
             custom_options: [],
             configurable_item_options: [],
@@ -106,111 +107,115 @@ class ProductDetails extends Component {
                     bigcheck = true
                     await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
                         prod.data.brand = data?.data
-
+                        setImmediate(() => {
+                            this.setState({
+                                product_details: prod?.data
+                            })
+                        })
                         // Condition for fetching products with type_id:"simple"
 
-                        if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-                            setImmediate(() => {
-                                this.setState({
-                                    product_details: prod?.data
-                                })
-                            })
-                        }
+                        // if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
+                        //     setImmediate(() => {
+                        //         this.setState({
+                        //             product_details: prod?.data
+                        //         })
+                        //     })
+                        // }
 
-                        // Condition for fetching products with type_id:"Configurable"
+                        // // Condition for fetching products with type_id:"Configurable"
 
-                        if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
+                        // if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
 
-                            setImmediate(() => {
-                                this.setState({
-                                    product_details: prod?.data,
-                                })
-                            })
+                        //     setImmediate(() => {
+                        //         this.setState({
+                        //             product_details: prod?.data,
+                        //         })
+                        //     })
 
-                            // Checking value of configurable_product_links (product Varients)
-                            for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
+                        //     // Checking value of configurable_product_links (product Varients)
+                        //     for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
 
-                                // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
-                                var selected_products = ""
-                                if (allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0] == undefined) {
-                                    alert("Error Fetching Data check network connection")
-                                    this.props.navigation.pop()
-                                } else {
-                                    selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
-                                }
-                                // Condition
-                                if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
+                        //         // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
+                        //         var selected_products = ""
+                        //         if (allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0] == undefined) {
+                        //             alert("Error Fetching Data check network connection")
+                        //             this.props.navigation.pop()
+                        //         } else {
+                        //             selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
+                        //         }
+                        //         // Condition
+                        //         if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
 
-                                    // if id's match then the value "sku" is picked up from the matching product object and then we run an api
-                                    // to fetch details for the varient because they are not in the products object from all products api
-                                    var check = false
+                        //             // if id's match then the value "sku" is picked up from the matching product object and then we run an api
+                        //             // to fetch details for the varient because they are not in the products object from all products api
+                        //             var check = false
 
-                                    // Api for fetching product details
+                        //             // Api for fetching product details
 
-                                    await api.get('/products/' + selected_products?.sku, {
-                                        headers: {
-                                            Authorization: `Bearer ${admintoken}`,
-                                        },
-                                    }).then(async (cfPD) => {
+                        //             await api.get('/products/' + selected_products?.sku, {
+                        //                 headers: {
+                        //                     Authorization: `Bearer ${admintoken}`,
+                        //                 },
+                        //             }).then(async (cfPD) => {
 
-                                        // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
-                                        // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
-                                        // long process already done above to save time while fetching for its main version of product
+                        //                 // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
+                        //                 // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
+                        //                 // long process already done above to save time while fetching for its main version of product
 
-                                        cfPD.data.brand = data?.data // brand value
-                                        cfPD.data.parent_product_id = prod?.data?.id
-                                        cfPD.data.options = prod?.data?.options
-                                        cfPD.data.type_id = prod?.data?.type_id
-                                        // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
-                                        // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
-                                        // together
+                        //                 cfPD.data.brand = data?.data // brand value
+                        //                 cfPD.data.parent_product_id = prod?.data?.id
+                        //                 cfPD.data.options = prod?.data?.options
+                        //                 cfPD.data.type_id = prod?.data?.type_id
+                        //                 // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
+                        //                 // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
+                        //                 // together
 
-                                        tempPRoducts.push(cfPD?.data)
+                        //                 tempPRoducts.push(cfPD?.data)
 
-                                        // here's the condition once the configurable_product_links array reach its end
-                                        if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
+                        //                 // here's the condition once the configurable_product_links array reach its end
+                        //                 if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
 
-                                            //we also change the value of price of the main product because products with type_id have "0" price
-                                            // so we take a price from its varient overwrite (Note price of all vareints are same)
-                                            prod.data.price = cfPD.data?.price
+                        //                     //we also change the value of price of the main product because products with type_id have "0" price
+                        //                     // so we take a price from its varient overwrite (Note price of all vareints are same)
+                        //                     prod.data.price = cfPD.data?.price
 
-                                            // then we create an of product_varients and push into main product's object to show and display the varients in
-                                            // product details screen
-                                            prod.data.product_varients = tempPRoducts
+                        //                     // then we create an of product_varients and push into main product's object to show and display the varients in
+                        //                     // product details screen
+                        //                     prod.data.product_varients = tempPRoducts
 
-                                            // then we push this product into main products array with all of these things so it can be displayed
-                                            // in the Products Detail screen
+                        //                     // then we push this product into main products array with all of these things so it can be displayed
+                        //                     // in the Products Detail screen
 
-                                            setImmediate(() => {
-                                                this.setState({
-                                                    product_details: prod?.data
-                                                })
-                                            })
+                        //                     setImmediate(() => {
+                        //                         this.setState({
+                        //                             product_details: prod?.data
+                        //                         })
+                        //                     })
 
-                                            // Emptying the temporary array that we pushed products varients so the varients of other products
-                                            // dont get added in the other products
-                                            tempPRoducts = []
+                        //                     // Emptying the temporary array that we pushed products varients so the varients of other products
+                        //                     // dont get added in the other products
+                        //                     tempPRoducts = []
 
-                                            // setting value of check to true from false to break the loop once it reaches its end
-                                            check = true
-                                        }
+                        //                     // setting value of check to true from false to break the loop once it reaches its end
+                        //                     check = true
+                        //                 }
 
-                                    }).catch((err) => {
-                                        console.log("Configurable Product Details Api Error", err)
-                                    })
+                        //             }).catch((err) => {
+                        //                 console.log("Configurable Product Details Api Error", err)
+                        //             })
 
-                                    console.log("CHeck", check)
-                                    // this condition break the loop from further adding more products
-                                    if (check == true) {
+                        //             console.log("CHeck", check)
+                        //             // this condition break the loop from further adding more products
+                        //             if (check == true) {
 
-                                        break;
-                                    }
-                                } else {
+                        //                 break;
+                        //             }
+                        //         } else {
 
-                                }
-                            }
+                        //         }
+                        //     }
 
-                        }
+                        // }
                     }).catch((err) => {
                         console.log("DAta for Brands Api errr", err)
                     })
@@ -220,13 +225,19 @@ class ProductDetails extends Component {
                     break;
                 }
             }
-            // this.createVarients()
+            setImmediate(() => {
+                this.setState({
+                    loader: false,
+                    refreshing: false,
+                })
+            })
+            this.createVarients()
             this.getDescription('prop')
             this.checkOptions('prop')
             this.getMain_Info('prop')
             // this.checkVarients('prop')
             this.productImages("prop")
-            this.check_Configurable_Product_Options()
+            // this.check_Configurable_Product_Options()
 
 
         }).catch((err) => {
@@ -248,90 +259,96 @@ class ProductDetails extends Component {
     }
 
 
-    // createVarients = async () => {
-    //     var { product_details } = this.state
-    //     var { userData: { admintoken, allproducts } } = this.props
-    //     var tempPRoducts = []
-    //     // Checking value of configurable_product_links (product Varients)
-    //     var check = false
-    //     for (let tp = 0; tp < product_details?.extension_attributes?.configurable_product_links?.length; tp++) {
+    createVarients = async () => {
+        var { product_details } = this.state
+        var { userData: { admintoken, allproducts } } = this.props
+        var tempPRoducts = []
+        // Checking value of configurable_product_links (product Varients)
+        var check = false
+        setImmediate(() => {
+            this.setState({
+                configurable_product_options_loader: true,
+            })
+        })
+        for (let tp = 0; tp < product_details?.extension_attributes?.configurable_product_links?.length; tp++) {
 
-    //         // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
-    //         const selected_products = allproducts.filter((value) => value?.id == product_details?.extension_attributes?.configurable_product_links[tp])[0]
+            // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
+            const selected_products = allproducts.filter((value) => value?.id == product_details?.extension_attributes?.configurable_product_links[tp])[0]
 
-    //         // Condition
-    //         if (product_details?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
+            // Condition
+            if (product_details?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
 
-    //             // if id's match then the value "sku" is picked up from the matching product object and then we run an api
-    //             // to fetch details for the varient because they are not in the products object from all products api
+                // if id's match then the value "sku" is picked up from the matching product object and then we run an api
+                // to fetch details for the varient because they are not in the products object from all products api
 
-    //             // Api for fetching product details
+                // Api for fetching product details
 
-    //             await api.get('/products/' + selected_products?.sku, {
-    //                 headers: {
-    //                     Authorization: `Bearer ${admintoken}`,
-    //                 },
-    //             }).then(async (cfPD) => {
+                await api.get('/products/' + selected_products?.sku, {
+                    headers: {
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                }).then(async (cfPD) => {
 
-    //                 // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
-    //                 // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
-    //                 // long process already done above to save time while fetching for its main version of product
+                    // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
+                    // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
+                    // long process already done above to save time while fetching for its main version of product
 
-    //                 // cfPD.data.brand = data?.data // brand value
-    //                 cfPD.data.parent_product_id = product_details?.id
-    //                 cfPD.data.options = product_details?.options
-    //                 cfPD.data.type_id = product_details?.type_id
-    //                 // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
-    //                 // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
-    //                 // together
-    //                 // console.log("cfPD?.data", cfPD?.data)
+                    // cfPD.data.brand = data?.data // brand value
+                    cfPD.data.parent_product_id = product_details?.id
+                    cfPD.data.options = product_details?.options
+                    cfPD.data.type_id = product_details?.type_id
+                    // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
+                    // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
+                    // together
+                    // console.log("cfPD?.data", cfPD?.data)
 
-    //                 tempPRoducts.push(cfPD?.data)
+                    tempPRoducts.push(cfPD?.data)
 
-    //                 // here's the condition once the configurable_product_links array reach its end
-    //                 if (tp == product_details?.extension_attributes?.configurable_product_links?.length - 1) {
+                    // here's the condition once the configurable_product_links array reach its end
+                    if (tp == product_details?.extension_attributes?.configurable_product_links?.length - 1) {
 
-    //                     //we also change the value of price of the main product because products with type_id have "0" price
-    //                     // so we take a price from its varient overwrite (Note price of all vareints are same)
-    //                     product_details.price = cfPD.data?.price
+                        //we also change the value of price of the main product because products with type_id have "0" price
+                        // so we take a price from its varient overwrite (Note price of all vareints are same)
+                        product_details.price = cfPD.data?.price
 
-    //                     // then we create an of product_varients and push into main product's object to show and display the varients in
-    //                     // product details screen
-    //                     product_details.product_varients = tempPRoducts
+                        // then we create an of product_varients and push into main product's object to show and display the varients in
+                        // product details screen
+                        product_details.product_varients = tempPRoducts
 
-    //                     // then we push this product into main products array with all of these things so it can be displayed
-    //                     // in the Products Detail screen
+                        // then we push this product into main products array with all of these things so it can be displayed
+                        // in the Products Detail screen
+                        setImmediate(() => {
+                            this.setState({
+                                product_details,
+                                configurable_product_options_loader: false,
+                            })
+                        })
+                        this.check_Configurable_Product_Options()
 
-    //                     setImmediate(() => {
-    //                         this.setState({
-    //                             product_details
-    //                         })
-    //                     })
+                        // Emptying the temporary array that we pushed products varients so the varients of other products
+                        // dont get added in the other products
+                        tempPRoducts = []
 
-    //                     // Emptying the temporary array that we pushed products varients so the varients of other products
-    //                     // dont get added in the other products
-    //                     tempPRoducts = []
+                        // setting value of check to true from false to break the loop once it reaches its end
+                        check = true
+                    }
 
-    //                     // setting value of check to true from false to break the loop once it reaches its end
-    //                     check = true
-    //                 }
+                }).catch((err) => {
+                    console.log("Configurable Product Details Api Error", err)
+                })
 
-    //             }).catch((err) => {
-    //                 console.log("Configurable Product Details Api Error", err)
-    //             })
+                console.log("CHeck", check)
+                // this condition break the loop from further adding more products
 
-    //             console.log("CHeck", check)
-    //             // this condition break the loop from further adding more products
+            } else {
 
-    //         } else{
+            }
+            if (check == true) {
 
-    //         }
-    //         if (check == true) {
-
-    //             break;
-    //         }
-    //     }
-    // }
+                break;
+            }
+        }
+    }
 
 
     check_Configurable_Product_Options = async () => {
@@ -365,8 +382,7 @@ class ProductDetails extends Component {
             setImmediate(() => {
                 this.setState({
                     configurable_product_options: configurable_product_options,
-                    loader: false,
-                    refreshing: false
+
                 })
 
             })
@@ -1721,6 +1737,7 @@ class ProductDetails extends Component {
                     {/* Options */}
                     <Options
                         configurable_product_options={this.state.configurable_product_options}
+                        configurable_product_options_loader={this.state.configurable_product_options_loader}
                         checkMarked={(val) => this.checkMarked(val)}
                         product_options={this.state.product_options}
                         leftEyeQuantity={this.state.leftEyeQuantity}

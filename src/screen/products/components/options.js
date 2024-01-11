@@ -5,6 +5,7 @@ import OptionDropdown from './optionDropdown';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios';
 import { custom_api_url } from '../../../api/api';
+import LottieView from 'lottie-react-native';
 const width = Dimensions.get("screen").width;
 
 const Options = ({
@@ -42,6 +43,7 @@ const Options = ({
     selectedItemRight,
     selectedItemLeft,
     configurable_product_options,
+    configurable_product_options_loader,
     product_options,
 }) => {
 
@@ -54,7 +56,7 @@ const Options = ({
         <View style={styles.mainContainer}>
 
             {
-               (product_options == null || product_options == undefined || product_options.length == 0) ? <>
+                (product_options == null || product_options == undefined || product_options.length == 0) ? <>
                 </> :
                     <View style={styles.checkBox_cont} >
                         {checked ?
@@ -83,9 +85,31 @@ const Options = ({
             }
 
             {/* Configurable Product Options */}
-            {(configurable_product_options == null || configurable_product_options == undefined || configurable_product_options.length == 0) ?
-                <>
-                </>
+            {/* (configurable_product_options == null || configurable_product_options == undefined || configurable_product_options.length == 0) */}
+            {configurable_product_options_loader ?
+                <View style={{
+                    width: "100%",
+                    flexDirection: "row",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    marginTop: 10,
+                    marginBottom:-10,
+                    height:40,
+                    overflow:"hidden",
+                    // backgroundColor:"red"
+                }}>
+                    <Text style={{ fontSize: 14, color: "black",fontWeight:"600" }}>Checking Varients:</Text>
+               
+
+                    < LottieView source={require('../../../animations/dots_load.json')}
+                        autoPlay={true}
+                        resizeMode='cover'
+                        loop
+                    
+                    style={{ width: 180, height: 180, marginTop:0,}}
+                    />
+                  
+                </View>
                 :
                 <>
                     {checked == false && <View style={styles.colorFlatlist}>

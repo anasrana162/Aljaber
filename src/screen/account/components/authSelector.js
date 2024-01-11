@@ -9,7 +9,7 @@ const width = Dimensions.get("screen").width
 
 
 
-const AuthSelector = ({ props }) => {
+const AuthSelector = ({ props,style }) => {
 
 
     /** States */
@@ -34,7 +34,7 @@ const AuthSelector = ({ props }) => {
 
 
     return (
-        <View style={styles.mainContainer}>
+        <View style={[styles.mainContainer,style]}>
 
             {/** selector Button */}
             <View style={styles.selector_btn_cont}>
