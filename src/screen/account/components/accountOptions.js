@@ -5,7 +5,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 
 const width = Dimensions.get("screen").width
 
-const OrderList = ({ Logout }) => {
+const AccountOptions = ({ Logout }) => {
     return (
         <>
             <TouchableOpacity
@@ -39,7 +39,7 @@ const OrderList = ({ Logout }) => {
     )
 }
 
-export default OrderList
+export default AccountOptions
 
 const styles = StyleSheet.create({
     mainContainer: {

@@ -1,7 +1,7 @@
 import { Text, StyleSheet, View, Dimensions, TouchableOpacity, Platform, Image, Modal, Pressable, ScrollView } from 'react-native'
 import React, { Component } from 'react'
 import TabNavigator from '../../components_reusable/TabNavigator';
-import OrderList from './components/orderList';
+import AccountOptions from './components/accountOptions';
 import Settings from './components/settings';
 import Entypo from 'react-native-vector-icons/Entypo'
 import AuthSelector from './components/authSelector';
@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
 import NewsLetter from '../../components_reusable/newsLetter';
+import ContactInfo from './components/contactInfo';
 
 class Account extends Component {
     constructor(props) {
@@ -119,7 +120,7 @@ class Account extends Component {
         var { userData: { user: { default_billing, default_shipping, addresses } } } = this.props
 
         for (let a = 0; a < addresses?.length; a++) {
-            if (addresses[a].id = default_billing) {
+            if (addresses[a].id == default_billing) {
 
                 this.setState({
                     def_bill_add: addresses[a],
@@ -127,7 +128,7 @@ class Account extends Component {
                 })
 
             }
-            if (addresses[a].id = default_shipping) {
+            if (addresses[a].id == default_shipping) {
                 this.setState({
                     def_ship_add: addresses[a],
                     def_ship_add_found: true,
@@ -143,27 +144,11 @@ class Account extends Component {
 
     render() {
         var { userData: { user } } = this.props
-        var country_def_bill_add = ""
-        var country_ship_add = ""
-        if (this.state.def_ship_add != "") {
+        var country_def_bill_add = this.state.def_bill_add == "" ? "" : this.state.countries.filter((item) => item?.country_id == this.state.def_bill_add?.country_id)[0]
+        var country_ship_add = this.state.def_ship_add == "" ? "" : this.state.countries.filter((item) => item?.country_id == this.state.def_ship_add?.country_id)[0]
 
-            country_ship_add = this.state.countries.filter((item) => {
-                if (item?.country_id == this.state.def_ship_add?.country_id) {
-                    console.log("working")
-                    return item?.country.toString()
-                }
-            })[0]
-        }
-        if (this.state.def_bill_add != "") {
-
-            country_def_bill_add == this.state.countries.filter((item) => {
-                if (item?.country_id == this.state.def_bill_add?.country_id) {
-                    console.log("working")
-                    return item?.country.toString()
-                }
-            })[0]
-        }
-        console.log("country_ship_add , country_def_bill_add", country_ship_add)
+        // console.log(country_def_bill_add)
+        // console.log("country_ship_add , country_def_bill_add", country_ship_add, "  ", country_def_bill_add)
         return (
             <View style={styles.mainContainer}>
                 {Object.keys(user)?.length == 0 || user == "" ?
@@ -192,169 +177,45 @@ class Account extends Component {
                             {/** Title screen */}
                             <Text style={styles.heading}>My Account</Text>
                         </View>
-                        {/* <View style={styles.colorView}></View> */}
-
                         <ScrollView style={{ width: "100%", }}>
 
                             <View style={styles.inner_cont_main}>
-
-                                {/** Account Information */}
-                                <Text style={[styles.subHeading, { marginTop: 30 }]}>Account Information</Text>
-
-                                {/* Contact Information Block */}
-                                <View style={styles.blockContainer}>
-                                    {/* Upper Conatiner */}
-                                    <View style={styles.upper_block_cont}>
-                                        <Text style={styles.upper_block_text}>CONTACT INFORMATION</Text>
-                                    </View>
-                                    {/* middle Conatiner */}
-                                    <View style={styles.middle_block_cont}>
-                                        <Text style={styles.middle_block_text}>{user?.firstname} {user?.lastname}</Text>
-                                        <Text style={styles.middle_block_text}>{user?.email}</Text>
-                                       
-                                    </View>
-                                    {/* Lower Conatiner */}
-                                    <View style={styles.lower_block_cont}>
-                                        <TouchableOpacity style={{ padding: 10 }}>
-                                            <Text style={styles.lower_block_text}>Edit</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-
-                                {/* NewsLetters Block */}
-                                <View style={[styles.blockContainer, { marginTop: 40 }]}>
-                                    {/* Upper Conatiner */}
-                                    <View style={styles.upper_block_cont}>
-                                        <Text style={styles.upper_block_text}>NEWSLETTERS</Text>
-                                    </View>
-                                    {/* middle Conatiner */}
-                                    <View style={styles.middle_block_cont}>
-                                        {
-                                            user?.extension_attributes?.is_subscribed ?
-                                                <Text style={styles.middle_block_text}>You are subscribed to "General Subscription".</Text>
-                                                :
-                                                <NewsLetter
-                                                    props={this.props}
-                                                    style={{ backgroundColor: "white", marginLeft: -5, width: width - 60, }}
-                                                    innerMainStyle={{ marginVertical: 10 }}
-                                                    txtInpStyle={{ width: width - 80 }}
-                                                    paraStyle={{ width: width - 80 }}
-                                                />
-                                        }
-                                        {/* <Text style={styles.middle_block_text}>{user?.email}</Text> */}
-                                    </View>
-                                    {/* Lower Conatiner */}
-                                    <View style={styles.lower_block_cont}>
-                                        <TouchableOpacity style={{ padding: 10 }}>
-                                            <Text style={styles.lower_block_text}>Edit</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-
-
-                                {/** Address Book */}
-                                <Text style={[styles.subHeading, { marginTop: 30 }]}>Address Book</Text>
-
-                                {
-                                    this.state.def_ship_add == "" ? <></> :
-                                        <>
-                                            {/* default Shipping Address Block */}
-                                            < View style={[styles.blockContainer, { marginTop: 20 }]}>
-                                                {/* Upper Conatiner */}
-                                                <View style={styles.upper_block_cont}>
-                                                    <Text style={styles.upper_block_text}>DEFAULT SHIPPING ADDRESS</Text>
-
-                                                </View>
-                                                {/* middle Conatiner */}
-                                                <View style={styles.middle_block_cont}>
-
-                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{user?.firstname} {user?.lastname}</Text>
-                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_ship_add?.street[0]}</Text>
-                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_ship_add?.region?.region}, {this.state.def_ship_add?.postcode}</Text>
-                                                    <Text style={styles.middle_block_text}>{(country_ship_add == "" || country_ship_add == undefined) ? "" : country_ship_add?.country}</Text>
-                                                    <Text style={styles.middle_block_text}>T: {this.state.def_ship_add?.telephone}</Text>
-                                                </View>
-                                                {/* Lower Conatiner */}
-                                                <View style={styles.lower_block_cont}>
-                                                    <TouchableOpacity style={{ padding: 10 }}>
-                                                        <Text style={styles.lower_block_text}>Edit Address</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </View>
-                                        </>
-
-                                }
-                                {
-                                    this.state.def_bill_add == "" ? <></> :
-                                        <>
-                                            {/* default Shipping Address Block */}
-                                            < View style={[styles.blockContainer, { marginTop: 40 }]}>
-                                                {/* Upper Conatiner */}
-                                                <View style={styles.upper_block_cont}>
-                                                    <Text style={styles.upper_block_text}>DEFAULT BILLING ADDRESS</Text>
-
-                                                </View>
-                                                {/* middle Conatiner */}
-                                                <View style={styles.middle_block_cont}>
-
-                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{user?.firstname} {user?.lastname}</Text>
-                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_bill_add?.street[0]}</Text>
-                                                    <Text style={[styles.middle_block_text, { fontWeight: "400" }]}>{this.state.def_bill_add?.region?.region}, {this.state.def_ship_add?.postcode}</Text>
-                                                    <Text style={styles.middle_block_text}>{(country_def_bill_add == "" || country_def_bill_add == undefined) ? "" : country_def_bill_add?.country}</Text>
-                                                    <Text style={styles.middle_block_text}>T: {this.state.def_bill_add?.telephone}</Text>
-                                                </View>
-                                                {/* Lower Conatiner */}
-                                                <View style={styles.lower_block_cont}>
-                                                    <TouchableOpacity style={{ padding: 10 }}>
-                                                        <Text style={styles.lower_block_text}>Edit Address</Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </View>
-                                        </>
-
-                                }
-
-
                                 {/**login/Register Button */}
                                 {/* <TouchableOpacity
-                            onPress={() => this.closeAuthModalHandler("open")}
-                            activeOpacity={0.8}
-                            style={styles.login_reg_btn}
-                        >
-                            <Text style={styles.log_reg_btn_text}>Login / Register</Text>
-                        </TouchableOpacity> */}
+                                    onPress={() => this.closeAuthModalHandler("open")}
+                                    activeOpacity={0.8}
+                                    style={styles.login_reg_btn}
+                                >
+                                    <Text style={styles.log_reg_btn_text}>Login / Register</Text>
+                                </TouchableOpacity> */}
+
+                                {/** Contact Information */}
+                                <ContactInfo props={user} />
 
                                 {/** Order Track */}
-                                {/* <Text style={styles.track_order_text}>Track your orders and check out quicker</Text>
-                                <OrderList Logout={() => this.Logout()} navProps={this.props.navigation} /> */}
+                                {/* <Text style={styles.track_order_text}>Track your orders and check out quicker</Text> */}
+                                <AccountOptions Logout={() => this.Logout()} navProps={this.props.navigation} />
 
                                 {/** Settings */}
                                 {/* <Settings /> */}
 
                                 {/** Infromation */}
-                                {/* <Information navProps={this.props.navigation} /> */}
+                                <Information navProps={this.props.navigation} />
 
-                                {/** logo copyright */}
-                                {/* <Image
-                            source={require("../../../assets/aljabirlogo.png")}
-                            style={{ width: 130, height: 130 }}
-                        />
-                        <Text style={[styles.copyright_text, { marginTop: -10 }]}>© copyright 2023 Al-Jaber Alll rights reserved</Text>
-                        <Text style={styles.copyright_text}>Version 1.0 build 1</Text>
+                                <Text style={[styles.copyright_text, { marginTop: 20 }]}>© copyright 2023 Al-Jaber Alll rights reserved</Text>
+                                <Text style={styles.copyright_text}>Version 1.0 build 1</Text>
 
-                        <View style={styles.social_icon_main_cont}>
-                            <FontAwesome name="facebook-f" size={34} color="#3F51B5" />
-                            <FontAwesome name="twitter" size={34} color="#3F51B5" />
-                            <FontAwesome name="instagram" size={34} color="#3F51B5" />
-                            <FontAwesome name="youtube-play" size={34} color="#3F51B5" />
-                        </View>
+                                <View style={styles.social_icon_main_cont}>
+                                    <FontAwesome name="facebook-f" size={34} color="#3F51B5" />
+                                    <FontAwesome name="twitter" size={34} color="#3F51B5" />
+                                    <FontAwesome name="instagram" size={34} color="#3F51B5" />
+                                    <FontAwesome name="youtube-play" size={34} color="#3F51B5" />
+                                </View>
 
-                        <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 20 }} /> */}
+                                {/* <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 20 }} /> */}
+                                {/** Tab Navigator Custom */}
                             </View>
-
                         </ScrollView>
-
-                        {/** Tab Navigator Custom */}
                         <TabNavigator screenName={"account"} navProps={this.props.navigation} />
                     </>
                 }
@@ -436,7 +297,7 @@ const styles = StyleSheet.create({
         bottom: 0
     },
     blockContainer: {
-        width: width - 40,
+        width: width - 60,
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
@@ -449,7 +310,7 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: "center",
         alignItems: "flex-start",
-        backgroundColor: "#020621"
+        backgroundColor: "#233468"
     },
     upper_block_text: {
         fontSize: 16,
@@ -459,7 +320,7 @@ const styles = StyleSheet.create({
     },
     middle_block_cont: {
         width: "100%",
-        paddingVertical: 20,
+        paddingVertical: 10,
         justifyContent: "center",
         alignItems: "flex-start",
         backgroundColor: "#ffffff"
@@ -484,7 +345,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
-        backgroundColor: "#020621"
+        backgroundColor: "#233468"
     },
     modal_crossBtn_logo: {
         flexDirection: "row",
@@ -499,7 +360,7 @@ const styles = StyleSheet.create({
         height: 20
     },
     inner_cont_main: {
-        marginBottom: 700,
+        marginBottom: 150,
         alignItems: "center",
         width: width - 20,
         height: height,
@@ -522,7 +383,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10
     },
     subHeading: {
-        fontSize: 18,
+        fontSize: 20,
         color: "#020621",
         fontWeight: "600",
         alignSelf: "flex-start",
