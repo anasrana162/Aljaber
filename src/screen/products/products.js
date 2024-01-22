@@ -1642,10 +1642,6 @@ class Products extends Component {
     }
 
 
-
-
-
-
     render() {
         var { item, imageLinkMain } = this.props?.route?.params;
         var { contact_lens_diameter, contact_lens_base_curve, temple_size, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;

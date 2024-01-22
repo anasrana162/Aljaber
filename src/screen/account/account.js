@@ -24,39 +24,40 @@ class Account extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            authModal: false,
+            // authModal: false,
             def_ship_add: "",
             def_bill_add: "",
             def_ship_add_found: false,
             def_bill_add_found: false,
             countries: [],
+            orders: null,
         };
     }
 
 
-    closeAuthModalHandler = (key) => {
-        switch (key) {
-            case "open":
-                setImmediate(() => {
-                    this.setState({
-                        authModal: true
-                    })
-                })
-                break;
+    // closeAuthModalHandler = (key) => {
+    //     switch (key) {
+    //         case "open":
+    //             setImmediate(() => {
+    //                 this.setState({
+    //                     authModal: true
+    //                 })
+    //             })
+    //             break;
 
-            case "close":
-                setImmediate(() => {
-                    this.setState({
-                        authModal: false
-                    })
-                })
-        }
+    //         case "close":
+    //             setImmediate(() => {
+    //                 this.setState({
+    //                     authModal: false
+    //                 })
+    //             })
+    //     }
 
-    }
+    // }
     getCountries = () => {
 
         api.get("aljaber/getallcountry").then((result) => {
-            console.log("Get Country Api Result: ", result?.data)
+            // console.log("Get Country Api Result: ", result?.data)
             setImmediate(() => {
                 this.setState({ countries: result?.data })
             })
@@ -74,47 +75,70 @@ class Account extends Component {
             actions.userToken("")
             actions.adminToken("")
             actions.user("")
+            actions.myOrders("")
             AsyncStorage.setItem("@aljaber_userLoginData", "")
         }, 1000)
 
     }
 
-    checkProps = () => {
-        if (this.props?.route?.params?.modal !== undefined && this.props?.route?.params?.modal == "open") {
+    // checkProps = () => {
+    //     if (this.props?.route?.params?.modal !== undefined && this.props?.route?.params?.modal == "open") {
 
-            setImmediate(() => {
-                this.setState({
-                    authModal: true
-                })
-            })
-        } else {
-            console.log("Nothing to check Account.js")
-        }
-    }
-
-    componentDidMount = () => {
-        this.checkProps()
-        this.getCountries()
-        this.getDefaultAddresses()
-    }
-    // checkUserData = () => {
-    //     var { userData: { user } } = this.props
-
-    //     if (Object.keys(user)?.length == 0) {
     //         setImmediate(() => {
     //             this.setState({
     //                 authModal: true
     //             })
     //         })
     //     } else {
-    //         setImmediate(() => {
-    //             this.setState({
-    //                 authModal: false
-    //             })
-    //         })
+    //         console.log("Nothing to check Account.js")
     //     }
-
     // }
+
+    componentDidMount = () => {
+        // this.checkProps()
+        this.checkUserData()
+    }
+
+    fetchUserOrders = () => {
+        var { userData: { user, admintoken, orders }, actions } = this.props
+        // console.log("customer?.id", user?.id)
+        if (orders == null || orders == "") {
+
+            api.get("orders?searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bfield%5d=" + "customer_id"
+                + "&searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bvalue%5d=" + user?.id
+                + "searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bconditionType%5d=eq",
+                {
+                    headers: {
+                        Authorization: `Bearer ${admintoken}`,
+                    },
+                })
+                .then((res) => {
+                    console.log("Orders of Coustomer are:", res?.data)
+                    actions.myOrders(res?.data?.items)
+                    this.setState({orders:res?.data?.items})
+                }).catch((err) => {
+                    console.log("Err get customer orders api:  ", err?.response?.data?.message)
+                })
+        } else {
+            this.setState({orders:orders})
+            console.log("Orders already exits")
+        }
+    }
+
+    checkUserData = () => {
+        var { userData: { user } } = this.props
+
+        if (Object.keys(user)?.length == 0) {
+
+        } else {
+            setImmediate(() => {
+                this.getCountries()
+                this.getDefaultAddresses()
+                this.fetchUserOrders()
+            })
+        }
+
+    }
 
     getDefaultAddresses = () => {
         var { userData: { user: { default_billing, default_shipping, addresses } } } = this.props
@@ -194,13 +218,22 @@ class Account extends Component {
 
                                 {/** Order Track */}
                                 {/* <Text style={styles.track_order_text}>Track your orders and check out quicker</Text> */}
-                                <AccountOptions Logout={() => this.Logout()} navProps={this.props.navigation} />
+                                <AccountOptions
+                                    props={this.props.userData.user}
+                                    Logout={() => this.Logout()}
+                                    orders={this.state.orders}
+                                    navProps={this.props.navigation}
+                                    def_bill_add={this.state.def_bill_add}
+                                    def_ship_add={this.state.def_ship_add}
+                                    country_bill_add={country_def_bill_add}
+                                    country_ship_add={country_ship_add}
+                                />
 
                                 {/** Settings */}
                                 {/* <Settings /> */}
 
                                 {/** Infromation */}
-                                <Information navProps={this.props.navigation} />
+                                {/* <Information navProps={this.props.navigation} /> */}
 
                                 <Text style={[styles.copyright_text, { marginTop: 20 }]}>© copyright 2023 Al-Jaber Alll rights reserved</Text>
                                 <Text style={styles.copyright_text}>Version 1.0 build 1</Text>
@@ -360,7 +393,7 @@ const styles = StyleSheet.create({
         height: 20
     },
     inner_cont_main: {
-        marginBottom: 150,
+        marginBottom: 10,
         alignItems: "center",
         width: width - 20,
         height: height,

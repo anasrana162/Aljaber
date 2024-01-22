@@ -28,3 +28,4 @@ export const CASES = "CASES";
 export const GIFTCARDS = "GIFTCARDS";
 export const SAFETYGLASSES = "SAFETYGLASSES";
 export const SWIMMIMINGGOGGLES = "SWIMMIMINGGOGGLES";
+export const ORDERS = "ORDERS";

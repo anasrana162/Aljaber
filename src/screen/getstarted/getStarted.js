@@ -38,7 +38,7 @@ class GetStarted extends Component {
 
                     <TouchableOpacity
                         onPress={() => this.goHome()}
-                        style={{ position: "absolute", bottom: 110, zIndex: 150 }}>
+                        style={{ position: "absolute", bottom: 90, zIndex: 150 }}>
                         <Text style={styles.already_have_account}>Already have an account? Login</Text>
                     </TouchableOpacity>
 
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#233468",
         borderRadius: 30,
         position: "absolute",
-        bottom: 140,
+        bottom: 120,
         zIndex: 150
     },
     btnText: {

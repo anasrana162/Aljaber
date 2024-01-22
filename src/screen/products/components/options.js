@@ -86,6 +86,7 @@ const Options = ({
 
             {/* Configurable Product Options */}
             {/* (configurable_product_options == null || configurable_product_options == undefined || configurable_product_options.length == 0) */}
+           {/* { console.log("configurable_product_options",configurable_product_options)} */}
             {configurable_product_options_loader ?
                 <View style={{
                     width: "100%",

@@ -5,6 +5,8 @@ import {
     SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
     // Cart
     CARTITEMS,
+    //Orders
+    ORDERS,
 } from '../constants';
 
 const initialState = {
@@ -18,6 +20,7 @@ const initialState = {
     allproducts: null,
     cartitems: null,
     searchproducts: null,
+    orders: null,
     clearpres: [],
     color: [],
     toric: [],
@@ -91,6 +94,11 @@ const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 randomproducts: action.payload
+            }
+        case ORDERS:
+            return {
+                ...state,
+                orders: action.payload
             }
         case CARTITEMS:
             return {

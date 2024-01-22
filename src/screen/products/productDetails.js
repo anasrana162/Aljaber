@@ -79,7 +79,7 @@ class ProductDetails extends Component {
     getProductDetails = async () => {
         var { product_details, product_details: { sku }, screenName } = this.props.route.params
         var { userData: { admintoken, allproducts } } = this.props
-        // console.log("product_details", sku)
+        console.log("product_details", sku.replace("/", "_"))
 
 
         var tempPRoducts = []
@@ -90,7 +90,7 @@ class ProductDetails extends Component {
             })
         })
 
-        await api.get('/products/' + sku, {
+        await api.get('/products/' + sku.replace("/", "_"), {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
@@ -270,6 +270,14 @@ class ProductDetails extends Component {
                 configurable_product_options_loader: true,
             })
         })
+        console.log("Checking Varients",product_details?.extension_attributes?.configurable_product_links)
+        if(product_details?.extension_attributes?.configurable_product_links == undefined){
+            return setImmediate(() => {
+                this.setState({
+                    configurable_product_options_loader: false,
+                })
+            })
+        }
         for (let tp = 0; tp < product_details?.extension_attributes?.configurable_product_links?.length; tp++) {
 
             // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 

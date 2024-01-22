@@ -301,6 +301,7 @@ class App extends Component {
               actions.userToken(customerToken?.data)
               user_data.data.cartID = result?.data
               actions.user(user_data?.data)
+              this.fetchUserOrders()
 
             }
           }).catch((err) => {
@@ -318,6 +319,25 @@ class App extends Component {
       console.log("No credentials found for login")
     }
   }
+  fetchUserOrders = () => {
+    var { userData: { user }, actions } = this.props
+    // console.log("customer?.id", user?.id)
+    api.get("orders?searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bfield%5d=" + "customer_id"
+      + "&searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bvalue%5d=" + user?.id
+      + "searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bconditionType%5d=eq",
+      {
+        headers: {
+          Authorization: `Bearer ${this.state.adminToken}`,
+        },
+      })
+      .then((res) => {
+        // console.log("Orders of Coustomer are:", res?.data)
+        actions.myOrders(res?.data?.items)
+      }).catch((err) => {
+        console.log("Err get customer orders api:  ", err?.response?.data?.message)
+      })
+  }
+
   fetchAllProductsForSearch = async () => {
     var { actions } = this.props
     var fetchProducts = await api.get(custom_api_url + "func=get_all_products")
@@ -421,7 +441,7 @@ class App extends Component {
         }
       }).then((res) => {
         for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
-          
+
           // this cndition is for Acessories because it doenst have a attribute code "image" so there is no image link and
           // thats why in the array imagelink is manually given so it is also pushed in the array
           // as it is without any modification like above rest which have attribute code image

@@ -5,6 +5,8 @@ import {
     SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
     // Cart
     CARTITEMS,
+    //Orders
+    ORDERS,
 } from '../constants';
 
 export function userToken(token) {
@@ -72,6 +74,12 @@ export function cartItems(cartitems) {
     return {
         type: CARTITEMS,
         payload: cartitems
+    }
+}
+export function myOrders(orders) {
+    return {
+        type: ORDERS,
+        payload: orders
     }
 }
 
