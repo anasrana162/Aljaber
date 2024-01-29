@@ -12,7 +12,7 @@ const AccountOptions = ({ navProps,props, Logout, orders, country_ship_add, coun
     const [openOrders, setOpenOrders] = useState(false)
     const [openNL, setOpenNL] = useState(false)
     const [openAB, setOpenAB] = useState(false)
-console.log("props",props)
+// console.log("props",props)
     return (
         <>
             <View style={{ width: width - 20, alignSelf: "center", height: 1, backgroundColor: "#020621", marginTop: 15 }} />
@@ -172,7 +172,7 @@ console.log("props",props)
                                             </Text>
                                             <Text style={styles.flex_row_title_text}>Action:
                                                 <TouchableOpacity
-                                                onPress={()=> navProps.navigate("My_orders",{
+                                                onPress={()=> navProps.navigate("Order_Details",{
                                                     "order_detail":item,
                                                 })}
                                                 >

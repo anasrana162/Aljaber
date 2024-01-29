@@ -14,7 +14,7 @@ import Cart from '../screen/cart/cart';
 import Search from '../screen/search/search';
 import Billing_Shipping from '../screen/checkout/billing_Shipping';
 import Review_Payment from '../screen/checkout/review_Payment';
-import My_orders from '../screen/account/my_orders';
+import Order_Details from '../screen/account/orders_details';
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -37,7 +37,7 @@ export default class Navigation extends Component {
                     <Stack.Screen name="Account" component={Account} />
                     <Stack.Screen name="About_us" component={About_us} />
                     <Stack.Screen name="Contact_us" component={Contact_us} />
-                    <Stack.Screen name="My_orders" component={My_orders} />
+                    <Stack.Screen name="Order_Details" component={Order_Details} />
                     <Stack.Screen name="Categories" component={Categories} />
                     <Stack.Screen name="Products" component={Products} options={{ gestureEnabled: false }} />
                     <Stack.Screen name="ProductDetails" component={ProductDetails} />
