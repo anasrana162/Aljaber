@@ -12,6 +12,7 @@ const navigateT0 = (key, navProps) => {
 }
 
 const TabNavigator = ({ navProps, screenName }) => {
+    // console.log("height",height);
     return (
         <View style={styles.mainContainer}>
 
@@ -62,12 +63,12 @@ export default TabNavigator
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: width ,
+        width: width,
         borderWidth: 0.2,
         borderColor: "#98999c",
-        height: Platform.OS == "ios" ? 80 : 55,
+        height: Platform.OS == "ios" ? height <= 675 ? 55 : 80 : 55,
         backgroundColor: "white",
-        paddingBottom: Platform.OS == "ios" ? 15 : 0,
+        paddingBottom: Platform.OS == "ios" ? height <= 675 ? 0 : 15 : 0,
         // borderRadius: 15,
         position: "absolute",
         bottom: 0,

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 
-const ItemsOrdered = ({ order_detail_items, showMore, product_options }) => {
+const ItemsOrdered = ({ order_detail_items, showMore, product_options, subtotal, shipping_handling, total, navProps }) => {
     return (
         <>
             <View style={styles.page_sheet_view_inner_view}>
@@ -112,6 +112,7 @@ const ItemsOrdered = ({ order_detail_items, showMore, product_options }) => {
 
 
                                         </View>
+
                                         {/* SKU */}
                                         <View style={[styles.small_container, { width: "17.5%", padding: 5 }]}>
                                             <Text style={styles.small_container_text}>{item.sku}</Text>
@@ -126,17 +127,25 @@ const ItemsOrdered = ({ order_detail_items, showMore, product_options }) => {
                                         </View>
                                         {/* Subtotal */}
                                         <View style={[styles.small_container, { width: "17.5%" }]}>
-                                            <Text style={styles.small_container_text}>{item.original_price}</Text>
+                                            <Text style={styles.small_container_text}><Text style={[styles.small_container_text, { fontSize: 11 }]}>AED</Text> {item.original_price}</Text>
                                         </View>
                                     </>}
-
+                                {index !== 0 && <View style={{ width: "100%", height: 0.5, backgroundColor: "black" }} />}
                             </>
                         )
                     })
                 }
             </View>
 
+            <Text style={[styles.total_subtotal_shipping_text, { marginTop: 20, }]}>Subtotal:{"              "}AED {subtotal}</Text>
+            <Text style={styles.total_subtotal_shipping_text}>Shipping & Handling:{"              "}AED {shipping_handling}</Text>
+            <Text style={[styles.total_subtotal_shipping_text, { fontWeight: "700" }]}>Estimated Total:{"              "}AED {total}</Text>
 
+            <TouchableOpacity
+                onPress={() => navProps.pop()}
+                style={{ padding: 15, alignSelf: "flex-start", marginTop: 25, marginBottom: 20, }}>
+                <Text style={styles.back_to_my_orders_text}>Back to My Orders</Text>
+            </TouchableOpacity>
         </>
     )
 }
@@ -206,5 +215,18 @@ const styles = StyleSheet.create({
         width: "100%",
         height: 1,
         backgroundColor: "#c1c1c1"
-    }
+    },
+    total_subtotal_shipping_text: {
+        color: "#666666",
+        fontSize: 14,
+        fontWeight: "400",
+        alignSelf: "flex-end",
+        marginRight: 15,
+        marginTop: 10
+    },
+    back_to_my_orders_text: {
+        color: "#08c",
+        fontWeight: "500",
+        fontSize: 14,
+    },
 })

@@ -14,7 +14,7 @@ const AccountOptions = ({ navProps,props, Logout, orders, country_ship_add, coun
     const [openAB, setOpenAB] = useState(false)
 // console.log("props",props)
     return (
-        <>
+        <View style={{ width: width - 20, alignSelf: "center",  marginTop: 15,justifyContent:"center",alignItems:"center" }}>
             <View style={{ width: width - 20, alignSelf: "center", height: 1, backgroundColor: "#020621", marginTop: 15 }} />
             <TouchableOpacity
                 activeOpacity={0.8}
@@ -210,7 +210,7 @@ const AccountOptions = ({ navProps,props, Logout, orders, country_ship_add, coun
                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} style={{ position: "absolute", right: 20 }} />
             </TouchableOpacity> */}
             <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 15 }} />
-        </>
+        </View>
     )
 }
 

@@ -13,7 +13,8 @@ import { CGADULTS } from '../../redux/constants';
 import ItemsOrdered from './components/itemsOrdered';
 import Invoices from './components/invoices';
 import axios from 'axios';
-import { custom_api_url } from '../../api/api';
+import api, { custom_api_url } from '../../api/api';
+import OrderInfo from './components/orderInfo';
 
 class Order_Details extends Component {
     constructor(props) {
@@ -33,6 +34,7 @@ class Order_Details extends Component {
 
     componentDidMount = () => {
         this.getItem()
+        this.getCountries()
     }
 
     getItem = () => {
@@ -40,39 +42,42 @@ class Order_Details extends Component {
         // console.log('order_detail :>> ', order_detail?.items);
     }
 
+    getCountries = () => {
+
+        api.get("aljaber/getallcountry").then((result) => {
+            console.log("Get Country Api Result: ", result?.data)
+            setImmediate(() => {
+                this.setState({ countries: result?.data })
+            })
+        }).catch(err => {
+            console.log("Get Country Api Error: ", err)
+        })
+
+    }
+
     showMore = async (options, index) => {
         var { extension_attributes } = options
         var { product_options } = this.state
-        // console.log("Option Show More:", options);
-        // console.log("Option Show More configurable_item_options:", extension_attributes?.configurable_item_options);
-        // console.log("Option Show More custom_options:", extension_attributes?.custom_options);
         for (let co = 0; co < extension_attributes?.custom_options.length; co++) {
-
-            // console.log("items[i].product_option?.extension_attributes?.custom_options", items[i].product_option?.extension_attributes?.custom_options[co], "  ", co)
             var option_value_name = await this.fetchIdDataproductLabel(extension_attributes?.custom_options[co]?.option_value)
             var option_title = await this.fetchIdDataAttributeLabel(extension_attributes?.custom_options[co]?.option_id)
-            // console.log("option_title: ", option_title, "     ", "option_value_name: ", option_value_name)
             extension_attributes.custom_options[co].option_title = option_title;
             extension_attributes.custom_options[co].option_value_name = option_value_name;
-
         }
         if (extension_attributes?.configurable_item_options == undefined) {
             console.log("No Configurable Item Options")
         } else {
-            // console.log("items[i].product_option?.extension_attributes?.configurable_item_options", items[i].product_option?.extension_attributes?.configurable_item_options)
+
             for (let co = 0; co < extension_attributes?.configurable_item_options.length; co++) {
-                // console.log("items[i].product_option?.extension_attributes?.configurable_item_options", items[i].product_option?.extension_attributes?.configurable_item_options[co], "  ", co)
                 var option_title = "COLOR" //await this.fetchIdDataAttributeLabel(items[i].product_option?.extension_attributes?.configurable_item_options[co]?.option_id)
                 var option_value_name = await this.fetchIdDataOptionLabel(extension_attributes?.configurable_item_options[co]?.option_value)
                 extension_attributes.configurable_item_options[co].option_title = option_title;
                 extension_attributes.configurable_item_options[co].option_value_name = option_value_name;
-                // console.log("option_title: ", option_title, "     ", "option_value_name: ", option_value_name)
             }
         }
         extension_attributes.index_id = index
         product_options.push(extension_attributes)
         this.setState({ product_options })
-        console.log("extension_atrributes after modification in Show More:", this.state.product_options);
     }
 
     fetchIdDataproductLabel = async (id) => {
@@ -153,18 +158,46 @@ class Order_Details extends Component {
                                 this.state.selector == "items_ordered" &&
                                 <ItemsOrdered
                                     order_detail_items={order_detail?.items}
-                                    showMore={(options,index) => this.showMore(options,index)}
+                                    showMore={(options, index) => this.showMore(options, index)}
                                     product_options={this.state.product_options}
+                                    subtotal={order_detail?.base_subtotal}
+                                    shipping_method={order_detail?.shipping_description}
+                                    shipping_handling={order_detail?.shipping_amount}
+                                    total={order_detail?.grand_total}
+                                    navProps={this.props.navigation}
                                 />
                             }
                             {
                                 this.state.selector == "invoices" &&
-                                <Invoices />
+                                <Invoices
+                                    order_detail_items={order_detail?.items}
+                                    showMore={(options, index) => this.showMore(options, index)}
+                                    product_options={this.state.product_options}
+                                    subtotal={order_detail?.subtotal_invoiced}
+                                    shipping_method={order_detail?.shipping_description}
+                                    shipping_handling={order_detail?.shipping_invoiced}
+                                    total={order_detail?.total_invoiced}
+                                    navProps={this.props.navigation}
+                                />
                             }
 
                         </View>
 
                     </View>
+
+                    {/* Order Info */}
+                    <Text style={styles.order_info_title}>Order Information</Text>
+
+                    <OrderInfo
+                        shipping_address={order_detail?.extension_attributes?.shipping_assignments[0]?.shipping?.address}
+                        billing_address={order_detail?.billing_address}
+                        shipping_method={order_detail?.shipping_description}
+                        payment_method={order_detail?.payment?.additional_information}
+                        customer_name={order_detail?.customer_firstname + " " + order_detail?.customer_lastname}
+                        countries={this.state.countries}
+                    />
+
+
                 </ScrollView>
 
 
@@ -219,6 +252,13 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         letterSpacing: 0.5,
         color: "black",
+    },
+    order_info_title: {
+        fontSize: 18,
+        fontWeight: '400',
+        letterSpacing: 0.5,
+        color: "black",
+        marginVertical: 20
     },
     order_status_cont: {
         padding: 5,

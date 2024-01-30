@@ -115,12 +115,12 @@ class Account extends Component {
                 .then((res) => {
                     console.log("Orders of Coustomer are:", res?.data)
                     actions.myOrders(res?.data?.items)
-                    this.setState({orders:res?.data?.items})
+                    this.setState({ orders: res?.data?.items })
                 }).catch((err) => {
                     console.log("Err get customer orders api:  ", err?.response?.data?.message)
                 })
         } else {
-            this.setState({orders:orders})
+            this.setState({ orders: orders })
             console.log("Orders already exits")
         }
     }
@@ -201,9 +201,11 @@ class Account extends Component {
                             {/** Title screen */}
                             <Text style={styles.heading}>My Account</Text>
                         </View>
-                        <ScrollView style={{ width: "100%", }}>
 
-                            <View style={styles.inner_cont_main}>
+                        <View style={styles.inner_cont_main}>
+                            <ScrollView
+                            showsVerticalScrollIndicator={false}
+                            style={{ width: "100%", }}>
                                 {/**login/Register Button */}
                                 {/* <TouchableOpacity
                                     onPress={() => this.closeAuthModalHandler("open")}
@@ -235,7 +237,7 @@ class Account extends Component {
                                 {/** Infromation */}
                                 {/* <Information navProps={this.props.navigation} /> */}
 
-                                <Text style={[styles.copyright_text, { marginTop: 20 }]}>© copyright 2023 Al-Jaber Alll rights reserved</Text>
+                                <Text style={[styles.copyright_text, { marginTop: 20,}]}>© copyright 2023 Al-Jaber Alll rights reserved</Text>
                                 <Text style={styles.copyright_text}>Version 1.0 build 1</Text>
 
                                 <View style={styles.social_icon_main_cont}>
@@ -247,8 +249,8 @@ class Account extends Component {
 
                                 {/* <View style={{ width: width, height: 1, backgroundColor: "#020621", marginTop: 20 }} /> */}
                                 {/** Tab Navigator Custom */}
-                            </View>
-                        </ScrollView>
+                            </ScrollView>
+                        </View>
                         <TabNavigator screenName={"account"} navProps={this.props.navigation} />
                     </>
                 }
@@ -393,10 +395,10 @@ const styles = StyleSheet.create({
         height: 20
     },
     inner_cont_main: {
-        marginBottom: 10,
+        marginBottom: 20,
         alignItems: "center",
         width: width - 20,
-        height: height,
+        height: height-140,
         alignSelf: "center",
         backgroundColor: "#f0f0f0",
         marginTop: Platform.OS == "ios" ? 10 : 20,
@@ -455,6 +457,7 @@ const styles = StyleSheet.create({
     copyright_text: {
         color: "#020621",
         fontSize: 12,
+        alignSelf:"center" 
     },
     social_icon_main_cont: {
         width: width - 120,
@@ -462,6 +465,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 20,
         flexDirection: "row",
+        alignSelf:"center" 
     }
 })
 {/* {---------------redux State ------------} */ }
