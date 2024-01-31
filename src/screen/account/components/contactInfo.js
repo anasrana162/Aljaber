@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
-const ContactInfo = ({ props }) => {
-    // console.log(props, "contact comp")
+const ContactInfo = ({ userData,navProps }) => {
+    // console.log(userData, "contact comp")
     return (
         <View style={styles.mainCont} >
 
@@ -13,16 +13,18 @@ const ContactInfo = ({ props }) => {
                     style={{ width: "100%", height: "100%", }}
                 />
             </View>
-               
-            <View style={{flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 10 }}>
 
-                <Text style={styles.txt}>{props?.firstname} {props?.lastname}</Text>
-                <TouchableOpacity style={styles.editBtn}>
+            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 10 }}>
+
+                <Text style={styles.txt}>{userData?.firstname} {userData?.lastname}</Text>
+                <TouchableOpacity
+                    onPress={() => navProps.navigation.navigate("ChangeUserData")}
+                    style={styles.editBtn}>
                     <FontAwesome5 name="pencil-alt" size={18} color="black" />
                 </TouchableOpacity>
 
             </View>
-            <Text style={styles.txt}>{props?.email}</Text>
+            <Text style={styles.txt}>{userData?.email}</Text>
         </View>
     )
 }
@@ -34,7 +36,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginBottom: 20,
-        alignSelf:"center"
+        alignSelf: "center"
     },
     imageCont: {
         width: 140,
@@ -56,8 +58,8 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         justifyContent: "center",
         alignItems: "center",
-        marginRight:-45,
-        marginLeft:10
+        marginRight: -45,
+        marginLeft: 10
     },
 
 })

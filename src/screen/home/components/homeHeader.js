@@ -7,22 +7,24 @@ const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
 export default class HomeHeader extends Component {
     render() {
-        var { navProps } = this.props
+        var { navProps, openDrawer } = this.props
         return (
             <View style={styles.mainContainer}>
                 {/* <View style={styles.colorView}></View> */}
                 <View style={styles.inner_mainContainer}>
 
                     {/** Menu Icon Button */}
-                    {/* <TouchableOpacity style={styles.menuIcon}>
+                    <TouchableOpacity
+                        onPress={() => openDrawer()}
+                        style={styles.menuIcon}>
                         <Ionicons name="menu" size={35} color="#020621" />
-                    </TouchableOpacity> */}
+                    </TouchableOpacity>
 
                     {/**logo */}
                     <TouchableOpacity
                         style={{
                             position: "absolute",
-                            left: 10,
+                            left: 60,
                         }}
                         onPress={() => navProps.navigate("HomeScreen")}
                     >

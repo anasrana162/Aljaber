@@ -21,6 +21,7 @@ import StoreFeatures from '../products/components/storeFeatures';
 import NewsLetter from '../../components_reusable/newsLetter';
 import CustomerServices from '../../components_reusable/customerServices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Drawer from '../../components_reusable/drawer.js';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -149,12 +150,19 @@ class HomeScreen extends Component {
             firstSubItem: null,
             randomProducts: null,
             topCategoryData: this.props.userData?.topcatdata,
+            drawer: false,
         };
     }
 
     componentDidMount = () => {
         // this.adminApi()     
-        this.props.navigation.addListener('focus', async () => { this.adminApi(), this.loginUser() });
+        this.props.navigation.addListener('focus', async () => {
+            this.adminApi(),
+                setTimeout(() => {
+
+                    this.loginUser()
+                });
+        }, 1000)
         // this.getDefaultCategories()
         this.randomProducts()
         this.unsubscribe()
@@ -408,7 +416,7 @@ class HomeScreen extends Component {
             }).then((res) => {
                 if (topCategory[i]?.id == 122) {
                     topCategoryData.push(topCategory[i])
-                    
+
                 }
                 for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
                     if (res?.data?.custom_attributes[r].attribute_code == "image") {
@@ -603,12 +611,29 @@ class HomeScreen extends Component {
 
     }
 
+    openDrawer = () => {
+        console.log("drawer opened");
+        this.setState({
+            drawer: !this.state.drawer
+        })
+    }
+
     render() {
         return (
             <View style={styles.mainContainer}>
 
                 {/** Header for Home Screen */}
-                <HomeHeader navProps={this.props.navigation} />
+                <HomeHeader
+                    navProps={this.props.navigation}
+                    openDrawer={() => this.openDrawer()}
+                />
+
+                {/* Drawer */}
+                <Drawer
+                    props={this.props}
+                    isOpen={this.state.drawer}
+                    onDismiss={() => this.openDrawer()}
+                />
 
                 <ScrollView>
                     {/** Swiper below header */}

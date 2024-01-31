@@ -216,7 +216,7 @@ class Account extends Component {
                                 </TouchableOpacity> */}
 
                                 {/** Contact Information */}
-                                <ContactInfo props={user} />
+                                <ContactInfo userData={user} navProps={this.props} />
 
                                 {/** Order Track */}
                                 {/* <Text style={styles.track_order_text}>Track your orders and check out quicker</Text> */}
