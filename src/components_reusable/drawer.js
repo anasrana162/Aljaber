@@ -23,8 +23,8 @@ export default class Drawer extends Component {
                 navigation.navigate("Account")
                 break;
             case "my_orders":
-                // onDismiss()
-                // navigation.navigate("Account")
+                onDismiss()
+                navigation.navigate("MyOrders")
                 break;
             case "my_wishlist":
                 // onDismiss()
@@ -62,6 +62,7 @@ export default class Drawer extends Component {
 
     render() {
         var { props: { userData: { user } }, isOpen, onDismiss } = this.props
+        // console.log("user", user);
         return (
             <>
                 {
@@ -82,61 +83,79 @@ export default class Drawer extends Component {
                                     <Text style={[styles.darkContText, { marginTop: 5 }]}>{user?.firstname} {user?.lastname}</Text>
                                 </View>
 
-                                {/* My Account */}
-                                <TouchableOpacity
-                                    onPress={() => this.onPress("my_account")}
-                                    style={[styles.touchable, { marginTop: 20, }]}>
-                                    <Text style={styles.text_touchable}>My Account</Text>
-                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
-                                </TouchableOpacity>
 
-                                {/* My Orders */}
-                                <TouchableOpacity
-                                    onPress={() => this.onPress("my_orders")}
-                                    style={styles.touchable}>
-                                    <Text style={styles.text_touchable}>My Order</Text>
-                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
-                                </TouchableOpacity>
+                                {
+                                    (Object.keys(user).length == 0 || user == "") ?
+                                        <>
+                                            {/* Signin */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("my_account")}
+                                                style={[styles.touchable, { marginTop: 20, }]}>
+                                                <Text style={styles.text_touchable}>Signin</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
+                                        </>
+                                        :
+                                        <>
+                                            {/* My Account */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("my_account")}
+                                                style={[styles.touchable, { marginTop: 20, }]}>
+                                                <Text style={styles.text_touchable}>My Account</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
 
-                                {/* My Wishlist */}
-                                <TouchableOpacity
-                                    onPress={() => this.onPress("my_wishlist")}
-                                    style={styles.touchable}>
-                                    <Text style={styles.text_touchable}>My Wishlist</Text>
-                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
-                                </TouchableOpacity>
 
-                                {/* Address Book */}
-                                <TouchableOpacity
-                                    onPress={() => this.onPress("address_book")}
-                                    style={styles.touchable}>
-                                    <Text style={styles.text_touchable}>Address Book</Text>
-                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
-                                </TouchableOpacity>
+                                            {/* My Orders */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("my_orders")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>My Order</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
 
-                                {/* Address Book */}
-                                <TouchableOpacity
-                                    onPress={() => this.onPress("account_info")}
-                                    style={styles.touchable}>
-                                    <Text style={styles.text_touchable}>Account Info</Text>
-                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
-                                </TouchableOpacity>
+                                            {/* My Wishlist */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("my_wishlist")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>My Wishlist</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
 
-                                {/* My product Reviews */}
-                                <TouchableOpacity
-                                    onPress={() => this.onPress("my_pr_review")}
-                                    style={styles.touchable}>
-                                    <Text style={styles.text_touchable}>My Product Reviews</Text>
-                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
-                                </TouchableOpacity>
+                                            {/* Address Book */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("address_book")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>Address Book</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
 
-                                {/* My product Reviews */}
-                                <TouchableOpacity
-                                    onPress={() => this.onPress("logout")}
-                                    style={[styles.touchable, { position: "absolute", bottom: 15 }]}>
-                                    <Text style={styles.text_touchable}>Logout</Text>
-                                    <MaterialCommunityIcons name="location-exit" color='#3F51B5' size={24} />
-                                </TouchableOpacity>
+                                            {/* Address Book */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("account_info")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>Account Info</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
+
+                                            {/* My product Reviews */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("my_pr_review")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>My Product Reviews</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
+
+                                            {/* Logout */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("logout")}
+                                                style={[styles.touchable, { position: "absolute", bottom: height >= 675 ? 30 : 15 }]}>
+                                                <Text style={styles.text_touchable}>Logout</Text>
+                                                <MaterialCommunityIcons name="location-exit" color='#3F51B5' size={24} />
+                                            </TouchableOpacity>
+                                        </>
+                                }
+
 
                             </View>
                         </LinearX>

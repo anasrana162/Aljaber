@@ -2,19 +2,20 @@ import { Text, StyleSheet, Image, View, BackHandler, Dimensions, NativeModules, 
 import React, { Component } from 'react'
 import HomeHeader from '../home/components/homeHeader';;
 import Ionicons from "react-native-vector-icons/Ionicons"
-import api, { custom_api_url } from '../../api/api';
+import api, { custom_api_url, basis_auth } from '../../api/api';
 
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
-
+import { encode as base64encode } from 'base-64'
 import ImageView from './components/ImageView';
 import CategoryList from './components/categoryList';
 import ProductList from './components/productList';
 import { ImageArray } from '../categories/categoryData';
 import axios from 'axios';
 import FilterBoard from './components/filterBoard';
+import Drawer from '../../components_reusable/drawer';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -43,6 +44,7 @@ class Products extends Component {
             highest_price: "",
             lowest_price: "",
             filteredPrice: "",
+            drawer: false,
             contact_lens_diameter: {
                 name: "Contact Lens Diameter",
                 attribute_code: "contact_lens_diameter",
@@ -360,7 +362,7 @@ class Products extends Component {
 
             var smallest = sorted[0],
                 largest = sorted[sorted.length - 1];
-                
+
             setImmediate(() => {
 
                 this.setState({
@@ -1641,6 +1643,34 @@ class Products extends Component {
 
     }
 
+    openDrawer = () => {
+        // console.log("drawer opened");
+        this.setState({
+            drawer: !this.state.drawer
+        })
+    }
+
+    addToWishList = (productId) => {
+        var { userData: { user } } = this.props
+        console.log("Product ID:   ", productId);
+        const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
+        api.post(custom_api_url + "func=add_wishlist", {
+            "productId": productId,
+            "customerId": user?.id
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${base64Credentials}`,
+            },
+        }).then((res) => {
+            console.log("Product added to widhlist Product Screen Result:   ", res?.data);
+            alert("Product Successfully Added")
+        }).catch((err) => {
+            console.log("Product added to widhlist Product Screen Error:   ", err?.response?.data?.message);
+        })
+
+
+    }
 
     render() {
         var { item, imageLinkMain } = this.props?.route?.params;
@@ -1650,8 +1680,13 @@ class Products extends Component {
 
             <View style={styles.mainContainer} >
                 {/** Screen Header */}
-                < HomeHeader navProps={this.props.navigation} />
+                < HomeHeader navProps={this.props.navigation} openDrawer={() => this.openDrawer()} />
 
+                <Drawer
+                    props={this.props}
+                    isOpen={this.state.drawer}
+                    onDismiss={() => this.openDrawer()}
+                />
                 {/** Top Image & Category Name */}
                 < ImageView
                     source={{ uri: "https://aljaberoptical.com" + imageLinkMain }}
@@ -1680,6 +1715,7 @@ class Products extends Component {
                     loaderFilter={this.state.loaderFilter}
                     addToCart={(product, index) => this.addToCart(product, index)}
                     totalProductsLength={this.state.productSkuLength}
+                    addToWishList={(id) => this.addToWishList(id)}
                 />
 
 

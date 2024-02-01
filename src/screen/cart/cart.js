@@ -14,13 +14,15 @@ const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
 
-import api, { custom_api_url } from '../../api/api';
+import api, { custom_api_url, basis_auth } from '../../api/api';
+import { encode as base64encode } from 'base-64'
 import axios from 'axios';
 import LottieView from 'lottie-react-native';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import ProductList from '../products/components/productList';
 import Loading from '../../components_reusable/loading';
 import Shipping_Tax from './components/shipping_Tax';
+import HeaderComp from '../../components_reusable/headerComp';
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/"
 
 class Cart extends Component {
@@ -542,6 +544,54 @@ class Cart extends Component {
     }
 
 
+    addToWishList = async (product) => {
+        var { userData: { user, admintoken } } = this.props
+        console.log("Product ID:   ", product);
+        console.log("user ID:   ", user?.id);
+        const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
+        console.log("base64Credentials:   ", base64Credentials);
+
+        var result = await api.get(custom_api_url + "func=get_cart_item_image&item_id=" + product?.item_id)
+        console.log("result:", result.data);
+
+        api.delete("carts/" + product?.quote_id + "/items/" + product?.item_id, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            },
+        })
+            .then((res) => {
+                console.log("Delete cart item Api Res ", res?.data)
+                // this.refresh()
+                // alert("Item Removed")
+
+                api.post(custom_api_url + "func=add_wishlist", {
+                    "productId": result?.parent_id,
+                    "customerId": user?.id
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Basic ${base64Credentials}`,
+                    },
+                }).then((response) => {
+                    console.log("Product added to wishlist Cart Screen Result:   ", response?.data);
+                    this.refresh()
+                    alert("Product Successfully Added")
+                }).catch((err) => {
+                    console.log("Product added to wishlist Cart Screen Error:   ", err?.response);
+                })
+
+
+
+            }).catch((err) => {
+                console.log("Delete cart item Api ERR", err)
+            })
+
+
+
+
+    }
+
+
     //this component was placed here because it was re-rendering when state was updated 
     ListFooterComponent = () => {
         var { cartData, loader, randomProducts, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
@@ -713,9 +763,7 @@ class Cart extends Component {
 
         const ListHeaderComponent = () => {
             return (
-                <View style={styles.header_comp}>
-                    <Text style={styles.header_comp_title}>Shopping Cart</Text>
-                </View>
+                <HeaderComp titleEN={"Shopping Cart"} navProps={this.props.navigation} />
             )
         }
 
@@ -811,7 +859,14 @@ class Cart extends Component {
 
                     {/* Wishlist, remove, Edit */}
                     <View style={[styles.flatList_innerCont, { marginTop: 0, justifyContent: "space-between" }]}>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => {
+                                // console.log("item ID",item?.item);
+                                this.addToWishList(item?.item)
+
+                            }
+                            }
+                        >
                             <Text style={[styles.text_style, { fontSize: 14, padding: 10, }]}>Move to Wishlist</Text>
                         </TouchableOpacity>
 

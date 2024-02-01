@@ -9,6 +9,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Information from './components/information';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../api/api';
+import HeaderComp from '../../components_reusable/headerComp';
 
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
@@ -197,10 +198,7 @@ class Account extends Component {
                     </>
                     :
                     <>
-                        <View style={styles.header_comp}>
-                            {/** Title screen */}
-                            <Text style={styles.heading}>My Account</Text>
-                        </View>
+                         <HeaderComp titleEN={"My Account"} navProps={this.props.navigation}/>
 
                         <View style={styles.inner_cont_main}>
                             <ScrollView

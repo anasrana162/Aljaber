@@ -19,6 +19,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Add_NewAddress from './components/add_NewAddress_Modal';
+import HeaderComp from '../../components_reusable/headerComp';
 
 class Billing_Shipping extends Component {
     constructor(props) {
@@ -480,13 +481,11 @@ class Billing_Shipping extends Component {
 
             <View style={styles.mainContainer}>
                 {/* Header */}
-                <View style={styles.header_comp}>
-                    {/* Title */}
-                    <Text style={styles.header_comp_title}>Shipping Address</Text>
-                </View>
-                <ScrollView 
-                showsVerticalScrollIndicator={true}
-                style={{marginBottom:100}} >
+                <HeaderComp titleEN={"Shipping Address"} navProps={this.props.navigation}/>
+                
+                <ScrollView
+                    showsVerticalScrollIndicator={true}
+                    style={{ marginBottom: 100 }} >
 
 
                     {this.state.addressEmpty == true ?
@@ -752,7 +751,7 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         position: "absolute",
         top: 0,
-        zIndex:200,
+        zIndex: 200,
     },
 
     header_comp_title: {

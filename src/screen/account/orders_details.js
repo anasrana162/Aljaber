@@ -15,6 +15,7 @@ import Invoices from './components/invoices';
 import axios from 'axios';
 import api, { custom_api_url } from '../../api/api';
 import OrderInfo from './components/orderInfo';
+import HeaderComp from '../../components_reusable/headerComp';
 
 class Order_Details extends Component {
     constructor(props) {
@@ -99,12 +100,12 @@ class Order_Details extends Component {
         return (
             <View style={styles.mainContainer}>
                 {/* Header */}
-                <View style={styles.header}>
-                    <Text style={styles.header_txt}>Order Details</Text>
-                </View>
+
+                <HeaderComp titleEN={"Order Details"} navProps={this.props.navigation} />
 
                 <ScrollView
                     showsVerticalScrollIndicator={false}
+                    style={{ marginBottom:20}}
                 >
 
                     {/* Main Body */}
@@ -273,6 +274,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         alignSelf: "center",
         marginTop: 20,
+       
     },
     page_sheet: {
         width: width - 20,

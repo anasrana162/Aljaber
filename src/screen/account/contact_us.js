@@ -2,6 +2,7 @@ import { Text, StyleSheet, View, Dimensions, TouchableOpacity, Platform, Image, 
 import React, { Component } from 'react'
 import HomeHeader from '../home/components/homeHeader';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
+import Drawer from '../../components_reusable/drawer';
 
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
@@ -15,7 +16,8 @@ export class Contact_us extends Component {
             email: "",
             phone: "",
             message: "",
-            loader: false
+            loader: false,
+            drawer: false,
         };
     }
 
@@ -93,22 +95,29 @@ export class Contact_us extends Component {
         }, 2000)
     }
 
+    openDrawer = () => {
+        // console.log("drawer opened");
+        this.setState({
+            drawer: !this.state.drawer
+        })
+    }
+
     render() {
 
-        const Tiles = ({ text1, text2, text3, iconName,style }) => {
+        const Tiles = ({ text1, text2, text3, iconName, style }) => {
             return (
-                <View style={[styles.tile_cont,style]}>
-        
+                <View style={[styles.tile_cont, style]}>
+
                     <View style={styles.icon_cont}>
                         <FontAwesome5 name={iconName} size={24} color="white" />
                     </View>
-        
+
                     <View style={styles.tile_text_cont}>
                         {text1 !== undefined && <Text style={styles.para}>{text1}</Text>}
                         {text2 !== undefined && <Text style={styles.para}>{text2}</Text>}
                         {text3 !== undefined && <Text style={styles.para}>{text3}</Text>}
                     </View>
-        
+
                 </View>
             )
         }
@@ -116,7 +125,16 @@ export class Contact_us extends Component {
         return (
             <View style={styles.mainContainer}>
 
-                <HomeHeader />
+                <HomeHeader
+                    navProps={this.props.navigation}
+                    openDrawer={() => this.openDrawer()}
+                />
+
+                <Drawer
+                    props={this.props}
+                    isOpen={this.state.drawer}
+                    onDismiss={() => this.openDrawer()}
+                />
 
                 <ScrollView style={{ width: "100%" }}>
 
@@ -201,7 +219,7 @@ export class Contact_us extends Component {
             </View>
         )
 
-        
+
     }
 }
 

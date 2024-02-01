@@ -7,7 +7,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 const width = Dimensions.get("screen").width
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/"
 
-const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatListEnd, navProps, sortBY, openFilterBoard, loaderDot, addToCart }) => {
+const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatListEnd, addToWishList, navProps, sortBY, openFilterBoard, loaderDot, addToCart }) => {
     //  console.log("Products", data)
 
     const [openSort, setOpenSort] = useState(false)
@@ -19,8 +19,8 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
 
     const selectedItem = (item, index) => {
         // console.log("Item Product Slected:", item)
-       
-        navProps.navigate("ProductDetails", { product_details:  item, product_index: index })
+
+        navProps.navigate("ProductDetails", { product_details: item, product_index: index })
     }
 
     const onEndReached = () => {
@@ -334,7 +334,9 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
                                     <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.item?.price}</Text>
 
                                     <View style={styles.addToCart_Outer_Cont}>
-                                        <TouchableOpacity style={styles.wishlist_button}>
+                                        <TouchableOpacity
+                                            onPress={() => addToWishList(products?.item?.id)}
+                                            style={styles.wishlist_button}>
                                             <MaterialCommunityIcons name="cards-heart-outline" size={20} color="black" />
                                         </TouchableOpacity>
                                         <TouchableOpacity

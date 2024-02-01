@@ -4,12 +4,14 @@ import HomeHeader from './components/homeHeader';
 import Swiper from './components/Swiper';
 import TabNavigator from '../../components_reusable/TabNavigator';
 import HomeCategories from './components/homeCategories';
-import api, { custom_api_url } from '../../api/api';
+import api, { custom_api_url, basis_auth } from '../../api/api';
+import { encode as base64encode } from 'base-64'
 import axios from 'axios';
 import RNRestart from 'react-native-restart';
 import NetInfo from "@react-native-community/netinfo";
 import DefaultCategories from './components/defaultCategories';
 import ProductList from '../products/components/productList';
+
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
@@ -612,10 +614,33 @@ class HomeScreen extends Component {
     }
 
     openDrawer = () => {
-        console.log("drawer opened");
+        // console.log("drawer opened");
         this.setState({
             drawer: !this.state.drawer
         })
+    }
+
+
+    addToWishList = (productId) => {
+        var { userData: { user } } = this.props
+        console.log("Product ID:   ", productId);
+        const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
+        api.post(custom_api_url + "func=add_wishlist", {
+            "productId": productId,
+            "customerId": user?.id
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${base64Credentials}`,
+            },
+        }).then((res) => {
+            console.log("Product added to widhlist Home Screen Result:   ", res?.data);
+            alert("Product Successfully Added")
+        }).catch((err) => {
+            console.log("Product added to widhlist Home Screen Error:   ", err?.response?.data?.message);
+        })
+
+
     }
 
     render() {
@@ -660,6 +685,7 @@ class HomeScreen extends Component {
                         loaderDot={this.state.loaderDot}
                         navProps={this.props.navigation}
                         addToCart={(product, index) => this.addToCart(product, index)}
+                        addToWishList={(id) => this.addToWishList(id)}
                     />
 
 

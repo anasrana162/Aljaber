@@ -18,6 +18,7 @@ import api, { custom_api_url } from '../../api/api';
 import axios from 'axios';
 import Loading from '../../components_reusable/loading';
 import products from './products';
+import Drawer from '../../components_reusable/drawer';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -68,6 +69,7 @@ class ProductDetails extends Component {
             rightEyeQuantity: 1,
             more_info_loader: false,
             refreshing: false,
+            drawer:false,
         };
     }
 
@@ -270,8 +272,8 @@ class ProductDetails extends Component {
                 configurable_product_options_loader: true,
             })
         })
-        console.log("Checking Varients",product_details?.extension_attributes?.configurable_product_links)
-        if(product_details?.extension_attributes?.configurable_product_links == undefined){
+        console.log("Checking Varients", product_details?.extension_attributes?.configurable_product_links)
+        if (product_details?.extension_attributes?.configurable_product_links == undefined) {
             return setImmediate(() => {
                 this.setState({
                     configurable_product_options_loader: false,
@@ -1581,6 +1583,12 @@ class ProductDetails extends Component {
 
     }
 
+    openDrawer = () => {
+        // console.log("drawer opened");
+        this.setState({
+            drawer: !this.state.drawer
+        })
+    }
 
     render() {
 
@@ -1619,8 +1627,13 @@ class ProductDetails extends Component {
             <View style={styles.mainContainer}>
                 {this.state.loader && <Loading />}
                 {/* Header */}
-                <HomeHeader navProps={this.props.navigation} />
+                <HomeHeader navProps={this.props.navigation}   openDrawer={() => this.openDrawer()} />
 
+                <Drawer
+                    props={this.props}
+                    isOpen={this.state.drawer}
+                    onDismiss={() => this.openDrawer()}
+                />
                 <ScrollView
                     showsVerticalScrollIndicator={false}
                     refreshControl={

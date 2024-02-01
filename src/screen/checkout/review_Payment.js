@@ -20,6 +20,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import Loading from '../../components_reusable/loading';
+import HeaderComp from '../../components_reusable/headerComp';
 
 class Review_Payment extends Component {
     constructor(props) {
@@ -211,6 +212,7 @@ class Review_Payment extends Component {
                     {/* Title */}
                     <Text style={styles.header_comp_title}>Review & Payment</Text>
                 </View>
+                <HeaderComp titleEN={"Review & Payment"} navProps={this.props.navigation} />
                 <ScrollView showsVerticalScrollIndicator={false} >
 
                     <View style={styles.inner_main}>

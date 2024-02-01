@@ -114,7 +114,8 @@ const styles = StyleSheet.create({
     mainCont: {
         width: "100%",
         alignItems: "flex-start",
-        alignSelf: "center"
+        alignSelf: "center",
+        // marginBottom:100
     },
 
     touchableCont: {
