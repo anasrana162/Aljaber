@@ -7,12 +7,17 @@ import {
     CARTITEMS,
     //Orders
     ORDERS,
+    //Wishlist
+    WISHLIST,
+    //Countries
+    COUNTRIES,
 } from '../constants';
 
 const initialState = {
     user: {},
     token: null,
     language: null,
+    countries: [],
     admintoken: null,
     defaultcategory: null,
     createddefaultcategory: null,
@@ -21,6 +26,7 @@ const initialState = {
     cartitems: null,
     searchproducts: null,
     orders: null,
+    wishlist: [],
     clearpres: [],
     color: [],
     toric: [],
@@ -100,10 +106,20 @@ const userReducer = (state = initialState, action) => {
                 ...state,
                 orders: action.payload
             }
+        case WISHLIST:
+            return {
+                ...state,
+                wishlist: action.payload
+            }
         case CARTITEMS:
             return {
                 ...state,
                 cartitems: action.payload
+            }
+        case COUNTRIES:
+            return {
+                ...state,
+                countries: action.payload
             }
 
         // SUB CATEGORIES

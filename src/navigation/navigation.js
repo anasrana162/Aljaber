@@ -17,6 +17,9 @@ import Review_Payment from '../screen/checkout/review_Payment';
 import Order_Details from '../screen/account/orders_details';
 import ChangeUserData from '../screen/account/changeUserData';
 import MyOrders from '../screen/account/myOrders';
+import Wishlist from '../screen/wishlist/wishlist';
+import AddressBook from '../screen/addressbook/addressBook';
+import MyReviews from '../screen/account/myReviews';
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -33,10 +36,13 @@ export default class Navigation extends Component {
                     <Stack.Screen name="GetStarted" component={GetStarted} />
                     <Stack.Screen name="HomeScreen" component={HomeScreen} />
                     <Stack.Screen name="Cart" component={Cart} />
+                    <Stack.Screen name="Wishlist" component={Wishlist} />
                     <Stack.Screen name="Billing_Shipping" component={Billing_Shipping} />
                     <Stack.Screen name="Review_Payment" component={Review_Payment} />
                     <Stack.Screen name="Search" component={Search} />
                     <Stack.Screen name="Account" component={Account} />
+                    <Stack.Screen name="AddressBook" component={AddressBook} />
+                    <Stack.Screen name="MyReviews" component={MyReviews} />
                     <Stack.Screen name="MyOrders" component={MyOrders} />
                     <Stack.Screen name="ChangeUserData" component={ChangeUserData} />
                     <Stack.Screen name="About_us" component={About_us} />

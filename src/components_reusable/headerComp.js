@@ -22,7 +22,7 @@ export default HeaderComp
 
 const styles = StyleSheet.create({
     heading: {
-        fontSize: 22,
+        fontSize: 21,
         color: "white",
         fontWeight: "600",
 
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         backgroundColor: "#020621",
         alignItems: "center",
-        paddingTop: 0,
+        paddingTop: 10,
         paddingBottom: 10
     },
 })

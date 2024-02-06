@@ -2,7 +2,31 @@ import { Text, StyleSheet, Image, View, Dimensions, Modal, NativeModules, Scroll
 import React from 'react'
 const width = Dimensions.get("screen").width
 
-const CustomerServices = () => {
+const CustomerServices = ({ navProps }) => {
+
+    const onPress = (key) => {
+
+        switch (key) {
+            case "my_account":
+                navProps.navigate("Account")
+                break;
+            case "my_orders":
+                navProps.navigate("MyOrders")
+                break;
+            case "my_wishlist":
+                navProps.navigate("Wishlist")
+                break;
+            case "address_book":
+                navProps.navigate("AddressBook")
+                break;
+            case "account_info":
+                navProps.navigate("ChangeUserData")
+                break;
+
+
+
+        }
+    }
     return (
         <View style={styles.mainContainer}>
             <View style={styles.inner_mainContainer}>
@@ -16,7 +40,7 @@ const CustomerServices = () => {
                     {/* My Account */}
                     <TouchableOpacity
                         activeOpacity={0.8}
-                        onPress={() => { }}
+                        onPress={() => onPress("my_account")}
                     >
                         <Text style={[styles.title, { fontSize: 14, paddingVertical: 10, marginRight: 25 }]}>My Account</Text>
                     </TouchableOpacity>
@@ -24,7 +48,7 @@ const CustomerServices = () => {
                     {/* My Orders */}
                     <TouchableOpacity
                         activeOpacity={0.8}
-                        onPress={() => { }}
+                        onPress={() => onPress("my_orders")}
                     >
                         <Text style={[styles.title, { fontSize: 14, paddingVertical: 10, marginRight: 25 }]}>My Orders</Text>
                     </TouchableOpacity>
@@ -32,7 +56,7 @@ const CustomerServices = () => {
                     {/* My WishList */}
                     <TouchableOpacity
                         activeOpacity={0.8}
-                        onPress={() => { }}
+                        onPress={() => onPress("my_wishlist")}
                     >
                         <Text style={[styles.title, { fontSize: 14, paddingVertical: 10, marginRight: 25 }]}>My WishList</Text>
                     </TouchableOpacity>
@@ -40,7 +64,7 @@ const CustomerServices = () => {
                     {/* AddressBook */}
                     <TouchableOpacity
                         activeOpacity={0.8}
-                        onPress={() => { }}
+                        onPress={() =>  onPress("address_book")}
                     >
                         <Text style={[styles.title, { fontSize: 14, paddingVertical: 10, marginRight: 25 }]}>AddressBook</Text>
                     </TouchableOpacity>
@@ -48,7 +72,7 @@ const CustomerServices = () => {
                     {/* Account Information */}
                     <TouchableOpacity
                         activeOpacity={0.8}
-                        onPress={() => { }}
+                        onPress={() => onPress("account_info")}
                     >
                         <Text style={[styles.title, { fontSize: 14, paddingVertical: 10, marginRight: 25 }]}>Account Information</Text>
                     </TouchableOpacity>

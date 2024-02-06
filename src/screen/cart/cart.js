@@ -546,45 +546,46 @@ class Cart extends Component {
 
     addToWishList = async (product) => {
         var { userData: { user, admintoken } } = this.props
-        console.log("Product ID:   ", product);
-        console.log("user ID:   ", user?.id);
+        // console.log("Product ID:   ", product);
+        // console.log("user ID:   ", user?.id);
         const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
-        console.log("base64Credentials:   ", base64Credentials);
+        // console.log("base64Credentials:   ", base64Credentials);
 
         var result = await api.get(custom_api_url + "func=get_cart_item_image&item_id=" + product?.item_id)
-        console.log("result:", result.data);
+        // console.log("result:", result.data);
 
-        api.delete("carts/" + product?.quote_id + "/items/" + product?.item_id, {
+        api.post(custom_api_url + "func=add_wishlist", {
+            "productId": result?.data?.parent_id,
+            "customerId": user?.id,
+        }, {
             headers: {
-                Authorization: `Bearer ${admintoken}`,
+                'Content-Type': 'application/json',
+                Authorization: `Basic ${base64Credentials}`,
             },
-        })
-            .then((res) => {
-                console.log("Delete cart item Api Res ", res?.data)
-                // this.refresh()
-                // alert("Item Removed")
+        }).then((response) => {
+            console.log("Product added to wishlist Cart Screen Result:   ", response?.data);
+            api.delete("carts/" + product?.quote_id + "/items/" + product?.item_id, {
+                headers: {
+                    Authorization: `Bearer ${admintoken}`,
+                },
+            })
+                .then((res) => {
+                    console.log("Delete cart item Api Res ", res?.data)
+                    // this.refresh()
+                    // alert("Item Removed")
 
-                api.post(custom_api_url + "func=add_wishlist", {
-                    "productId": result?.parent_id,
-                    "customerId": user?.id
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Basic ${base64Credentials}`,
-                    },
-                }).then((response) => {
-                    console.log("Product added to wishlist Cart Screen Result:   ", response?.data);
                     this.refresh()
                     alert("Product Successfully Added")
                 }).catch((err) => {
-                    console.log("Product added to wishlist Cart Screen Error:   ", err?.response);
+                    console.log("Delete cart item Api ERR", err)
                 })
+        }).catch((err) => {
+            console.log("Product added to wishlist Cart Screen Error:   ", err?.response);
+        })
 
 
 
-            }).catch((err) => {
-                console.log("Delete cart item Api ERR", err)
-            })
+
 
 
 

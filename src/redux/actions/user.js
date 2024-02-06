@@ -1,5 +1,5 @@
 import {
-    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT,TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
+    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
     SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
@@ -7,6 +7,10 @@ import {
     CARTITEMS,
     //Orders
     ORDERS,
+    //Wishlist
+    WISHLIST,
+    //Countries
+    COUNTRIES,
 } from '../constants';
 
 export function userToken(token) {
@@ -25,6 +29,12 @@ export function user(userObject) {
     return {
         type: USER,
         payload: userObject
+    }
+}
+export function fetchCountries(countries) {
+    return {
+        type: COUNTRIES,
+        payload: countries
     }
 }
 export function updateLanguage(language) {
@@ -74,6 +84,12 @@ export function cartItems(cartitems) {
     return {
         type: CARTITEMS,
         payload: cartitems
+    }
+}
+export function wishList(wishlist) {
+    return {
+        type: WISHLIST,
+        payload: wishlist
     }
 }
 export function myOrders(orders) {

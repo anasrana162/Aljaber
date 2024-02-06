@@ -644,6 +644,7 @@ class HomeScreen extends Component {
     }
 
     render() {
+        var { userData: { user } } = this.props
         return (
             <View style={styles.mainContainer}>
 
@@ -692,9 +693,15 @@ class HomeScreen extends Component {
 
                     <StoreFeatures screenName={"home"} />
 
-                    <NewsLetter props={this.props} />
+                    <NewsLetter props={this.props} 
+                    style={{marginBottom: Object.keys(user).length == 0? 60:0}}
+                    />
 
-                    <CustomerServices />
+                    {
+                        Object.keys(user).length !== 0 && <CustomerServices
+                            navProps={this.props.navigation}
+                        />
+                    }
 
                 </ScrollView>
 

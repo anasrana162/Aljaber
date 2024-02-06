@@ -27,12 +27,12 @@ export default class Drawer extends Component {
                 navigation.navigate("MyOrders")
                 break;
             case "my_wishlist":
-                // onDismiss()
-                // navigation.navigate("Account")
+                onDismiss()
+                navigation.navigate("Wishlist")
                 break;
             case "address_book":
-                // onDismiss()
-                // navigation.navigate("Account")
+                onDismiss()
+                navigation.navigate("AddressBook")
                 break;
             case "account_info":
                 onDismiss()
@@ -40,8 +40,8 @@ export default class Drawer extends Component {
                 break;
 
             case "my_pr_review":
-                // onDismiss()
-                // navigation.navigate("ChangeUserData")
+                onDismiss()
+                navigation.navigate("MyReviews")
                 break;
             case "logout":
 

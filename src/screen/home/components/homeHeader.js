@@ -41,8 +41,10 @@ export default class HomeHeader extends Component {
                         <Ionicons name="search" size={30} color="#020621" />
                     </TouchableOpacity>
 
-                    {/** Favourate icon Button */}
-                    <TouchableOpacity style={styles.favourateIcon}>
+                    {/** Wishlist icon Button */}
+                    <TouchableOpacity
+                     onPress={() => navProps.navigate("Wishlist")}
+                     style={styles.favourateIcon}>
                         <Ionicons name="heart-outline" size={30} color="#020621" />
                     </TouchableOpacity>
 

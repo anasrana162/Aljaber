@@ -110,6 +110,7 @@ class App extends Component {
     this.adminApi()
     this.loginUser()
     this.fetchAllProductsForSearch()
+    this.getCountries()
   }
 
   // ---------Code Push Start-----------//
@@ -466,6 +467,22 @@ class App extends Component {
         loader: false,
       })
     })
+  }
+
+  getCountries = () => {
+
+    var { actions } = this.props
+
+    api.get("aljaber/getallcountry").then((result) => {
+      // console.log("Get Country Api Result: ", result?.data)
+      // setImmediate(() => {
+      //     this.setState({ countries: result?.data })
+      // })
+      actions.fetchCountries(result?.data)
+    }).catch(err => {
+      console.log("Get Country Api Error: ", err)
+    })
+
   }
 
   render() {

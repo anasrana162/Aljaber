@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../api/api';
 import Entypo from 'react-native-vector-icons/Entypo';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-
+import HeaderComp from '../../components_reusable/headerComp';
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
 
@@ -204,17 +204,13 @@ class ChangeUserData extends Component {
         return (
             <View style={styles.mainContainer}>
 
-                <View style={styles.header_comp}>
-                    {/** Title screen */}
-                    <Text style={styles.heading}>Edit Account Information</Text>
-
-                </View>
+                <HeaderComp titleEN={"Edit Account Information"} navProps={this.props.navigation} />
 
                 <ScrollView>
                     <View style={styles.subMainCont}>
 
                         {/* Sub Heading */}
-                        <Text style={[styles.subHeading,{marginTop:30,}]}>Account Information</Text>
+                        <Text style={[styles.subHeading, { marginTop: 30, }]}>Account Information</Text>
 
                         {/* First Name */}
                         <CustomTextInp
@@ -279,8 +275,8 @@ class ChangeUserData extends Component {
 
                         {this.state.check_password &&
                             <>
-                             {/* Sub Heading */}
-                        <Text style={[styles.subHeading,{marginTop:30}]}>Change Password</Text>
+                                {/* Sub Heading */}
+                                <Text style={[styles.subHeading, { marginTop: 30 }]}>Change Password</Text>
 
                                 <CustomTextInp
                                     // value={this.state.email}
