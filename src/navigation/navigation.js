@@ -20,6 +20,7 @@ import MyOrders from '../screen/account/myOrders';
 import Wishlist from '../screen/wishlist/wishlist';
 import AddressBook from '../screen/addressbook/addressBook';
 import MyReviews from '../screen/account/myReviews';
+import EditAddress from '../screen/editaddress/editAddress';
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -42,6 +43,7 @@ export default class Navigation extends Component {
                     <Stack.Screen name="Search" component={Search} />
                     <Stack.Screen name="Account" component={Account} />
                     <Stack.Screen name="AddressBook" component={AddressBook} />
+                    <Stack.Screen name="EditAddress" component={EditAddress} />
                     <Stack.Screen name="MyReviews" component={MyReviews} />
                     <Stack.Screen name="MyOrders" component={MyOrders} />
                     <Stack.Screen name="ChangeUserData" component={ChangeUserData} />

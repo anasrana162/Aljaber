@@ -17,11 +17,13 @@ const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, open
                 console.log("Inner selected", val)
                 setCountrySelected(val?.country)
                 selectItem(val)
+                setModalDropDown(false)
                 break;
             case 'province':
                 console.log("Inner selected", val)
                 setProvinceSelected(val?.title)
                 selectItem(val)
+                setModalDropDown(false)
                 break;
         }
     }

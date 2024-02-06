@@ -24,6 +24,8 @@ class AddressBook extends Component {
             loader: false,
             default_billing_address: {},
             default_shipping_address: {},
+            default_billing_address_index: 0,
+            default_shipping_address_index: 0,
         }
     }
 
@@ -117,13 +119,15 @@ class AddressBook extends Component {
             // console.log("country", country);
             if (default_billing == addresses[a]?.id) {
                 this.setState({
-                    default_billing_address: addresses[a]
+                    default_billing_address: addresses[a],
+                    default_billing_address_index: a
                 })
                 check.push("1")
             }
             if (default_shipping == addresses[a]?.id) {
                 this.setState({
-                    default_shipping_address: addresses[a]
+                    default_shipping_address: addresses[a],
+                    default_shipping_address_index: a
                 })
                 check.push("1")
             }
@@ -178,6 +182,21 @@ class AddressBook extends Component {
 
     }
 
+    onEdit = (address, index) => {
+        this.props.navigation.navigate("EditAddress", { propAddress: address, addressIndex: index })
+    }
+
+    onChangeAddress = (key) => {
+        switch (key) {
+            case "billing":
+                this.props.navigation.navigate("EditAddress", { propAddress: this.state.default_billing_address, addressIndex: this.state.default_billing_address_index })
+                break;
+            case "shipping":
+                this.props.navigation.navigate("EditAddress", { propAddress: this.state.default_shipping_address, addressIndex: this.state.default_shipping_address_index })
+                break;
+        }
+    }
+
     render() {
         var { userData: { countries, user: { addresses }, user } } = this.props
         var { default_billing_address, default_shipping_address } = this.state
@@ -224,7 +243,9 @@ class AddressBook extends Component {
                             </View>
 
                             <View style={styles.defaultAddressTitleCont}>
-                                <TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => this.onChangeAddress("billing")}
+                                >
                                     <Text style={[styles.title, {
                                         marginTop: 0,
                                         fontSize: 16,
@@ -252,7 +273,9 @@ class AddressBook extends Component {
                             </View>
 
                             <View style={styles.defaultAddressTitleCont}>
-                                <TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => this.onChangeAddress("shipping")}
+                                >
                                     <Text style={[styles.title, {
                                         marginTop: 0,
                                         fontSize: 16,
@@ -277,34 +300,41 @@ class AddressBook extends Component {
                                         contentContainerStyle={{ marginBottom: 30 }}
                                         renderItem={({ item, index }) => {
                                             return (
-                                                <View
-                                                    key={index}
-                                                    style={styles.listCont}>
-                                                    <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Name:  <Text style={styles.defaultAddressText} >{item?.firstname} {item?.lastname}</Text></Text>
-                                                    <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Street Address: <Text style={styles.defaultAddressText} >{item?.street[0]} {item?.street[1] == undefined ? "" : item?.street[1]}</Text> </Text>
-                                                    <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>City:  <Text style={styles.defaultAddressText} >{item?.city}</Text></Text>
-                                                    <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Country:  <Text style={styles.defaultAddressText} >{item?.country}</Text></Text>
-                                                    <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>State:  <Text style={styles.defaultAddressText} >{item?.region?.region}</Text></Text>
-                                                    <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Zip / Postal Code:  <Text style={styles.defaultAddressText} >{item?.postcode}</Text></Text>
-                                                    <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Phone:  <Text style={styles.defaultAddressText} >{item?.telephone}</Text></Text>
-                                                    <View style={{
-                                                        // width: "100%",
-                                                        flexDirection: "row",
-                                                        justifyContent: "center",
-                                                        alignItems: "center",
-                                                        alignSelf: "flex-end"
-                                                    }}>
-                                                        <TouchableOpacity>
-                                                            <Text style={styles.editBtnTxt}>Edit</Text>
-                                                        </TouchableOpacity>
-                                                        <Text style={styles.defaultAddressText}> | </Text>
-                                                        <TouchableOpacity
-                                                            onPress={() => this.deleteAddress(index)}
-                                                        >
-                                                            <Text style={styles.deleteBtnTxt}>delete</Text>
-                                                        </TouchableOpacity>
-                                                    </View>
-                                                </View>
+                                                <>
+                                                    {(user?.default_billing == item?.id || user?.default_shipping == item?.id) ?
+                                                        <></>
+                                                        :
+                                                        < View
+                                                            key={index}
+                                                            style={styles.listCont}>
+                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Name:  <Text style={styles.defaultAddressText} >{item?.firstname} {item?.lastname}</Text></Text>
+                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Street Address: <Text style={styles.defaultAddressText} >{item?.street[0]} {item?.street[1] == undefined ? "" : item?.street[1]}</Text> </Text>
+                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>City:  <Text style={styles.defaultAddressText} >{item?.city}</Text></Text>
+                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Country:  <Text style={styles.defaultAddressText} >{item?.country}</Text></Text>
+                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>State:  <Text style={styles.defaultAddressText} >{item?.region?.region}</Text></Text>
+                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Zip / Postal Code:  <Text style={styles.defaultAddressText} >{item?.postcode}</Text></Text>
+                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Phone:  <Text style={styles.defaultAddressText} >{item?.telephone}</Text></Text>
+                                                            <View style={{
+                                                                // width: "100%",
+                                                                flexDirection: "row",
+                                                                justifyContent: "center",
+                                                                alignItems: "center",
+                                                                alignSelf: "flex-end"
+                                                            }}>
+                                                                <TouchableOpacity
+                                                                    onPress={() => this.onEdit(item, index)}
+                                                                >
+                                                                    <Text style={styles.editBtnTxt}>Edit</Text>
+                                                                </TouchableOpacity>
+                                                                <Text style={styles.defaultAddressText}> | </Text>
+                                                                <TouchableOpacity
+                                                                    onPress={() => this.deleteAddress(index)}
+                                                                >
+                                                                    <Text style={styles.deleteBtnTxt}>delete</Text>
+                                                                </TouchableOpacity>
+                                                            </View>
+                                                        </View >}
+                                                </>
                                             )
                                         }}
                                     />
