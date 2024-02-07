@@ -34,7 +34,7 @@ class EditAddress extends Component {
             street1: propAddress?.street[0],
             street2: propAddress?.street[1] == undefined ? "" : propAddress?.street[1],
             city: propAddress?.city,
-            zipcode: propAddress?.zipcode,
+            zipcode: propAddress?.postcode,
             shippingChecked: false,
             billingChecked: false,
         }
@@ -66,7 +66,7 @@ class EditAddress extends Component {
             case "city":
                 this.setState({ city: txt });
                 break;
-            case "zipcode":
+            case "zip_code":
                 this.setState({ zipcode: txt });
                 break;
         }
@@ -89,6 +89,128 @@ class EditAddress extends Component {
                     countryDDSelected: val,
                     openCountryDD: !this.state.openCountryDD
                 })
+        }
+    }
+
+    onSaveAddress = () => {
+        var { userData: { countries, user: { addresses, id, default_billing, default_shipping }, admintoken }, route: { params: { propAddress, addressIndex } } } = this.props
+        var { firstname, lastname, email, street1, street2, phone, countryDDSelected, province, city, zipcode, billingChecked, shippingChecked } = this.state
+        var tempAddress = addresses
+
+        this.setState({
+            loader: true
+        })
+
+        for (let i = 0; i < tempAddress?.length; i++) {
+            delete tempAddress[i].country
+        }
+
+        tempAddress[addressIndex].firstname = firstname;
+        tempAddress[addressIndex].lastname = lastname;
+        tempAddress[addressIndex].phone = phone;
+        tempAddress[addressIndex].street[0] = street1;
+        // tempAddress[addressIndex].street[1] !== undefined ? null : street2 == '' ? undefined : street2,
+        if (tempAddress[addressIndex].street[1] !== undefined) {
+
+            tempAddress[addressIndex].street[1] = street2 == '' ? tempAddress[addressIndex].street[1] : street2;
+            // }else{
+        } else {
+            tempAddress[addressIndex].street[1] = street2 == '' ? undefined : street2;
+        }
+        tempAddress[addressIndex].region.region_code = province,
+            tempAddress[addressIndex].region.region = province,
+            tempAddress[addressIndex].country_id = countryDDSelected == "" ? tempAddress[addressIndex].country_id : countryDDSelected?.country_id,
+            tempAddress[addressIndex].city = city
+        tempAddress[addressIndex].postcode = zipcode
+
+        console.log("addresses", tempAddress);
+
+        let final_obj = {
+            "customer": {
+                "default_billing": billingChecked ? propAddress?.id : default_billing,
+                "default_shipping": shippingChecked ? propAddress?.id : default_shipping,
+                "addresses": tempAddress
+            }
+        }
+
+        console.log("final_obj", final_obj);
+
+        api.put("customers/" + id,
+            final_obj,
+            {
+                headers: {
+                    Authorization: `Bearer ${admintoken}`,
+                },
+            }
+        ).then((res) => {
+            console.log("Res customer profile update API Edit Addess Screen:", res?.data)
+            this.loginUser()
+
+        }).catch((err) => {
+            console.log("Err customer profile update API Edit Addess Screen", err)
+        })
+    }
+    loginUser = async () => {
+
+        var { actions } = this.props
+
+        var LoginData = await AsyncStorage.getItem("@aljaber_userLoginData")
+        var objLoginData = JSON.parse(LoginData)
+        console.log("LoginData", objLoginData)
+        if (objLoginData !== null) {
+
+            var customerToken = await api.post('integration/customer/token', {
+                username: objLoginData?.username,
+                password: objLoginData?.password,
+            })
+
+            // console.log("customerToken", customerToken?.data)
+            if (customerToken?.data !== "") {
+                const res = await api.post(
+                    "carts/mine",
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${customerToken?.data}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                ).then((result) => {
+
+
+                    // console.log("========Success ALJEBER============ Home", result?.data);
+
+                    api.get('customers/me', {
+                        headers: {
+                            Authorization: `Bearer ${customerToken?.data}`,
+                        },
+                    }).then((user_data) => {
+
+
+                        if (user_data?.data) {
+                            // console.log("TOKEN GENERATED============Home",)
+                            actions.userToken(customerToken?.data)
+                            user_data.data.cartID = result?.data
+                            actions.user(user_data?.data)
+                            this.setState({
+                                loader: false
+                            })
+                            this.fetchDefaultAddresses()
+
+                        }
+                    }).catch((err) => {
+                        alert("Network Error Code: (cd1)")
+                        console.log("customer data Api error HOme: ", err?.response)
+
+                    })
+                }).catch((err) => {
+                    console.log("Error AddtoCart ID API Home:", err?.message)
+
+                })
+            }
+        }
+        else {
+            console.log("No credentials found for login")
         }
     }
 
@@ -135,7 +257,7 @@ class EditAddress extends Component {
                         <CustomTextInp
                             value={this.state.street1}
                             titleEN={"Street Address: Line 1 *"}
-                            onChangeText={(txt) => onChangeText(txt, "street_address_line1")}
+                            onChangeText={(txt) => this.onChangeText(txt, "street1")}
                         />
 
                         {/* Street Address Line2 */}
@@ -143,7 +265,7 @@ class EditAddress extends Component {
                             // titleEN={"Street Address: Line 1 *"}
                             value={this.state.street2}
                             style={{ marginTop: -3 }}
-                            onChangeText={(txt) => onChangeText(txt, "street_address_line2")}
+                            onChangeText={(txt) => this.onChangeText(txt, "street2")}
                         />
 
                         {/* Country */}
@@ -170,24 +292,31 @@ class EditAddress extends Component {
                         <CustomTextInp
                             value={this.state.city}
                             titleEN={"City *"}
-                            onChangeText={(txt) => onChangeText(txt, "city")}
+                            onChangeText={(txt) => this.onChangeText(txt, "city")}
                         />
 
                         {/* ZIP/POSTAL CODE */}
                         <CustomTextInp
                             value={this.state.zipcode}
+                            keyboardType={"numeric"}
                             titleEN={"Zip / Postal Code *"}
-                            onChangeText={(txt) => onChangeText(txt, "zip_code")}
+                            onChangeText={(txt) => this.onChangeText(txt, "zip_code")}
                         />
 
                         {/* use as default billing */}
-                        <View style={{ flexDirection: 'row', alignItems: "center", alignSelf: "flex-end", marginRight: 15 }}>
+                        <View style={{
+                            flexDirection: 'row', alignItems: "center", alignSelf: "flex-end",
+                            paddingHorizontal: 18,
+                            // backgroundColor: user?.default_shipping == propAddress?.id ? "#6f4400" : "white",
+                            marginBottom: 10,
+                            marginTop: 10,
+                        }}>
                             {
                                 user?.default_billing == propAddress?.id ?
 
                                     <View
                                         style={{ padding: 5 }}>
-                                        <AntDesign name="warning" size={24} color="black" />
+                                        <AntDesign name="warning" size={24} color={user?.default_shipping == propAddress?.id ? "#c07600" : "black"} />
                                     </View>
 
                                     :
@@ -207,17 +336,24 @@ class EditAddress extends Component {
                                         }
                                     </>
                             }
-                            <Text style={styles.checkboxText}>Use as my default billing address</Text>
+                            <Text style={[styles.checkboxText, {
+                                color: user?.default_shipping == propAddress?.id ? "#c07600" : "black"
+                            }]}>{user?.default_shipping == propAddress?.id ? "it's a default billing address" : "Use as my default billing address"}</Text>
                         </View>
 
                         {/* use as default shipping */}
-                        <View style={{ flexDirection: 'row', alignItems: "center", alignSelf: "flex-end", }}>
+                        <View style={{
+                            flexDirection: 'row', alignItems: "center", alignSelf: "flex-end",
+                            paddingHorizontal: 10,
+                            // backgroundColor: user?.default_shipping == propAddress?.id ? "#6f4400" : "white",
+                            marginBottom: 20,
+                        }}>
                             {
                                 user?.default_shipping == propAddress?.id ?
 
                                     <View
                                         style={{ padding: 5 }}>
-                                        <AntDesign name="warning" size={24} color="black" />
+                                        <AntDesign name="warning" size={24} color={user?.default_shipping == propAddress?.id ? "#c07600" : "black"} />
                                     </View>
 
                                     :
@@ -237,8 +373,24 @@ class EditAddress extends Component {
                                         }
                                     </>
                             }
-                            <Text style={styles.checkboxText}>Use as my default shipping address</Text>
+                            <Text style={[styles.checkboxText, {
+                                color: user?.default_shipping == propAddress?.id ? "#c07600" : "black"
+                            }]}>{user?.default_shipping == propAddress?.id ? "its's a default shipping address" : "Use as my default shipping address"}</Text>
                         </View>
+
+                        <TouchableOpacity style={{
+                            width: 140,
+                            height: 45,
+                            backgroundColor: "#08c",
+                            marginBottom: 50,
+                            justifyContent: "center",
+                            alignItems: "center"
+                        }}
+                            onPress={() => this.onSaveAddress()}
+                        >
+                            <Text style={{ fontSize: 14, fontWeight: "600", color: "white" }}>Save address</Text>
+                        </TouchableOpacity>
+
 
                     </View>
                 </ScrollView>
@@ -284,7 +436,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
     },
     checkboxText: {
-        fontWeight: "400",
+        fontWeight: "500",
         color: "black",
         fontSize: 14,
     },

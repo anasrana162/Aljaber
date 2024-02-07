@@ -103,6 +103,7 @@ class Categories extends Component {
                                 <>
                                     {/* item?.index != 0 this condition is for hiding shop by brand */}
                                     {item?.item?.is_active == true && item?.index != 0 &&
+                                        item?.item?.id != 72 && item?.item?.id != 49 && item?.item?.id != 128 &&
                                         <TouchableOpacity
 
                                             onPress={() => this.selectedItems(item?.item, index, 'main')}
@@ -157,6 +158,15 @@ class Categories extends Component {
                                     case 34:
                                         item.is_active = false
                                         break;
+                                    // case 72:
+                                    //     item.is_active = false
+                                    //     break;
+                                    // case 89:
+                                    //     item.is_active = false
+                                    //     break;
+                                    // case 128:
+                                    //     item.is_active = false
+                                    //     break;
                                 }
                                 return (
                                     <View
@@ -218,13 +228,13 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start"
     },
     inner_main: {
-        width: width-20,
+        width: width - 20,
         alignSelf: "center",
         marginTop: 30,
         // marginRight: 200,
         // flexDirection: "row",
         alignItems: "center",
-        marginBottom:10
+        marginBottom: 10
     },
     default_category_cont: {
         width: 110,

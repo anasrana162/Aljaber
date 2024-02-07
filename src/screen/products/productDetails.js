@@ -1775,7 +1775,7 @@ class ProductDetails extends Component {
                     />
 
                     {/* Store Features */}
-                    <StoreFeatures />
+                    {/* <StoreFeatures /> */}
 
                     {/* DetailsNav */}
                     {this.state.more_info_loader ?
