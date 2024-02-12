@@ -107,7 +107,7 @@ class EditAddress extends Component {
 
         tempAddress[addressIndex].firstname = firstname;
         tempAddress[addressIndex].lastname = lastname;
-        tempAddress[addressIndex].phone = phone;
+        tempAddress[addressIndex].telephone = phone;
         tempAddress[addressIndex].street[0] = street1;
         // tempAddress[addressIndex].street[1] !== undefined ? null : street2 == '' ? undefined : street2,
         if (tempAddress[addressIndex].street[1] !== undefined) {
@@ -123,12 +123,15 @@ class EditAddress extends Component {
             tempAddress[addressIndex].city = city
         tempAddress[addressIndex].postcode = zipcode
 
-        console.log("addresses", tempAddress);
+        console.log("addresses", addresses);
+        // console.log("default_billing propAddress?.id ", propAddress?.id ,"     default_billing  ",default_billing);
+        // console.log("default_shipping propAddress?.id", propAddress?.id,'      default_shipping ',default_shipping);
+
+        // "default_billing": billingChecked ? propAddress?.id : default_billing,
+        // "default_shipping": shippingChecked ? propAddress?.id : default_shipping,
 
         let final_obj = {
             "customer": {
-                "default_billing": billingChecked ? propAddress?.id : default_billing,
-                "default_shipping": shippingChecked ? propAddress?.id : default_shipping,
                 "addresses": tempAddress
             }
         }
@@ -147,7 +150,7 @@ class EditAddress extends Component {
             this.loginUser()
 
         }).catch((err) => {
-            console.log("Err customer profile update API Edit Addess Screen", err)
+            console.log("Err customer profile update API Edit Addess Screen", err.response)
         })
     }
     loginUser = async () => {
@@ -195,12 +198,12 @@ class EditAddress extends Component {
                             this.setState({
                                 loader: false
                             })
-                            this.fetchDefaultAddresses()
 
+                            alert("Address Saved!")
                         }
                     }).catch((err) => {
                         alert("Network Error Code: (cd1)")
-                        console.log("customer data Api error HOme: ", err?.response)
+                        console.log("customer data Api error HOme: ", err)
 
                     })
                 }).catch((err) => {
@@ -303,8 +306,46 @@ class EditAddress extends Component {
                             onChangeText={(txt) => this.onChangeText(txt, "zip_code")}
                         />
 
+
+                        {/* it is a default billing */}
+                        {user?.default_billing == propAddress?.id && <View style={{
+                            flexDirection: 'row', alignItems: "center", alignSelf: "flex-end",
+                            paddingHorizontal: 18,
+                            // backgroundColor: user?.default_shipping == propAddress?.id ? "#6f4400" : "white",
+                            marginBottom: 10,
+                            marginTop: 10,
+                        }}>
+                            <View
+                                style={{ padding: 5 }}>
+                                <AntDesign name="warning" size={24} color={"#c07600"} />
+                            </View>
+                            <Text style={[styles.checkboxText, {
+                                color: "#c07600"
+                            }]}>it's a default billing address</Text>
+                        </View>}
+
+                        {/* use as default shipping */}
+                        {user?.default_shipping == propAddress?.id && <View style={{
+                            flexDirection: 'row', alignItems: "center", alignSelf: "flex-end",
+                            paddingHorizontal: 10,
+                            // backgroundColor: user?.default_shipping == propAddress?.id ? "#6f4400" : "white",
+                            marginBottom: 20,
+                        }}>
+
+                            <View
+                                style={{ padding: 5 }}>
+                                <AntDesign name="warning" size={24} color={"#c07600"} />
+                            </View>
+
+
+                            <Text style={[styles.checkboxText, {
+                                color: "#c07600"
+                            }]}> its's a default shipping address</Text>
+                        </View>}
+
+
                         {/* use as default billing */}
-                        <View style={{
+                        {/* <View style={{
                             flexDirection: 'row', alignItems: "center", alignSelf: "flex-end",
                             paddingHorizontal: 18,
                             // backgroundColor: user?.default_shipping == propAddress?.id ? "#6f4400" : "white",
@@ -316,7 +357,7 @@ class EditAddress extends Component {
 
                                     <View
                                         style={{ padding: 5 }}>
-                                        <AntDesign name="warning" size={24} color={user?.default_shipping == propAddress?.id ? "#c07600" : "black"} />
+                                        <AntDesign name="warning" size={24} color={user?.default_billing == propAddress?.id ? "#c07600" : "black"} />
                                     </View>
 
                                     :
@@ -337,12 +378,12 @@ class EditAddress extends Component {
                                     </>
                             }
                             <Text style={[styles.checkboxText, {
-                                color: user?.default_shipping == propAddress?.id ? "#c07600" : "black"
-                            }]}>{user?.default_shipping == propAddress?.id ? "it's a default billing address" : "Use as my default billing address"}</Text>
-                        </View>
+                                color: user?.default_billing == propAddress?.id ? "#c07600" : "black"
+                            }]}>{user?.default_billing == propAddress?.id ? "it's a default billing address" : "Use as my default billing address"}</Text>
+                        </View> */}
 
                         {/* use as default shipping */}
-                        <View style={{
+                        {/* <View style={{
                             flexDirection: 'row', alignItems: "center", alignSelf: "flex-end",
                             paddingHorizontal: 10,
                             // backgroundColor: user?.default_shipping == propAddress?.id ? "#6f4400" : "white",
@@ -376,7 +417,7 @@ class EditAddress extends Component {
                             <Text style={[styles.checkboxText, {
                                 color: user?.default_shipping == propAddress?.id ? "#c07600" : "black"
                             }]}>{user?.default_shipping == propAddress?.id ? "its's a default shipping address" : "Use as my default shipping address"}</Text>
-                        </View>
+                      </View> */}
 
                         <TouchableOpacity style={{
                             width: 140,

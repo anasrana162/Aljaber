@@ -11,7 +11,7 @@ export default class Drawer extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            openAppointmentOptions: false,
         }
     }
 
@@ -38,13 +38,22 @@ export default class Drawer extends Component {
                 onDismiss()
                 navigation.navigate("ChangeUserData")
                 break;
-
             case "my_pr_review":
                 onDismiss()
                 navigation.navigate("MyReviews")
                 break;
+            case "appointment":
+                this.setState({ openAppointmentOptions: !this.state.openAppointmentOptions })
+                break;
+            case "eyetest":
+                onDismiss()
+                navigation.navigate("Eyetest")
+                break;
+            case "mobilebus":
+                onDismiss()
+                navigation.navigate("Mobile_Bus")
+                break;
             case "logout":
-
                 onDismiss()
                 setTimeout(() => {
                     // console.log("Actions Redex", actions)
@@ -55,8 +64,6 @@ export default class Drawer extends Component {
                     AsyncStorage.setItem("@aljaber_userLoginData", "")
                 }, 1000)
                 break;
-
-
         }
     }
 
@@ -145,6 +152,40 @@ export default class Drawer extends Component {
                                                 <Text style={styles.text_touchable}>My Product Reviews</Text>
                                                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
                                             </TouchableOpacity>
+
+                                            {/* Appointment */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("appointment")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>Appointment</Text>
+                                                <MaterialCommunityIcons name={this.state.openAppointmentOptions ? "chevron-down" : "chevron-right"} color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
+
+                                            {this.state.openAppointmentOptions && <View style={{ width: "95%", alignItems: "flex-end" }}>
+
+                                                {/* EyeTest */}
+                                                <TouchableOpacity
+                                                    onPress={() => this.onPress("eyetest")}
+                                                    style={[styles.touchable, {
+                                                        width: "80%",
+                                                        alignSelf: "flex-end",
+                                                    }]}>
+                                                    <Text style={styles.text_touchable}>Eye Test</Text>
+                                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                                    <View style={{ width: "95%", height: 1, backgroundColor: "#666666", position: "absolute", bottom: 0 }}></View>
+                                                </TouchableOpacity>
+                                                {/* Appointment */}
+                                                <TouchableOpacity
+                                                    onPress={() => this.onPress("mobilebus")}
+                                                    style={[styles.touchable, {
+                                                        width: "80%",
+                                                        alignSelf: "flex-end",
+                                                    }]}>
+                                                    <Text style={styles.text_touchable}>Mobile Bus</Text>
+                                                    <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                                    <View style={{ width: "95%", height: 0.5, backgroundColor: "#666666", position: "absolute", bottom: 0 }}></View>
+                                                </TouchableOpacity>
+                                            </View>}
 
                                             {/* Logout */}
                                             <TouchableOpacity

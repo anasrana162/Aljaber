@@ -21,6 +21,8 @@ import Wishlist from '../screen/wishlist/wishlist';
 import AddressBook from '../screen/addressbook/addressBook';
 import MyReviews from '../screen/account/myReviews';
 import EditAddress from '../screen/editaddress/editAddress';
+import Eyetest from '../screen/appointment/eyetest';
+import Mobile_Bus from '../screen/appointment/mobile_bus';
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -43,6 +45,8 @@ export default class Navigation extends Component {
                     <Stack.Screen name="Search" component={Search} />
                     <Stack.Screen name="Account" component={Account} />
                     <Stack.Screen name="AddressBook" component={AddressBook} />
+                    <Stack.Screen name="Eyetest" component={Eyetest} />
+                    <Stack.Screen name="Mobile_Bus" component={Mobile_Bus} />
                     <Stack.Screen name="EditAddress" component={EditAddress} />
                     <Stack.Screen name="MyReviews" component={MyReviews} />
                     <Stack.Screen name="MyOrders" component={MyOrders} />

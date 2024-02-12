@@ -236,7 +236,7 @@ class AddressBook extends Component {
 
                             <View style={{ rowGap: 5, alignSelf: "flex-start", marginLeft: 10, }}>
                                 <Text style={styles.defaultAddressText}>{default_billing_address?.firstname} {default_billing_address?.lastname}</Text>
-                                <Text style={styles.defaultAddressText}>{default_billing_address?.street}</Text>
+                                <Text style={styles.defaultAddressText}>{default_billing_address?.street[0]} {default_billing_address?.street[1] == undefined ? "" : default_billing_address?.street[1]}</Text>
                                 <Text style={styles.defaultAddressText}>{default_billing_address?.region?.region}, {default_billing_address?.city}, {default_billing_address?.postcode}</Text>
                                 <Text style={styles.defaultAddressText}>{default_billing_address?.country}</Text>
                                 <Text style={styles.defaultAddressText}>{default_billing_address?.telephone}</Text>
@@ -266,7 +266,7 @@ class AddressBook extends Component {
 
                             <View style={{ rowGap: 5, alignSelf: "flex-start", marginLeft: 10, }}>
                                 <Text style={styles.defaultAddressText}>{default_shipping_address?.firstname} {default_shipping_address?.lastname}</Text>
-                                <Text style={styles.defaultAddressText}>{default_shipping_address?.street}</Text>
+                                <Text style={styles.defaultAddressText}>{default_shipping_address?.street[0]} {default_shipping_address?.street[1] == undefined ? "" : default_shipping_address?.street[1]}</Text>
                                 <Text style={styles.defaultAddressText}>{default_shipping_address?.region?.region}, {default_shipping_address?.city}, {default_shipping_address?.postcode}</Text>
                                 <Text style={styles.defaultAddressText}>{default_shipping_address?.country}</Text>
                                 <Text style={styles.defaultAddressText}>{default_shipping_address?.telephone}</Text>
@@ -293,47 +293,57 @@ class AddressBook extends Component {
 
                         {Object.keys(user).length !== 0 &&
                             <>
+                                {/* {console.log("addresses", addresses)} */}
                                 {addresses.length !== 0 &&
                                     <FlatList
                                         data={addresses}
                                         scrollEnabled={false}
-                                        contentContainerStyle={{ marginBottom: 30 }}
+                                        contentContainerStyle={{ marginBottom: 30,paddingBottom:10, }}
+                                        ListEmptyComponent={() => {
+                                            return (
+                                                <Text style={{ color: "black" }}>You have no other address entries in your address book.</Text>
+                                            )
+                                        }}
                                         renderItem={({ item, index }) => {
                                             return (
                                                 <>
-                                                    {(user?.default_billing == item?.id || user?.default_shipping == item?.id) ?
-                                                        <></>
-                                                        :
-                                                        < View
-                                                            key={index}
-                                                            style={styles.listCont}>
-                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Name:  <Text style={styles.defaultAddressText} >{item?.firstname} {item?.lastname}</Text></Text>
-                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Street Address: <Text style={styles.defaultAddressText} >{item?.street[0]} {item?.street[1] == undefined ? "" : item?.street[1]}</Text> </Text>
-                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>City:  <Text style={styles.defaultAddressText} >{item?.city}</Text></Text>
-                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Country:  <Text style={styles.defaultAddressText} >{item?.country}</Text></Text>
-                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>State:  <Text style={styles.defaultAddressText} >{item?.region?.region}</Text></Text>
-                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Zip / Postal Code:  <Text style={styles.defaultAddressText} >{item?.postcode}</Text></Text>
-                                                            <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Phone:  <Text style={styles.defaultAddressText} >{item?.telephone}</Text></Text>
-                                                            <View style={{
-                                                                // width: "100%",
-                                                                flexDirection: "row",
-                                                                justifyContent: "center",
-                                                                alignItems: "center",
-                                                                alignSelf: "flex-end"
-                                                            }}>
-                                                                <TouchableOpacity
-                                                                    onPress={() => this.onEdit(item, index)}
-                                                                >
-                                                                    <Text style={styles.editBtnTxt}>Edit</Text>
-                                                                </TouchableOpacity>
-                                                                <Text style={styles.defaultAddressText}> | </Text>
-                                                                <TouchableOpacity
-                                                                    onPress={() => this.deleteAddress(index)}
-                                                                >
-                                                                    <Text style={styles.deleteBtnTxt}>delete</Text>
-                                                                </TouchableOpacity>
-                                                            </View>
-                                                        </View >}
+                                                    {
+
+                                                        (user?.default_billing == item?.id || user?.default_shipping == item?.id) ?
+                                                            <>
+                                                                {index == 0 && <Text style={{ color: "black",fontSize:16,marginTop:10 }}>You have no other address entries in your address book.</Text>}
+                                                            </>
+                                                            :
+                                                            < View
+                                                                key={index}
+                                                                style={styles.listCont}>
+                                                                <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Name:  <Text style={styles.defaultAddressText} >{item?.firstname} {item?.lastname}</Text></Text>
+                                                                <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Street Address: <Text style={styles.defaultAddressText} >{item?.street[0]} {item?.street[1] == undefined ? "" : item?.street[1]}</Text> </Text>
+                                                                <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>City:  <Text style={styles.defaultAddressText} >{item?.city}</Text></Text>
+                                                                <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Country:  <Text style={styles.defaultAddressText} >{item?.country}</Text></Text>
+                                                                <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>State:  <Text style={styles.defaultAddressText} >{item?.region?.region}</Text></Text>
+                                                                <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Zip / Postal Code:  <Text style={styles.defaultAddressText} >{item?.postcode}</Text></Text>
+                                                                <Text style={[styles.defaultAddressText, { fontWeight: "500", color: "black" }]}>Phone:  <Text style={styles.defaultAddressText} >{item?.telephone}</Text></Text>
+                                                                <View style={{
+                                                                    // width: "100%",
+                                                                    flexDirection: "row",
+                                                                    justifyContent: "center",
+                                                                    alignItems: "center",
+                                                                    alignSelf: "flex-end"
+                                                                }}>
+                                                                    <TouchableOpacity
+                                                                        onPress={() => this.onEdit(item, index)}
+                                                                    >
+                                                                        <Text style={styles.editBtnTxt}>Edit</Text>
+                                                                    </TouchableOpacity>
+                                                                    <Text style={styles.defaultAddressText}> | </Text>
+                                                                    <TouchableOpacity
+                                                                        onPress={() => this.deleteAddress(index)}
+                                                                    >
+                                                                        <Text style={styles.deleteBtnTxt}>delete</Text>
+                                                                    </TouchableOpacity>
+                                                                </View>
+                                                            </View >}
                                                 </>
                                             )
                                         }}

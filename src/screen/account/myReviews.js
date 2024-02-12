@@ -83,7 +83,7 @@ class MyReviews extends Component {
 
                     {this.state.loader == false && <FlatList
                         data={this.state.reviews}
-                        contentContainerStyle={{ marginVertical: 20 }}
+                        contentContainerStyle={{ marginVertical: 20,paddingBottom:10 }}
                         ListEmptyComponent={() => {
                             return (
                                 <>
