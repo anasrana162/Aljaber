@@ -50,7 +50,7 @@ var sliderImages = [
     // },
     // {
     //     id: 6,
-    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/o/l/oliver_peoples_web_banner.jpg"
+    //     source: "https://aljaberoptical.com/media/magestore/bannerslider/images/b/a/banners_ajo_1950_x_450-02.jpg"
     // },
     {
         id: 7,
@@ -527,7 +527,7 @@ class HomeScreen extends Component {
 
 
                     } else {
-                        // console.log(" adding Index 1")
+                        console.log(" adding Index 1")
                         // index = index + 1
                     }
 

@@ -109,11 +109,11 @@ class Login extends Component {
                 console.log("Customer Token", res?.data)
                 console.log("customerToken", customerToken)
 
-                let obj={
+                let obj = {
                     username: email.toLowerCase(),
                     password: password,
                 }
-                
+
                 AsyncStorage.setItem("@aljaber_userLoginData", JSON.stringify(obj));
                 //alert("Login Successful!")
                 // this.props.modal()
@@ -239,6 +239,8 @@ class Login extends Component {
     render() {
         return (
             <View style={styles.mainContainer}>
+
+
                 {/** Email */}
                 <AuthTxtInp
                     value={this.state.email}

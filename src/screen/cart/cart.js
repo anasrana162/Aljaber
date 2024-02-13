@@ -50,7 +50,8 @@ class Cart extends Component {
             shipping_tax_key: 0,
             couponCode: "",
             loaderEdit: false,
-            itemToEditSelected: ""
+            itemToEditSelected: "",
+            hideSummary: false,
 
         };
     }
@@ -90,6 +91,7 @@ class Cart extends Component {
         setImmediate(() => {
             this.setState({
                 loader: true,
+                hideSummary:true,
                 calculating: true,
                 cartItems: [],
                 cartData: null,
@@ -116,6 +118,9 @@ class Cart extends Component {
             }).catch((err) => {
                 console.log("Get cart Data APi Error", err)
                 alert("Please try Logging in your account first")
+                setImmediate(() => {
+                    this.setState({ loader: false, hideSummary: true })
+                })
             })
 
     }
@@ -140,7 +145,7 @@ class Cart extends Component {
             }).catch((err) => {
                 console.log("Get cart ITems APi Error", err)
                 setImmediate(() => {
-                    this.setState({ loader: true })
+                    this.setState({ loader: false, hideSummary: true })
                 })
             })
 
@@ -219,6 +224,7 @@ class Cart extends Component {
                 setImmediate(() => {
                     this.setState({
                         calculating: false,
+                        hideSummary: false,
                     })
                 })
                 this.calculateShipping()
@@ -616,7 +622,8 @@ class Cart extends Component {
                         marginBottom: 10,
                         marginLeft: 20,
                     }]}>Summary</Text>
-                    {cartItems.length == 0 && <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />}
+                    {cartItems.length == 0 &&
+                        <View style={{ width: width - 30, alignSelf: "center", height: 1.5, backgroundColor: "#777", marginTop: 60 }} />}
                     {calculating ?
                         <View style={{
                             width: "80%",
@@ -736,7 +743,7 @@ class Cart extends Component {
     }
 
     render() {
-        var { cartData, loader, randomProducts, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
+        var { cartData, loader, randomProducts,hideSummary, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
 
         const ListEmptyComponent = () => {
             return (
@@ -907,7 +914,7 @@ class Cart extends Component {
 
                 {loader && <Loading />}
 
-                {!loader && <this.ListFooterComponent />}
+                {!hideSummary && <this.ListFooterComponent />}
                 {/** Tab Navigator */}
                 {/* <TabNavigator
                     screenName={"Cart"}

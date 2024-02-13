@@ -378,7 +378,7 @@ class Billing_Shipping extends Component {
         }
 
 
-        console.log("selectedAddress", selectedAddress)
+        console.log("selectedAddress region", region)
         let obj = {
             "addressInformation": {
                 "shipping_address": {

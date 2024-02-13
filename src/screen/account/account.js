@@ -178,18 +178,19 @@ class Account extends Component {
             <View style={styles.mainContainer}>
                 {Object.keys(user)?.length == 0 || user == "" ?
                     <>
-                        <View style={styles.header_comp}>
-                            {/** Title screen */}
-                            <Text style={styles.heading}>My Account</Text>
-                        </View>
+                        <HeaderComp titleEN={"My Account"} navProps={this.props.navigation} />
                         {/** Modal for login/register */}
 
-
+                        {/* Image */}
+                        <Image
+                            source={require("../../../assets/aljabirlogo.png")}
+                            style={{ width: 180, height: 150, marginTop: 40 }}
+                        />
                         {/* <View style={styles.modal_cont}>                               */}
                         {/** Login or Register */}
                         <AuthSelector
                             props={this.props}
-                            style={{ backgroundColor: "#f0f0f0", marginTop: 120 }}
+                            style={{ backgroundColor: "#f0f0f0", marginTop: 30 }}
                         />
                         {/* </View> */}
 
@@ -198,12 +199,12 @@ class Account extends Component {
                     </>
                     :
                     <>
-                         <HeaderComp titleEN={"My Account"} navProps={this.props.navigation}/>
+                        <HeaderComp titleEN={"My Account"} navProps={this.props.navigation} />
 
                         <View style={styles.inner_cont_main}>
                             <ScrollView
-                            showsVerticalScrollIndicator={false}
-                            style={{ width: "100%", }}>
+                                showsVerticalScrollIndicator={false}
+                                style={{ width: "100%", }}>
                                 {/**login/Register Button */}
                                 {/* <TouchableOpacity
                                     onPress={() => this.closeAuthModalHandler("open")}
@@ -235,7 +236,7 @@ class Account extends Component {
                                 {/** Infromation */}
                                 {/* <Information navProps={this.props.navigation} /> */}
 
-                                <Text style={[styles.copyright_text, { marginTop: 20,}]}>© copyright 2023 Al-Jaber Alll rights reserved</Text>
+                                <Text style={[styles.copyright_text, { marginTop: 20, }]}>© copyright 2023 Al-Jaber Alll rights reserved</Text>
                                 <Text style={styles.copyright_text}>Version 1.0 build 1</Text>
 
                                 <View style={styles.social_icon_main_cont}>
@@ -396,7 +397,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignItems: "center",
         width: width - 20,
-        height: height-140,
+        height: height - 140,
         alignSelf: "center",
         backgroundColor: "#f0f0f0",
         marginTop: Platform.OS == "ios" ? 10 : 20,
@@ -455,7 +456,7 @@ const styles = StyleSheet.create({
     copyright_text: {
         color: "#020621",
         fontSize: 12,
-        alignSelf:"center" 
+        alignSelf: "center"
     },
     social_icon_main_cont: {
         width: width - 120,
@@ -463,7 +464,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 20,
         flexDirection: "row",
-        alignSelf:"center" 
+        alignSelf: "center"
     }
 })
 {/* {---------------redux State ------------} */ }

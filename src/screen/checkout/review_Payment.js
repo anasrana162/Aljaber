@@ -31,13 +31,14 @@ class Review_Payment extends Component {
             isBillShipSame: true,
             order_summary: "",
             order_summary_original: "",
-            billing_shipping_address: "",
+            original_billing_address: "",
+            bill_ship_address: "",
             billing_shipping_address_original: "",
             country_billing_shipping: "",
             openBillingAddresses: false,
             isBillingAddressSelected: false,
             countries: [],
-            selectedBillingAddress: this.props?.route.params.billing_shipping_address == undefined ? "" : this.props?.route.params.billing_shipping_address?.addressInformation?.billing_address,
+            selectedBillingAddress: this.props?.route.params.bill_ship_address == undefined ? "" : this.props?.route.params.bill_ship_address?.addressInformation?.billing_address,
             confirmBillingAddress: "",
             couponCode: '',
             couponLoader: false,
@@ -55,7 +56,7 @@ class Review_Payment extends Component {
     }
 
     isCouponApplied = () => {
-        var { route: { params: { order_summary, billing_shipping_address, country } }, userData } = this.props
+        var { route: { params: { order_summary, bill_ship_address, country } }, userData } = this.props
         if (this.props.route.params !== undefined) {
             if (order_summary?.totals?.coupon_code == undefined || order_summary?.totals?.coupon_code == "" || order_summary?.totals?.coupon_code == null) {
                 console.log("Coupon is undefined")
@@ -96,14 +97,15 @@ class Review_Payment extends Component {
     }
 
     checkSummary = () => {
-        var { route: { params: { order_summary, billing_shipping_address, country } }, userData } = this.props
+        let { route: { params: { order_summary, billing_shipping_address, country } }, userData } = this.props
         this.setState({
             order_summary: order_summary,
             order_summary_original: order_summary,
-            billing_shipping_address: billing_shipping_address,
+            bill_ship_address: billing_shipping_address,
             billing_shipping_address_original: billing_shipping_address,
             country_billing_shipping: country,
         })
+        // console.log("bill_ship_address checkSummary:", bill_ship_address?.addressInformation?.shipping_address);
     }
     selectBillingAddress = (item) => {
         this.setState({
@@ -147,7 +149,7 @@ class Review_Payment extends Component {
     createNewSummary = () => {
         var { userData: { admintoken, token, user: { cartID } } } = this.props
         this.setState({ loader: true })
-        api.post("carts/mine/shipping-information", this.state.billing_shipping_address,
+        api.post("carts/mine/shipping-information", this.state.bill_ship_address,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -160,8 +162,8 @@ class Review_Payment extends Component {
                 this.setState({
                     order_summary: res?.data,
                     order_summary_original: res?.data,
-                    billing_shipping_address: this.state.billing_shipping_address,
-                    billing_shipping_address_original: this.state.billing_shipping_address,
+                    bill_ship_address: this.state.bill_ship_address,
+                    billing_shipping_address_original: this.state.bill_ship_address,
                     // country_billing_shipping: country,
                     couponApplied: true,
                     key: this.state.key + 1,
@@ -176,34 +178,53 @@ class Review_Payment extends Component {
     }
 
     onUpdate = () => {
-        var { billing_shipping_address, selectedBillingAddress } = this.state
+        var { selectedBillingAddress } = this.state
+        var tempAddress= this.state.bill_ship_address
         var { userData: { user: { email } } } = this.props
         this.setState({ updateBillingAddress: true })
         console.log("selectedBillingAddress", selectedBillingAddress)
 
         // var obj =  selectedBillingAddress 
-        console.log("billing_shipping_address BEFORE UPDATE", billing_shipping_address)
-        console.log("billing_shipping_address region BEFORE UPDATE", billing_shipping_address?.addressInformation?.billing_address.region)
+        console.log("");
+        console.log("--------------------------------------------------");
+        console.log("bill_ship_address BEFORE UPDATE", bill_ship_address)
+        console.log("--------------------------------------------------");
+        console.log("");
+        // console.log("bill_ship_address ORIGINAL BEFORE UPDATE", billing_shipping_address_original?.addressInformation?.billing_address)
 
-        billing_shipping_address.addressInformation.billing_address = selectedBillingAddress
-        billing_shipping_address.addressInformation.billing_address.region = selectedBillingAddress?.region?.region
-        billing_shipping_address.addressInformation.billing_address.email = email
+        // tempAddress.addressInformation.billing_address = selectedBillingAddress
+        // bill_ship_address.addressInformation.billing_address.region = selectedBillingAddress?.region?.region
+        // bill_ship_address.addressInformation.billing_address.email = email
         setTimeout(() => {
 
             this.setState({
-                billing_shipping_address,
+                // bill_ship_address: tempAddress,
+                // billing_shipping_address_original:bill_ship_address,
                 updateBillingAddress: false
             })
         }, 1000)
-        console.log("billing_shipping_address AFTER UPDATE", billing_shipping_address?.addressInformation?.billing_address)
+        // console.log("bill_ship_address AFTER UPDATE", bill_ship_address?.addressInformation?.billing_address)
 
     }
+
+    onDeselect = () => {
+        console.log("bill_ship_address ORIGINAL BEFORE UPDATE", this.props?.route.params.billing_shipping_address?.addressInformation?.billing_address)
+        setTimeout(() => {
+            this.setState({
+                bill_ship_address: this.state.billing_shipping_address_original,
+                isBillShipSame: !this.state.isBillShipSame,
+                key: this.state.key + 1
+            })
+        }, 500)
+    }
+
+
 
 
     render() {
 
         var { userData } = this.props
-        var { order_summary, billing_shipping_address } = this.state
+        var { order_summary, bill_ship_address } = this.state
         // console.log("Order Summary from Params:", order_summary)
 
         return (
@@ -227,6 +248,7 @@ class Review_Payment extends Component {
                                     }]}>
                                         <View style={styles.flex_container}>
                                             {this.state.paymentMethodSelected == item?.code ?
+                                                // when payment is checked
                                                 <>
                                                     <TouchableOpacity
                                                         style={{ paddingVertical: 10 }}
@@ -236,11 +258,13 @@ class Review_Payment extends Component {
 
                                                 </>
                                                 :
+                                                // when payment is not checked
                                                 <>
                                                     <TouchableOpacity
                                                         style={{ paddingVertical: 10 }}
                                                         onPress={() => this.setState({
-                                                            isPaymentMethodSelected: !this.state.isPaymentMethodSelected, paymentMethodSelected: item?.code,
+                                                            isPaymentMethodSelected: !this.state.isPaymentMethodSelected,
+                                                            paymentMethodSelected: item?.code,
                                                             selectedBillingAddress: this.props?.route.params.billing_shipping_address == undefined ? "" : this.props?.route.params.billing_shipping_address?.addressInformation?.billing_address,
                                                             isBillShipSame: true,
                                                             isBillingAddressSelected: false
@@ -268,7 +292,11 @@ class Review_Payment extends Component {
                                                         <>
                                                             <TouchableOpacity
                                                                 style={{ paddingVertical: 10 }}
-                                                                onPress={() => this.setState({ isBillShipSame: !this.state.isBillShipSame })}>
+                                                                onPress={() => {
+                                                                    // console.log(this.state.billing_shipping_address_original.addressInformation?.billing_address);
+                                                                    this.onDeselect()
+                                                                }
+                                                                }>
                                                                 <Feather name="square" size={18} color="black" />
                                                             </TouchableOpacity>
                                                         </>
@@ -282,19 +310,19 @@ class Review_Payment extends Component {
 
                                                         {/* First and Last Name */}
                                                         <Text style={styles.billingAddressText}>
-                                                            {billing_shipping_address?.addressInformation?.billing_address?.firstname} {billing_shipping_address?.addressInformation?.billing_address?.lastname}
+                                                            {bill_ship_address?.addressInformation?.billing_address?.firstname} {bill_ship_address?.addressInformation?.billing_address?.lastname}
                                                         </Text>
                                                         {/* Location */}
                                                         <Text style={styles.billingAddressText}>
-                                                            {billing_shipping_address?.addressInformation?.billing_address?.street[0] == undefined ?
+                                                            {bill_ship_address?.addressInformation?.billing_address?.street[0] == undefined ?
                                                                 ""
                                                                 :
-                                                                billing_shipping_address?.addressInformation?.billing_address?.street[0]
+                                                                bill_ship_address?.addressInformation?.billing_address?.street[0]
                                                             }
                                                         </Text>
                                                         {/* City and Postal Code */}
                                                         <Text style={styles.billingAddressText}>
-                                                            {billing_shipping_address?.addressInformation?.billing_address?.city},  {billing_shipping_address?.addressInformation?.billing_address?.postcode}
+                                                            {bill_ship_address?.addressInformation?.billing_address?.city},  {bill_ship_address?.addressInformation?.billing_address?.postcode}
                                                         </Text>
                                                         {/* Country */}
                                                         <Text style={styles.billingAddressText}>
@@ -302,7 +330,7 @@ class Review_Payment extends Component {
                                                         </Text>
                                                         {/* Telephone */}
                                                         <Text style={[styles.billingAddressText, { marginBottom: 10, }]}>
-                                                            {billing_shipping_address?.addressInformation?.billing_address?.telephone}
+                                                            {bill_ship_address?.addressInformation?.billing_address?.telephone}
                                                         </Text>
                                                     </View>
                                                     :
@@ -333,17 +361,31 @@ class Review_Payment extends Component {
                                                         }
                                                         {
                                                             this.state.isBillingAddressSelected &&
-                                                            <TouchableOpacity
-                                                                onPress={() => this.onUpdate()}
-                                                                style={styles.updateBtn}>
-                                                                {
-                                                                    this.state?.updateBillingAddress ?
-                                                                        <ActivityIndicator size={"small"} color="#ffffff" />
-                                                                        :
-                                                                        <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>Update</Text>
-                                                                }
-                                                            </TouchableOpacity>
+                                                            <View style={{ flexDirection: "row", columnGap: 10 }}>
+
+                                                                <TouchableOpacity
+                                                                    onPress={() => this.onDeselect()}
+                                                                    style={[styles.updateBtn, { backgroundColor: "white", borderWidth: 1 }]}>
+                                                                    {
+                                                                        this.state?.updateBillingAddress ?
+                                                                            <ActivityIndicator size={"small"} color="#ffffff" />
+                                                                            :
+                                                                            <Text style={{ fontSize: 16, fontWeight: "600", color: "black" }}>Cancel</Text>
+                                                                    }
+                                                                </TouchableOpacity>
+                                                                <TouchableOpacity
+                                                                    onPress={() => this.onUpdate()}
+                                                                    style={styles.updateBtn}>
+                                                                    {
+                                                                        this.state?.updateBillingAddress ?
+                                                                            <ActivityIndicator size={"small"} color="#ffffff" />
+                                                                            :
+                                                                            <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>Update</Text>
+                                                                    }
+                                                                </TouchableOpacity>
+                                                            </View>
                                                         }
+
 
 
                                                     </>
@@ -374,19 +416,19 @@ class Review_Payment extends Component {
 
                             {/* First and Last Name */}
                             <Text style={styles.billingAddressText}>
-                                {billing_shipping_address?.addressInformation?.shipping_address?.firstname} {billing_shipping_address?.addressInformation?.shipping_address?.lastname}
+                                {bill_ship_address?.addressInformation?.shipping_address?.firstname} {bill_ship_address?.addressInformation?.shipping_address?.lastname}
                             </Text>
                             {/* Location */}
                             <Text style={styles.billingAddressText}>
-                                {billing_shipping_address?.addressInformation?.shipping_address?.street[0] == undefined ?
+                                {bill_ship_address?.addressInformation?.shipping_address?.street[0] == undefined ?
                                     ""
                                     :
-                                    billing_shipping_address?.addressInformation?.shipping_address?.street[0]
+                                    bill_ship_address?.addressInformation?.shipping_address?.street[0]
                                 }
                             </Text>
                             {/* City and Postal Code */}
                             <Text style={styles.billingAddressText}>
-                                {billing_shipping_address?.addressInformation?.shipping_address?.city},  {billing_shipping_address?.addressInformation?.shipping_address?.postcode}
+                                {bill_ship_address?.addressInformation?.shipping_address?.city},  {bill_ship_address?.addressInformation?.shipping_address?.postcode}
                             </Text>
                             {/* Country */}
                             <Text style={styles.billingAddressText}>
@@ -394,7 +436,7 @@ class Review_Payment extends Component {
                             </Text>
                             {/* Telephone */}
                             <Text style={[styles.billingAddressText, { marginBottom: 10, }]}>
-                                {billing_shipping_address?.addressInformation?.shipping_address?.telephone}
+                                {bill_ship_address?.addressInformation?.shipping_address?.telephone}
                             </Text>
                         </View>
                         <View style={{ width: width - 40, borderWidth: 0.5 }}></View>
@@ -417,7 +459,7 @@ class Review_Payment extends Component {
                             <Text
 
                                 style={[styles.billingAddressText, { marginBottom: 10 }]}>
-                                {billing_shipping_address?.addressInformation?.shipping_carrier_code == "flatrate" ? "FlatRate - FlatRate" : "Free Shipping"}
+                                {bill_ship_address?.addressInformation?.shipping_carrier_code == "flatrate" ? "FlatRate - FlatRate" : "Free Shipping"}
                             </Text>
 
                         </View>
@@ -519,7 +561,7 @@ class Review_Payment extends Component {
                             <Text style={styles.order_summary_texts_title}>Shipping</Text>
                             <Text style={styles.order_summary_texts_value}>AED {order_summary?.totals?.shipping_amount}</Text>
                         </View>
-                        <Text style={[styles.order_summary_texts_title, { marginTop: 5 }]}>{billing_shipping_address?.addressInformation?.shipping_carrier_code == "flatrate" ? "FlatRate - FlatRate" : "Free Shipping"}</Text>
+                        <Text style={[styles.order_summary_texts_title, { marginTop: 5 }]}>{bill_ship_address?.addressInformation?.shipping_carrier_code == "flatrate" ? "FlatRate - FlatRate" : "Free Shipping"}</Text>
                         <View style={{ width: width - 40, borderWidth: 0.5, marginVertical: 10, }}></View>
 
                         {/* Order Total */}

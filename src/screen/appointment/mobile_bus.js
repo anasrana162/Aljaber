@@ -49,14 +49,18 @@ class Mobile_Bus extends Component {
                 <WebView
                     onLoad={() => {
                         console.log("Loading started");
-                        this.setState({
-                            loading: true
+                        setImmediate(()=>{
+                            this.setState({
+                                loading: true
+                            })
                         })
                     }}
                     onLoadEnd={() => {
                         console.log("Loading ended");
-                        this.setState({
-                            loading: false
+                        setImmediate(()=>{
+                            this.setState({
+                                loading: false
+                            })
                         })
                     }}
                     source={{ uri: 'https://aljaberoptical.com/pub/book-appointment-mobilebus-iframe/' }} style={{ width: width, height: height - 90 }} />
