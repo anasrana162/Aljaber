@@ -28,8 +28,10 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress, admintoken }) => {
 
         navProps.navigate("Products", {
             item,
-            mainCat_selected: data?.position, sub_category_id: item?.id,
+            mainCat_selected: data?.position,
+             sub_category_id: item?.id,
             imageLinkMain: image,
+            otherCats: data,
 
         })
     }

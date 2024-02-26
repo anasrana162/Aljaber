@@ -640,7 +640,7 @@ class Cart extends Component {
                         </View>
                         :
                         <>
-                            <Shipping_Tax
+                            {/* <Shipping_Tax
                                 key={this.state.shipping_tax_key}
                                 openShipping_TaxModal={this.openShipping_TaxModal}
                                 isModalOpen={this.state.openShipping_TaxModal}
@@ -650,7 +650,7 @@ class Cart extends Component {
                                 shipping={shipping}
                                 flatrate={flatrate}
                                 selectItem={(val, key) => this.itemSelectedFromShipping_Tax(val, key)}
-                            />
+                            /> */}
 
 
 
@@ -661,10 +661,10 @@ class Cart extends Component {
                             </View>
 
                             {/* Flatrate */}
-                            {shipping == "" && <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center" }]}>
+                            {/* {shipping == "" && <View style={[styles.flatList_innerCont, { justifyContent: "space-between", alignSelf: "center" }]}>
                                 <Text style={[styles.text_style, { fontSize: 16, fontWeight: "600", color: "#777" }]}>Shipping (Flat Rate - Flat Rate)</Text>
                                 <Text style={[styles.text_style, { fontSize: 15, fontWeight: "400", color: "#777" }]}>AED {flatrate} </Text>
-                            </View>}
+                            </View>} */}
 
                             <View style={{ width: width - 20, alignSelf: "center", height: 1.5, backgroundColor: "#bbb", marginTop: 10 }} />
 
@@ -936,7 +936,7 @@ const styles = StyleSheet.create({
     },
     footerComp: {
         width: width,
-        height: height / 2.5,
+        height: height / 3.4,
         backgroundColor: "white",
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,

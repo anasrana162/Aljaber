@@ -275,7 +275,14 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
                     flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
                     marginBottom: (screenName == "Home" || screenName == "Cart") ? 60 : 320,
                 }]}> */}
-            {data != null &&
+            {console.log("data", data)}
+            {data == null || data.length == 0 ?
+                <>{screenName == undefined &&
+                    < Text
+                        style={{ fontWeight: '600', fontSize: 18, color: "black", marginTop: 40, width: width - 100, alignSelf: "center", textAlign: 'center' }}
+                    >We can't find products matching the selection.</Text>}
+                </>
+                :
 
                 <FlatList
                     data={data.slice(0, slicedLength)}

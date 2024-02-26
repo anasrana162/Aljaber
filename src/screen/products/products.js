@@ -45,6 +45,7 @@ class Products extends Component {
             lowest_price: "",
             filteredPrice: "",
             drawer: false,
+            keyCat: 0,
             contact_lens_diameter: {
                 name: "Contact Lens Diameter",
                 attribute_code: "contact_lens_diameter",
@@ -220,11 +221,12 @@ class Products extends Component {
 
     checkExistingProductData = () => {
         const { userData: { admintoken, allproducts, clearpres, color, toric, pres, lenssol,
-            cgadults, cgkids, egmen, egwomen, egkids, sgmen, sgwomen,
+            cgadults, cgkids, egmen, egwomen, egkids, sgmen, sgwomen, offers,
             sgkids, cords, spraycleaner, cases, giftcards, safetyglasses, swimgoggles },
-            actions, userData, route: { params: { sub_category_id } } } = this.props
+            actions, userData, route: { params: { sub_category_id, otherCats } } } = this.props
 
-        console.log("sub_category_id |||||", sub_category_id)
+        // console.log("otherCats |||||", otherCats)
+
 
         console.log("swicth working");
         switch (sub_category_id) {
@@ -297,6 +299,14 @@ class Products extends Component {
                 this.createData(swimgoggles)
                 break;
 
+            // offers
+            case 72:
+                console.log("OFFERS",offers);
+                this.createData(offers)
+                break;
+
+
+
             default:
                 this.createData(null)
                 break;
@@ -318,12 +328,12 @@ class Products extends Component {
 
             })
         })
-
+        console.log("saved Products", savedProducts);
         let products = []
-        if (savedProducts.length == 0 || savedProducts == null || savedProducts == undefined) {
-
+        if (savedProducts == null || savedProducts.length == 0 || savedProducts == undefined) {
+            console.log('sub_category_id :>> ', sub_category_id);
             var result = await api.get(custom_api_url + "func=get_category_products&cid=" + sub_category_id)
-
+            console.log("result", result.data);
             var sorted = result.data.slice().sort(function (a, b) {
                 return a.price - b.price;
             });
@@ -1388,33 +1398,338 @@ class Products extends Component {
         })
     }
 
-    selectedItems = (selecteditem, index) => {
+    // selectedItems = (selecteditem, index) => {
 
 
-        var { item, mainCat_selected } = this.props?.route?.params;
-        // because position is giving 1 which index of array in first value while array starts with 0
-        var mainIndex = mainCat_selected - 1
-        if (mainIndex == 0) {
-            mainIndex = 0
-        } else {
-            // since there is 2nd position missing in data after 1 so thats why subtracting for second time
-            // see in defaultCategories console.log or  ImageArray file while matching parent ids
-            mainIndex = mainIndex - 1
-        }
-        var sub_index = selecteditem?.position - 1
-        var sub_cats = ImageArray[mainIndex]?.children_data[item.position - 1].children_data[sub_index]
-        if (sub_cats.children_data.length !== 0) {
+    //     var { item, mainCat_selected } = this.props?.route?.params;
+    //     // because position is giving 1 which index of array in first value while array starts with 0
+    //     var mainIndex = mainCat_selected - 1
+    //     if (mainIndex == 0) {
+    //         mainIndex = 0
+    //     } else {
+    //         // since there is 2nd position missing in data after 1 so thats why subtracting for second time
+    //         // see in defaultCategories console.log or  ImageArray file while matching parent ids
+    //         mainIndex = mainIndex - 1
+    //     }
+    //     console.log("selecteditem",selecteditem);
+    //     var sub_index = selecteditem?.position - 1
+    //     var sub_cats = ImageArray[mainIndex]?.children_data[item.position - 1].children_data[sub_index]
+    //      if (sub_cats.children_data.length !== 0) {
 
-            setImmediate(() => {
-                this.setState({
-                    item: sub_cats.children_data[0],
-                })
-                this.createData()
+    //         setImmediate(() => {
+    //             this.setState({
+    //                 item: sub_cats.children_data[0],
+    //             })
+    //             this.createData()
+    //         })
+    //     } else {
+    //         alert("Coming Soon")
+    //         console.log("children_data empty cannot set Item state")
+    //     }
+
+    // }
+
+    fetchSubFilterData = async (selecteditem) => {
+        const { userData: { admintoken, searchproducts }, actions } = this.props
+        var tempPRoducts = []
+        // Api to fetch  Array of products sku's of category selected
+        setImmediate(() => {
+            this.setState({
+                contact_lens_diameter: {
+                    name: "Contact Lens Diameter",
+                    attribute_code: "contact_lens_diameter",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                contact_lens_base_curve: {
+                    name: "Contact Lens Base Curve",
+                    attribute_code: "contact_lens_base_curve",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                water_container_content: {
+                    name: "Water Container Content",
+                    attribute_code: "water_container_content",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                contact_lens_usage: {
+                    name: "Contact Lens Usage",
+                    attribute_code: "contact_lens_usage",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                brands: {
+                    name: "Brands",
+                    attribute_code: "brands",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                size: {
+                    name: "Size",
+                    attribute_code: "size",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                model_no: {
+                    name: "Model No",
+                    attribute_code: "model_no",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                color: {
+                    name: "Colors",
+                    attribute_code: "color",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                box_content_pcs: {
+                    name: "Box Content (PCS)",
+                    attribute_code: "box_content_pcs",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                lense_color: {
+                    name: "Lense Color",
+                    attribute_code: "lense_color",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                frame_type: {
+                    name: "Frame Type",
+                    attribute_code: "frame_type",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                frame_shape: {
+                    name: "Frame Shape",
+                    attribute_code: "frame_shape",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                polarized: {
+                    name: "Polarized",
+                    attribute_code: "polarized",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                frame_color: {
+                    name: "Frame Color",
+                    attribute_code: "frame_color",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                frame_material: {
+                    name: "Frame Material",
+                    attribute_code: "frame_material",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                bridge_size: {
+                    name: "Bridge Size",
+                    attribute_code: "bridge_size",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                temple_color: {
+                    name: "Temple Color",
+                    attribute_code: "temple_color",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                temple_size: {
+                    name: "Temple Size",
+                    attribute_code: "temple_size",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                temple_material: {
+                    name: "Temple Material",
+                    attribute_code: "temple_material",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+                gender: {
+                    name: "Gender",
+                    attribute_code: "gender",
+                    count: 0,
+                    product_ids: [],
+                    value: [],
+                },
+
             })
-        } else {
-            alert("Coming Soon")
-            console.log("children_data empty cannot set Item state")
+        })
+        var result = await api.get("products?searchCriteria[filterGroups][0][filters][0][field]=category_id&searchCriteria[filterGroups][0][filters][0][value]=" + selecteditem?.id + "&searchCriteria[filterGroups][0][filters][0][conditionType]=eq&searchCriteria[filterGroups][1][filters][0][field]=visibility&searchCriteria[filterGroups][1][filters][0][value]=4&searchCriteria[filterGroups][1][filters][0][conditionType]=eq&searchCriteria[filterGroups][2][filters][0][field]=status&searchCriteria[filterGroups][2][filters][0][value]=1&searchCriteria[filterGroups][2][filters][0][conditionType]=eq&searchCriteria[sortOrders][0][field]=created_at&searchCriteria[sortOrders][0][direction]=DESC&fields=items[id,name,status,price,visibility,type_id,extension_attributes,custom_attributes]", {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            },
+        })
+        // console.log("Result For Custom Attributes", result?.data?.items.length)
+        result.data.items = result?.data?.items.reverse()
+        for (let rdi = 0; rdi < result?.data?.items.length; rdi++) {
+
+            for (let ca = 0; ca < result?.data?.items[rdi].custom_attributes.length; ca++) {
+
+                if (result?.data?.items[rdi].custom_attributes[ca].attribute_code == 'brands') {
+
+                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + result?.data?.items[rdi].custom_attributes[ca].value,).then(async (data) => {
+                        result.data.items[rdi].brand = data?.data
+
+                        // Condition for fetching products with type_id:"simple"
+
+                        if (result?.data?.items[rdi].visibility == 4 && result?.data?.items[rdi].price > 0 && result?.data?.items[rdi].status == 1 && result?.data?.items[rdi].type_id == "simple") {
+                            console.log("working simple");
+                            this.createFilterData(result?.data?.items[rdi])
+
+                        }
+
+                        // Condition for fetching products with type_id:"Configurable"
+
+                        if (result?.data?.items[rdi].price == 0 && result?.data?.items[rdi].status == 1 && result?.data?.items[rdi].type_id == "configurable") {
+
+                            var getprice = await axios.post("https://aljaberoptical.com/pub/script/custom_api.php?func=configurable_price&id=" + result?.data?.items[rdi].id).then((price_api) => {
+                                return price_api?.data
+                            }).catch((err) => {
+                                console.log("Error caught in custom Price fetch API PRoduct Details screen")
+                            })
+
+                            // console.log("Price from APi:", getprice)
+
+                            result.data.items[rdi].price = getprice
+                            result.data.items[rdi].brand = data?.data
+                            for (let tp = 0; tp < result.data.items[rdi].extension_attributes?.configurable_product_links?.length; tp++) {
+
+                                // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
+
+                                const selected_products = searchproducts.filter((value) => value?.id == result.data.items[rdi].extension_attributes?.configurable_product_links[tp])[0]
+
+                                // Condition
+
+                                if (result.data.items[rdi].extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
+
+                                    // if id's match then the value "sku" is picked up from the matching product object and then we run an api
+                                    // to fetch details for the varient because they are not in the products object from all products api
+
+                                    var check = false
+
+                                    // Api for fetching product details
+
+                                    await api.get('/products/' + selected_products?.sku, {
+                                        headers: {
+                                            Authorization: `Bearer ${admintoken}`,
+                                        },
+                                    }).then(async (cfPD) => {
+
+                                        // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
+                                        // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
+                                        // long process already done above to save time while fetching for its main version of product
+
+                                        cfPD.data.brand = data?.data // brand value
+                                        cfPD.data.parent_product_id = result.data.items[rdi].id
+                                        cfPD.data.options = result.data.items[rdi].options
+                                        cfPD.data.type_id = result.data.items[rdi].type_id
+                                        // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
+                                        // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
+                                        // together
+
+                                        tempPRoducts.push(cfPD?.data)
+
+                                        // here's the condition once the configurable_product_links array reach its end
+                                        if (tp == result.data.items[rdi].extension_attributes?.configurable_product_links?.length - 1) {
+
+                                            //we also change the value of price of the main product because products with type_id have "0" price
+                                            // so we take a price from its varient overwrite (Note price of all vareints are same)
+                                            result.data.items[rdi].price = cfPD.data?.price
+
+                                            // then we create an of product_varients and push into main product's object to show and display the varients in
+                                            // product details screen
+                                            result.data.items[rdi].product_varients = tempPRoducts
+
+                                            // then we push this product into main products array with all of these things so it can be displayed
+                                            // in the Products Detail screen
+
+                                            // console.log("result.data.items[rdi].product_varients",result.data.items[rdi].product_varients)
+                                            console.log("working asf");
+                                            this.createFilterData(result.data.items[rdi])
+
+                                            // Emptying the temporary array that we pushed products varients so the varients of other products
+                                            // dont get added in the other products
+                                            tempPRoducts = []
+
+                                            // setting value of check to true from false to break the loop once it reaches its end
+                                            check = true
+                                        }
+
+                                    }).catch((err) => {
+                                        console.log("Configurable Product Details Api Error", err)
+                                    })
+
+                                    // this condition break the loop from further adding more products
+                                    // if (check == true) {
+                                    break;
+                                    // }
+                                } else {
+                                }
+                            }
+                            this.createFilterData(result?.data?.items[rdi])
+                        }
+                    }).catch((err) => {
+                        console.log("DAta for Brands Api errr", err)
+                    })
+                    break;
+                }
+            }
         }
+    }
+
+    createSubData = async (selecteditem, index) => {
+
+        var result = await api.get(custom_api_url + "func=get_category_products&cid=" + selecteditem?.id)
+
+        var sorted = result.data.slice().sort(function (a, b) {
+            return a.price - b.price;
+        });
+
+        var smallest = sorted[0],
+            largest = sorted[sorted.length - 1];
+
+        // setting the products in the state once they are all done 
+
+        // Reversing Array because data is showing from wrong end
+        result.data = result?.data?.reverse()
+
+        // actions.savedProducts(sub_category_id.toString(), result.data)
+        setImmediate(() => {
+
+            this.setState({
+                highest_price: largest?.price,
+                lowest_price: smallest?.price,
+                products: result.data,
+                original: result.data,
+                loader: false,
+                loaderFilter: false
+
+            })
+        })
 
     }
 
@@ -1590,6 +1905,18 @@ class Products extends Component {
         })
     }
 
+    onScreenReload = () => {
+        setImmediate(() => {
+            this.setState({
+                filterBoardOpen: !this.state.filterBoardOpen,
+                keyCat: this.state.keyCat + 1
+            })
+        })
+        this.checkExistingProductData()
+        this.inner_Categories()
+        this.fetchFilterData()
+    }
+
     addToCart = (product, index) => {
 
         var { userData } = this.props
@@ -1673,12 +2000,12 @@ class Products extends Component {
     }
 
     render() {
-        var { item, imageLinkMain } = this.props?.route?.params;
+        var { item, imageLinkMain, otherCats } = this.props?.route?.params;
         var { contact_lens_diameter, contact_lens_base_curve, temple_size, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
 
         return (
 
-            <View style={styles.mainContainer} >
+            <View key={this.state.keyCat} style={styles.mainContainer} >
                 {/** Screen Header */}
                 < HomeHeader navProps={this.props.navigation} openDrawer={() => this.openDrawer()} />
 
@@ -1699,7 +2026,10 @@ class Products extends Component {
                     this.state.categories !== null &&
                     <CategoryList
                         categories={this.state.categories}
-                        selectedItem={(item, index) => this.selectedItems(item, index)}
+                        selectedItem={(item, index) => {
+                            this.fetchSubFilterData(item)
+                            this.createSubData(item)
+                        }}
                     />
                 }
 
@@ -1721,6 +2051,9 @@ class Products extends Component {
 
                 <FilterBoard
                     key={filterKey}
+                    otherCats={otherCats}
+                    navProps={this.props.navigation}
+                    admintoken={this.props.userData?.admintoken}
                     filterBoardOpen={this.state.filterBoardOpen}
                     contact_lens_diameter={contact_lens_diameter}
                     contact_lens_base_curve={contact_lens_base_curve}
@@ -1749,6 +2082,7 @@ class Products extends Component {
                     removeFilter={(product_ids) => this.removeFilter(product_ids)}
                     updatePriceFilter={(val) => this.updatePriceFilter(val)}
                     onDismiss={() => this.openFilterBoard()}
+                    reloadScreen={() => this.onScreenReload()}
                 />
 
 

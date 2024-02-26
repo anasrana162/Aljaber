@@ -161,11 +161,11 @@ class HomeScreen extends Component {
         this.props.navigation.addListener('focus', async () => {
             this.adminApi(),
                 setTimeout(() => {
-
+                    this.fetchUserOrders()
                     this.loginUser()
                 });
         }, 1000)
-        // this.getDefaultCategories()
+        this.defaultCategories()
         this.randomProducts()
         this.unsubscribe()
 
@@ -352,7 +352,7 @@ class HomeScreen extends Component {
         const { actions, userData: { defaultcategory, admintoken } } = this.props
 
         var { children_data } = defaultcategory
-        // console.log("tempArray1", children_data)
+        console.log("tempArray1", defaultcategory)
         actions?.createdDefaultCategories(children_data)
 
         // this to to hide some categories ID's are specified in switch
@@ -363,6 +363,8 @@ class HomeScreen extends Component {
                     children_data[i].is_active = false
                     break;
                 case 72:
+                    children_data[i].parent_position = defaultcategory.position
+                    actions.offersObj(children_data[i])
                     children_data[i].is_active = false
                     break;
                 case 89:
@@ -643,6 +645,25 @@ class HomeScreen extends Component {
 
     }
 
+    fetchUserOrders = () => {
+        var { userData: { user, admintoken }, actions } = this.props
+        // console.log("customer?.id", user?.id)
+        api.get("orders?searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bfield%5d=" + "customer_id"
+            + "&searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bvalue%5d=" + user?.id
+            + "searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bconditionType%5d=eq",
+            {
+                headers: {
+                    Authorization: `Bearer ${admintoken}`,
+                },
+            })
+            .then((res) => {
+                // console.log("Orders of Coustomer are:", res?.data)
+                actions.myOrders(res?.data?.items)
+            }).catch((err) => {
+                console.log("Err get customer orders api:  ", err?.response?.data?.message)
+            })
+    }
+
     render() {
         var { userData: { user } } = this.props
         return (
@@ -666,20 +687,20 @@ class HomeScreen extends Component {
                     <Swiper data={sliderImages} />
 
                     {/* * Default Categories */}
-                    {/* {this.state.loader == false && <DefaultCategories
+                    {this.state.loader == false && <DefaultCategories
                         data={this.state.defaultCategories1}
                         navProps={this.props.navigation}
                         firstSubItem={this.state.firstSubItem}
                         admintoken={this.props.userData.admintoken}
-                    />} */}
+                    />}
 
                     {/** Categories like men, women etc */}
-                    <HomeCategories
+                    {/* <HomeCategories
                         // data={this.state.topCategoryData == null ? [] : this.state.topCategoryData[0]?.children_data}
                         data={this.state.topCategoryData}
                         mainCatPos={this.state.topCategoryData == null ? null : this.state.topCategoryData[0]?.position}
                         navProps={this.props.navigation}
-                    />
+                    /> */}
                     <ProductList
                         screenName="Home"
                         data={this.state.randomProducts}
@@ -693,8 +714,8 @@ class HomeScreen extends Component {
 
                     <StoreFeatures screenName={"home"} />
 
-                    <NewsLetter props={this.props} 
-                    style={{marginBottom: Object.keys(user).length == 0? 60:0}}
+                    <NewsLetter props={this.props}
+                        style={{ marginBottom: Object.keys(user).length == 0 ? 60 : 0 }}
                     />
 
                     {

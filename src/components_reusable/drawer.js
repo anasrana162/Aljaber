@@ -1,8 +1,10 @@
 import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, TouchableOpacity } from 'react-native'
 import React, { Component } from 'react'
 import LinearX from '../animations/LinearX'
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import api from '../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -15,8 +17,8 @@ export default class Drawer extends Component {
         }
     }
 
-    onPress = (key) => {
-        var { props: { userData: { user }, navigation, actions }, onDismiss } = this.props
+    onPress = async (key) => {
+        var { props: { userData: { user, offersobj, admintoken }, navigation, actions }, onDismiss } = this.props
         switch (key) {
             case "my_account":
                 onDismiss()
@@ -52,6 +54,37 @@ export default class Drawer extends Component {
             case "mobilebus":
                 onDismiss()
                 navigation.navigate("Mobile_Bus")
+                break;
+            case "offers":
+                console.log("Offers", offersobj);
+
+                var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
+                await api.get("categories/" + offersobj?.id, {
+                    headers: {
+                        Authorization: `Bearer ${admintoken}`,
+                    }
+                }).then((res) => {
+                    // console.log("Response for Top Category API:", res?.data)
+                    for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+                        if (res?.data?.custom_attributes[r].attribute_code == "image") {
+                            image = res?.data?.custom_attributes[r]?.value
+                            break;
+                        }
+
+                    }
+                }).catch((err) => {
+                    console.log("Err Fetching image in DefaultCategoryItems: ", err)
+                })
+                onDismiss()
+                navigation.navigate("Products", {
+                    item: offersobj,
+                    mainCat_selected: offersobj?.parent_position,
+                    sub_category_id: offersobj?.id,
+                    imageLinkMain: image,
+                    otherCats: [],
+
+                })
+
                 break;
             case "logout":
                 onDismiss()
@@ -100,6 +133,18 @@ export default class Drawer extends Component {
                                                 style={[styles.touchable, { marginTop: 20, }]}>
                                                 <Text style={styles.text_touchable}>Signin</Text>
                                                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
+
+                                              {/* Offers */}
+                                              <TouchableOpacity
+                                                onPress={() => this.onPress("offers")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>Offers</Text>
+                                                <MaterialIcons name="discount" color='#3F51B5' size={20} style={{
+                                                    transform: [{
+                                                        rotate: "90deg"
+                                                    }], marginRight: 6
+                                                }} />
                                             </TouchableOpacity>
                                         </>
                                         :
@@ -186,6 +231,19 @@ export default class Drawer extends Component {
                                                     <View style={{ width: "95%", height: 0.5, backgroundColor: "#666666", position: "absolute", bottom: 0 }}></View>
                                                 </TouchableOpacity>
                                             </View>}
+
+
+                                            {/* Offers */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("offers")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>Offers</Text>
+                                                <MaterialIcons name="discount" color='#3F51B5' size={20} style={{
+                                                    transform: [{
+                                                        rotate: "90deg"
+                                                    }], marginRight: 6
+                                                }} />
+                                            </TouchableOpacity>
 
                                             {/* Logout */}
                                             <TouchableOpacity

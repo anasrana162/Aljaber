@@ -1,4 +1,4 @@
-import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, TouchableOpacity } from 'react-native'
+import { Text, StyleSheet, Image, View, Dimensions, NativeModules, ScrollView, TouchableOpacity, FlatList } from 'react-native'
 import React, { useState } from 'react'
 
 {/* {---------------Redux Imports------------} */ }
@@ -10,7 +10,7 @@ import LinearX from '../../../animations/LinearX';
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 import FBListCont from './fbListCont';
-
+import api from '../../../api/api'
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -18,11 +18,15 @@ const height = Dimensions.get("screen").height - HEIGHT
 const FilterBoard = ({
     //Functions
     onDismiss,
+    reloadScreen,
     applyFilter,
     filterBoardOpen,
     removeFilter,
     updatePriceFilter,
+    navProps,
     // Data
+    admintoken,
+    otherCats,  // other sub categories
     contact_lens_diameter, lense_color, price, temple_size, frame_type, highest_price, lowest_price, gender, frame_shape, temple_material, bridge_size, frame_color, temple_color, frame_material, polarized, contact_lens_base_curve, water_container_content, contact_lens_usage, brands, size, model_no, box_content_pcs, color
 }) => {
 
@@ -50,27 +54,6 @@ const FilterBoard = ({
     const [temple_size_open, settemple_size_open] = useState(false)
 
     const [show_filters, setShow_filters] = useState(false)
-
-    // state for holding values
-    const [contact_lens_diameter_state, setcontact_lens_diameter_state] = useState("")
-    const [contact_lens_base_curve_state, setcontact_lens_base_curve_state] = useState("")
-    const [water_container_content_state, setwater_container_content_state] = useState("")
-    const [contact_lens_usage_state, setcontact_lens_usage_state] = useState("")
-    const [brands_state, setbrands_state] = useState("")
-    const [size_state, setsize_state] = useState("")
-    const [model_no_state, setmodel_no_state] = useState("")
-    const [box_content_pcs_state, setsbox_content_pcs_state] = useState("")
-    const [color_state, setcolor_state] = useState("")
-    const [lense_color_state, setlense_color_state] = useState("")
-    const [frame_shape_state, setframe_shape_state] = useState("")
-    const [polarized_state, setpolarized_state] = useState("")
-    const [frame_color_state, setframe_color_state] = useState("")
-    const [frame_material_state, setframe_material_state] = useState("")
-    const [bridge_size_state, setbridge_size_state] = useState("")
-    const [temple_color_state, settemple_color_state] = useState("")
-    const [temple_material_state, settemple_material_state] = useState("")
-    const [gender_state, setgender_state] = useState("")
-    const [temple_size_state, settemple_size_state] = useState("")
 
     // state for holding values
     // const [cld_check, setcld_check] = useState("")
@@ -444,7 +427,38 @@ const FilterBoard = ({
 
     }
 
+    const selectedCat = async (item) => {
 
+        var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
+        await api.get("categories/" + item?.id, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            }
+        }).then((res) => {
+            // console.log("Response for Top Category API:", res?.data)
+            for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+                if (res?.data?.custom_attributes[r].attribute_code == "image") {
+                    image = res?.data?.custom_attributes[r]?.value
+                    break;
+                }
+
+            }
+        }).catch((err) => {
+            console.log("Err Fetching image in DefaultCategoryItems: ", err)
+        })
+
+        reloadScreen()
+
+        navProps.push("Products", {
+            item,
+            mainCat_selected: otherCats?.position,
+            sub_category_id: item?.id,
+            imageLinkMain: image,
+            otherCats: otherCats,
+        })
+    }
+
+    // console.log("otherCats", otherCats);
     return (
         <>
             {filterBoardOpen == true ?
@@ -462,6 +476,31 @@ const FilterBoard = ({
 
                             <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
 
+                                {/* Other Sub Categories */}
+                                {
+                                    otherCats?.children_data == undefined ?
+                                        <></>
+                                        :
+                                        <>
+                                            {otherCats?.children_data.length == 0 ? <></> : <View style={styles.otherCatsCont}>
+                                                {/* Title */}
+                                                <Text style={styles.otherCatsContTitle}>{otherCats?.name}</Text>
+
+                                                <FlatList
+                                                    data={otherCats?.children_data}
+                                                    renderItem={({ item, index }) => {
+                                                        // console.log("items", item);
+                                                        return (
+                                                            <TouchableOpacity onPress={() => selectedCat(item)}>
+                                                                <Text style={styles.otherCatsContItemTitle}>{item?.name}</Text>
+                                                            </TouchableOpacity>
+                                                        )
+                                                    }}
+                                                />
+
+                                            </View>}
+                                        </>
+                                }
 
 
                                 {(show_filters == true && contact_lens_diameter?.value?.length > 0) &&
@@ -793,6 +832,35 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "600",
         color: "black"
+    },
+
+    otherCatsCont: {
+        width: "100%",
+        borderRightWidth: 1,
+        paddingBottom: 10,
+        justifyContent: "center",
+        alignItems: "flex-start"
+    },
+    otherCatsContTitle: {
+        fontWeight: "600",
+        fontSize: 15,
+        color: "black",
+        textAlign: 'left',
+        width: 130,
+        marginLeft: 10,
+        marginTop: 10,
+        marginBottom: 0,
+    },
+    otherCatsContItemTitle: {
+        fontWeight: "500",
+        fontSize: 14,
+        color: "black",
+        textAlign: 'left',
+        width: 160,
+        // borderWidth:1,
+        marginLeft: 10,
+        marginTop: 10,
+        // marginBottom: 10,
     }
 
 })

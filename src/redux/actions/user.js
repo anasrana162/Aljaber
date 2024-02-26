@@ -2,7 +2,7 @@ import {
     LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
-    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES,
+    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES, OFFERS, OFFERSOBJ,
     // Cart
     CARTITEMS,
     //Orders
@@ -31,6 +31,18 @@ export function user(userObject) {
         payload: userObject
     }
 }
+export function offersObj(offers) {
+    return {
+        type: OFFERSOBJ,
+        payload: offers,
+    }
+}
+// export function offers(offers) {
+//     return {
+//         type: OFFERS,
+//         payload: offers,
+//     }
+// }
 export function fetchCountries(countries) {
     return {
         type: COUNTRIES,
@@ -207,7 +219,12 @@ export function savedProducts(category_id, savedproducts) {
             }
         case "127":
             return {
-                type: SWIMMIMINGGOGGLES,
+
+            }
+        // Offers
+        case "72":
+            return {
+                type: OFFERS,
                 payload: savedproducts
             }
 

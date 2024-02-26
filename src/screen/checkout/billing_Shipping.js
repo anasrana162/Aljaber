@@ -376,6 +376,10 @@ class Billing_Shipping extends Component {
             this.setState({ loadNext: false })
             return alert("Please Select Shipping!")
         }
+        if (Object.keys(selectedAddress).length == 0) {
+            this.setState({ loadNext: false })
+            return alert("Please Select an Address to proceed!")
+        }
 
 
         console.log("selectedAddress region", region)
@@ -481,8 +485,8 @@ class Billing_Shipping extends Component {
 
             <View style={styles.mainContainer}>
                 {/* Header */}
-                <HeaderComp titleEN={"Shipping Address"} navProps={this.props.navigation}/>
-                
+                <HeaderComp titleEN={"Shipping Address"} navProps={this.props.navigation} />
+
                 <ScrollView
                     showsVerticalScrollIndicator={true}
                     style={{ marginBottom: 100 }} >
@@ -501,6 +505,28 @@ class Billing_Shipping extends Component {
                             <FlatList
                                 data={this.state.addresses}
                                 contentContainerStyle={styles.flatlistCont}
+                                ListEmptyComponent={() => {
+                                    return (
+                                        <View style={{
+                                            width: "100%",
+                                            height: 100,
+                                            justifyContent: "center",
+                                            alignItems: "center",
+                                            alignSelf: "center",
+                                            borderWidth: 1,
+                                            borderColor: "#08c"
+                                        }}>
+                                            <View style={{
+                                                width: "60%",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                alignSelf: "center",
+                                            }}>
+                                                <Text style={{ color: "black", fontSize: 16, fontWeight: "600", textAlign: "center" }}>No addresses available, Please add new Address</Text>
+                                            </View>
+                                        </View>
+                                    )
+                                }}
                                 // horizontal={true}
                                 scrollEnabled={false}
                                 numColumns={2}
@@ -520,7 +546,7 @@ class Billing_Shipping extends Component {
                             <Text style={styles.shipping_method_title}>SHIPPING METHODS* (PLEASE SELECT)</Text>
 
                             {/* Shipping Methods */}
-                            <View style={styles.shipping_method_cont}>
+                            <View style={[styles.shipping_method_cont, { opacity: this.state.addresses.length == 0 ? 0.3 : 1 }]}>
                                 {this.state.isShippingFree ?
                                     <>
 
@@ -528,6 +554,7 @@ class Billing_Shipping extends Component {
                                             <>
                                                 <TouchableOpacity
                                                     style={{ paddingVertical: 10 }}
+                                                    disabled={this.state.addresses.length == 0}
                                                     onPress={() => this.setState({ shippingSelected: !this.state.shippingSelected })}>
                                                     <AntDesign name="checkcircle" size={18} color="black" />
                                                 </TouchableOpacity>
@@ -538,6 +565,7 @@ class Billing_Shipping extends Component {
                                             <>
                                                 <TouchableOpacity
                                                     style={{ paddingVertical: 10 }}
+                                                    disabled={this.state.addresses.length == 0}
                                                     onPress={() => this.setState({ shippingSelected: !this.state.shippingSelected })}>
                                                     <Entypo name="circle" size={18} color="black" />
                                                 </TouchableOpacity>
@@ -552,6 +580,7 @@ class Billing_Shipping extends Component {
                                             <>
                                                 <TouchableOpacity
                                                     style={{ paddingVertical: 10 }}
+                                                    disabled={this.state.addresses.length == 0}
                                                     onPress={() => this.setState({ shippingSelected: !this.state.shippingSelected })}>
                                                     <AntDesign name="checkcircle" size={18} color="black" />
                                                 </TouchableOpacity>
@@ -563,6 +592,7 @@ class Billing_Shipping extends Component {
                                             <>
                                                 <TouchableOpacity
                                                     style={{ paddingVertical: 10 }}
+                                                    disabled={this.state.addresses.length == 0}
                                                     onPress={() => this.setState({ shippingSelected: !this.state.shippingSelected })}>
                                                     <Entypo name="circle" size={18} color="black" />
                                                 </TouchableOpacity>
@@ -908,7 +938,7 @@ const styles = StyleSheet.create({
         right: 0
     },
     flatlistCont: {
-        marginTop: 20,
+        marginTop: 0,
         width: width - 20,
         // height: width / 2 - 20,
         // flexWrap:"wrap",

@@ -103,7 +103,7 @@ class Categories extends Component {
                                 <>
                                     {/* item?.index != 0 this condition is for hiding shop by brand */}
                                     {item?.item?.is_active == true && item?.index != 0 &&
-                                        item?.item?.id != 72 && item?.item?.id != 49 && item?.item?.id != 128 &&
+                                        item?.item?.id != 72 && item?.item?.id != 49 && item?.item?.id != 128 && item?.item?.id != 89 &&
                                         <TouchableOpacity
 
                                             onPress={() => this.selectedItems(item?.item, index, 'main')}
