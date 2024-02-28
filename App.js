@@ -317,9 +317,43 @@ class App extends Component {
       }
     }
     else {
-      console.log("No credentials found for login")
+      var guestCartKey = await AsyncStorage.getItem("@aljaber_guestCartKey")
+      var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+      if (guestCartKey == null || guestCartID == null) {
+        this.getGuestCartKey()
+      } else {
+
+        console.log("Guest Key exists");
+        actions.guestCartKey(guestCartKey)
+        actions.guestCartID(JSON.parse(guestCartID))
+        console.log("No credentials found for login")
+      }
     }
   }
+
+  getGuestCartKey = async () => {
+    var { actions } = this.props
+    await api.post("guest-carts")
+      .then(async (result) => {
+        console.log("Guest Cart Key in App.js:", result?.data);
+        var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+        if (guestCartID == null) {
+          await api.get("guest-carts/" + result?.data)
+            .then((res) => {
+              console.log("Guest Cart ID in App.js:", res?.data);
+              AsyncStorage.setItem("@aljaber_guestCartID", JSON.stringify(res?.data));
+              AsyncStorage.setItem("@aljaber_guestCartKey", result?.data);
+              actions.guestCartKey(result?.data)
+              actions.guestCartID(res?.data)
+            }).catch((err) => {
+              console.log("Guest Cart ID in App.js Error:", err.response.data.message);
+            })
+        }
+      }).catch((err) => {
+        console.log("Guest Cart Key in App.js Error:", err);
+      })
+  }
+
   fetchUserOrders = () => {
     var { userData: { user }, actions } = this.props
     // console.log("customer?.id", user?.id)
@@ -487,7 +521,7 @@ class App extends Component {
 
   render() {
     return (
-      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#020621", }}>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#020621", }} >
 
         <View style={{ marginTop: StatusBarManager?.HEIGHT, flex: 1 }} >
           {Platform.OS == "ios" && <StatusBar
@@ -548,7 +582,7 @@ class App extends Component {
           </Modal>
 
         </View>
-      </GestureHandlerRootView>
+      </GestureHandlerRootView >
     );
 
   }

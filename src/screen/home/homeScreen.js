@@ -228,8 +228,41 @@ class HomeScreen extends Component {
             }
         }
         else {
-            console.log("No credentials found for login")
+            var guestCartKey = await AsyncStorage.getItem("@aljaber_guestCartKey")
+            var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+            if (guestCartKey == null || guestCartID == null) {
+                this.getGuestCartKey()
+            } else {
+
+                console.log("Guest Key exists");
+                actions.guestCartKey(guestCartKey)
+                actions.guestCartID(JSON.parse(guestCartID))
+                console.log("No credentials found for login")
+            }
         }
+    }
+
+    getGuestCartKey = async () => {
+        var { actions } = this.props
+        await api.post("guest-carts")
+            .then(async (result) => {
+                console.log("Guest Cart Key in Home.js:", result?.data);
+                var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+                if (guestCartID == null) {
+                    await api.post("guest-carts" + result?.data)
+                        .then((res) => {
+                            console.log("Guest Cart ID in Home.js:", res?.data);
+                            AsyncStorage.setItem("@aljaber_guestCartID", JSON.stringify(res?.data));
+                            AsyncStorage.setItem("@aljaber_guestCartKey", result?.data);
+                            actions.guestCartKey(result?.data)
+                            actions.guestCartID(res?.data)
+                        }).catch((err) => {
+                            console.log("Guest Cart ID in Home.js Error:", err);
+                        })
+                }
+            }).catch((err) => {
+                console.log("Guest Cart Key in Home.js Error:", err);
+            })
     }
 
     // fetchAllProductsForSearch = async () => {
@@ -352,7 +385,7 @@ class HomeScreen extends Component {
         const { actions, userData: { defaultcategory, admintoken } } = this.props
 
         var { children_data } = defaultcategory
-        console.log("tempArray1", defaultcategory)
+        // console.log("tempArray1", defaultcategory)
         actions?.createdDefaultCategories(children_data)
 
         // this to to hide some categories ID's are specified in switch
@@ -561,6 +594,67 @@ class HomeScreen extends Component {
 
     }
 
+    isUserLoggedIn = (product, index) => {
+        var { userData: { user, } } = this.props
+        if (Object.keys(user).length == 0) {
+            this.addToCartGuest(product, index)
+        } else {
+            this.addToCart(product, index)
+        }
+    }
+
+    addToCartGuest = (product, index) => {
+
+        var { userData } = this.props
+
+        if (userData?.admintoken !== null || userData?.guestcartkey !== null) {
+
+            if (product?.type_id == "virtual" || product?.type_id == "simple") {
+
+                if (product?.options.length == 0) {
+
+                    var obj = {
+                        "cartItem": {
+                            "sku": product?.sku,
+                            "qty": 1,
+                            "name": product?.name,
+                            "price": product?.price,
+                            "product_type": "simple",
+                            "quote_id": userData?.guestcartid?.id
+                        }
+                    }
+                    console.log("this product does not have options", obj)
+
+                    api.post("guest-carts/"+ userData?.guestcartkey +"/items", obj, {
+                        headers: {
+                            Authorization: `Bearer ${userData?.admintoken}`,
+                        },
+                    }).then((response) => {
+                        console.log(" Guest Add to cart Item API response : ", response?.data)
+                        alert("Product Added to Cart!")
+                    }).catch((err) => {
+                        console.log("Add to cart item api error:  ", err)
+                    })
+
+                } else {
+                    console.log("this product has options")
+                    this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                    return alert("Please select a Product Options!")
+                }
+
+            } else {
+                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                return alert("Please select a Product varient color!")
+            }
+
+        }
+
+        else {
+            alert("Something Went wrong!")
+            // this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+    }
     addToCart = (product, index) => {
 
         var { userData } = this.props
@@ -622,7 +716,6 @@ class HomeScreen extends Component {
         })
     }
 
-
     addToWishList = (productId) => {
         var { userData: { user } } = this.props
         console.log("Product ID:   ", productId);
@@ -666,6 +759,7 @@ class HomeScreen extends Component {
 
     render() {
         var { userData: { user } } = this.props
+
         return (
             <View style={styles.mainContainer}>
 
@@ -706,7 +800,7 @@ class HomeScreen extends Component {
                         data={this.state.randomProducts}
                         loaderDot={this.state.loaderDot}
                         navProps={this.props.navigation}
-                        addToCart={(product, index) => this.addToCart(product, index)}
+                        addToCart={(product, index) => this.isUserLoggedIn(product, index)}
                         addToWishList={(id) => this.addToWishList(id)}
                     />
 

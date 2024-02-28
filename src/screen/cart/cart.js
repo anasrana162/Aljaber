@@ -59,17 +59,52 @@ class Cart extends Component {
     componentDidMount = () => {
         // this.props.navigation.addListener('focus', async () => this.refresh());
         this.getRecommendedProducts()
-        this.getCartData()
-        this.getCartItemDetails()
+        this.isUserLoggedIn("start")
         this.getCountries()
         // console.log("USER DATA", this.props.userData.user)
     }
 
+    isUserLoggedIn = (key, delete_cart_item_product) => {
+        var { userData: { user, } } = this.props
+        if (Object.keys(user).length == 0) {
+            switch (key) {
+                case "start":
+                    this.getGuestCartItems()
+                    break;
+
+                case "deleteCartItem":
+                    this.deleteGuestCartItem(delete_cart_item_product)
+                    break
+                case "updateCartItem":
+                    this.updateGuestCart()
+                    break
+            }
+        } else {
+            // if user is logged in 
+            switch (key) {
+                case "start":
+                    this.getCartData()
+                    this.getCartItemDetails()
+                    break;
+
+                case "deleteCartItem":
+                    this.deleteCartItem(delete_cart_item_product)
+                    break
+
+                case "updateCartItem":
+                    this.updateCart()
+                    break
+            }
+
+        }
+    }
+
     refresh = () => {
         this.getRecommendedProducts()
-        this.getCartData()
-        this.getCartItemDetails()
+        this.isUserLoggedIn("start")
     }
+
+
 
     getCountries = () => {
 
@@ -84,6 +119,44 @@ class Cart extends Component {
 
     }
 
+    getGuestCartItems = async () => {
+
+        var { userData: { token, admintoken, guestcartkey, guestcartid } } = this.props
+
+        setImmediate(() => {
+            this.setState({
+                loader: true,
+                hideSummary: true,
+                calculating: true,
+                cartItems: [],
+                cartData: null,
+                subtotal: 0,
+                flatrate: 0,
+                shipping: "",
+            })
+        })
+
+        api.get("guest-carts/" + guestcartkey + '/items')
+            .then(async (res) => {
+                // console.log("REsponse Get Guest cart Data APi", res?.data)
+                setImmediate(() => {
+                    this.setState({
+                        cartData: guestcartid,
+                        // cartItems: res?.data
+                    })
+                })
+
+                this.addDataToCartItems(res?.data)
+
+            }).catch((err) => {
+                console.log("Get guest cart Data APi Error", err)
+                // alert("Please try Logging in your account first")
+                setImmediate(() => {
+                    this.setState({ loader: false, hideSummary: true })
+                })
+            })
+
+    }
     getCartData = async () => {
 
         var { userData: { token, admintoken, allproducts } } = this.props
@@ -91,7 +164,7 @@ class Cart extends Component {
         setImmediate(() => {
             this.setState({
                 loader: true,
-                hideSummary:true,
+                hideSummary: true,
                 calculating: true,
                 cartItems: [],
                 cartData: null,
@@ -115,9 +188,10 @@ class Cart extends Component {
                     })
                 })
 
+
             }).catch((err) => {
                 console.log("Get cart Data APi Error", err)
-                alert("Please try Logging in your account first")
+                // alert("Please try Logging in your account first")
                 setImmediate(() => {
                     this.setState({ loader: false, hideSummary: true })
                 })
@@ -159,7 +233,11 @@ class Cart extends Component {
         // setImmediate(() => {
         //     this.setState({ cartItems: items ,loader:false})
         // })
-
+        if (items.length == 0) {
+            return setImmediate(() => {
+                this.setState({ loader: false, hideSummary: true })
+            })
+        }
         for (let i = 0; i < items.length; i++) {
             // console.log(" ------------- ")
             // console.log("")
@@ -238,25 +316,23 @@ class Cart extends Component {
 
     }
 
-    calculateShipping = () => {
-        var { subtotal } = this.state
 
-        //    / console.log("calculateShipping subtotal", subtotal)
-
-        if (subtotal > 150) {
-            this.setState({
-                flatrate: 20,
-                shipping: ""
+    deleteGuestCartItem = (product) => {
+        var { userData: { admintoken, guestcartkey } } = this.props
+        // console.log("Delete Item PRoduct", token)
+        api.delete("guest-carts/" + guestcartkey + "/items/" + product?.item_id, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            },
+        })
+            .then((res) => {
+                console.log("Delete Guest cart item Api Res ", res?.data)
+                this.refresh()
+                alert("Item Removed")
+            }).catch((err) => {
+                console.log("Delete Guest cart item Api ERR", err)
             })
-        } else {
-            this.setState({
-                shipping: "free",
-            })
-        }
-
     }
-
-
     deleteCartItem = (product) => {
         var { userData: { token, admintoken, allproducts } } = this.props
         // console.log("Delete Item PRoduct", token)
@@ -272,138 +348,6 @@ class Cart extends Component {
             }).catch((err) => {
                 console.log("Delete cart item Api ERR", err)
             })
-    }
-
-    fetchIdDataproductLabel = async (id) => {
-        var result = await axios.get(custom_api_url + 'func=product_option_label&id=' + id)
-        return result.data
-    }
-    fetchIdDataOptionLabel = async (id) => {
-        var result = await axios.get(custom_api_url + 'func=option_label&id=' + id)
-        return result.data
-    }
-    fetchIdDataAttributeLabel = async (id) => {
-        var result = await axios.get(custom_api_url + 'func=attribute_label&id=' + id)
-        return result.data
-    }
-
-
-    getRecommendedProducts = () => {
-        var { userData: { randomproducts } } = this.props
-        setImmediate(() => {
-            this.setState({
-                loaderDot: true
-            })
-        })
-        // console.log("userData Recommended Products", randomproducts)
-        setImmediate(() => {
-            this.setState({
-                randomProducts: randomproducts,
-                loaderDot: false
-            })
-        })
-    }
-
-    addToCart = (product, index) => {
-
-        var { userData } = this.props
-        // console.log("userData", userData?.token)
-
-        if (userData?.token !== null || userData?.user?.cartID !== undefined) {
-
-            if (product?.type_id == "virtual" || product?.type_id == "simple") {
-
-                if (product?.options.length == 0) {
-
-                    var obj = {
-                        "cartItem": {
-                            "sku": product?.sku,
-                            "qty": 1,
-                            "name": product?.name,
-                            "price": product?.price,
-                            "product_type": "simple",
-                            "quote_id": userData?.user?.cartID
-                        }
-                    }
-                    // console.log("this product does not have options", obj)
-
-                    api.post("carts/mine/items", obj, {
-                        headers: {
-                            Authorization: `Bearer ${userData?.token}`,
-                        },
-                    }).then((response) => {
-                        // console.log("Add to cart Item API response : ", response?.data)
-                    }).catch((err) => {
-                        console.log("Add to cart item api error:  ", err.response)
-                    })
-
-                } else {
-                    console.log("this product has options")
-                    this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                    return alert("Please select a Product Options!")
-                }
-
-            } else {
-                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                return alert("Please select a Product varient color!")
-            }
-
-        }
-
-        else {
-            alert("Please Login to your account first!")
-            this.props.navigation.navigate("Account", { modal: "open" })
-        }
-
-    }
-
-    minusOne = (qty, index) => {
-        var { cartData, cartItems, original, updateCartItems } = this.state
-
-        if (qty > 1) {
-
-            cartItems[index].qty = qty - 1  // for modified List 
-            // original[index].qty = qty - 1  // For update cart API
-            //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
-
-            // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
-            // and index and pick whole object form cartItems to send to update cart API
-            var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
-
-            // a check if id already exist then no need to send it again which can cause duplicates
-            if (check?.item_id !== cartItems[index].item_id) {
-                // console.log("ID PUSHED")
-                updateCartItems.push({ item_id: cartItems[index].item_id, index: index })
-            }
-
-            setImmediate(() => {
-                this.setState({ cartItems, updateCartItems, original })
-            })
-        }
-
-    }
-
-    plusOne = (qty, index) => {
-        var { cartData, cartItems, original, updateCartItems } = this.state
-
-        // increasing quantity
-        cartItems[index].qty = qty + 1  // for modified List 
-        // original[index].qty = qty + 1  // For update cart API
-
-        // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
-        // and index and pick whole object form cartItems to send to update cart API
-        var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
-
-        // a check if id already exist then no need to send it again which can cause duplicates
-        if (check?.item_id !== cartItems[index].item_id) {
-            // console.log("ID PUSHED")
-            updateCartItems.push({ item_id: cartItems[index].item_id, index: index })
-        }
-        //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
-
-        setImmediate(() => {
-            this.setState({ cartItems, updateCartItems, original })
-        })
     }
 
     updateCart = async () => {
@@ -468,6 +412,221 @@ class Cart extends Component {
         }
 
     }
+
+    updateGuestCart = async () => {
+
+        var { updateCartItems, cartItems } = this.state
+        var { userData } = this.props
+        // console.log("working updateCart FUnc")
+        if (updateCartItems.length == 0) {
+            return console.log("working updateCart FUnc")
+        }
+        for (let i = 0; i < updateCartItems.length; i++) {
+            // console.log("updateCartItems OBJ", updateCartItems[i])
+            if (cartItems[updateCartItems[i]?.index]?.item_id == updateCartItems[i]?.item_id) {
+                var obj = { "cartItem": cartItems[updateCartItems[i]?.index] }
+                // delete obj?.cartItem?.item_id;
+                delete obj?.cartItem?.image;
+                delete obj?.cartItem?.subtotal
+                if (cartItems[updateCartItems[i]?.index]?.product_option !== undefined) {
+
+                    for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options.length; u++) {
+                        // console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u])
+                        delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_title
+                        delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_value_name
+                    }
+
+                    if (cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options == undefined) {
+                    } else {
+                        for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options.length; u++) {
+                            // console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u])
+                            delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_title
+                            delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_value_name
+                        }
+
+                    }
+                }
+                // console.log("Final OBJ", cartItems[updateCartItems[i]?.index].product_option?.extension_attributes)
+
+
+                api.post("guest-carts/" + userData?.guestcartkey + "/items", obj, {
+                    headers: {
+                        Authorization: `Bearer ${userData?.admintoken}`,
+                    },
+                }).then((response) => {
+                    // console.log(" Guest Update Cart Item API response : ", response?.data)
+                    if (i == updateCartItems.length - 1) {
+                        setImmediate(() => {
+                            this.setState({
+                                cartItems: [],
+                                cartData: null,
+                                subtotal: 0,
+                                flatrate: 0,
+                                shipping: "",
+                            })
+                        })
+                        this.getGuestCartItems()
+                        // this.getCartItemDetails()
+                    }
+                }).catch((err) => {
+                    console.log("Guest Update Cart item api error:  ", err)
+                })
+
+            }
+        }
+
+    }
+
+    calculateShipping = () => {
+        var { subtotal } = this.state
+
+        //    / console.log("calculateShipping subtotal", subtotal)
+
+        if (subtotal > 150) {
+            this.setState({
+                flatrate: 20,
+                shipping: ""
+            })
+        } else {
+            this.setState({
+                shipping: "free",
+            })
+        }
+
+    }
+
+    fetchIdDataproductLabel = async (id) => {
+        var result = await axios.get(custom_api_url + 'func=product_option_label&id=' + id)
+        return result.data
+    }
+    fetchIdDataOptionLabel = async (id) => {
+        var result = await axios.get(custom_api_url + 'func=option_label&id=' + id)
+        return result.data
+    }
+    fetchIdDataAttributeLabel = async (id) => {
+        var result = await axios.get(custom_api_url + 'func=attribute_label&id=' + id)
+        return result.data
+    }
+
+    getRecommendedProducts = () => {
+        var { userData: { randomproducts } } = this.props
+        setImmediate(() => {
+            this.setState({
+                loaderDot: true
+            })
+        })
+        // console.log("userData Recommended Products", randomproducts)
+        setImmediate(() => {
+            this.setState({
+                randomProducts: randomproducts,
+                loaderDot: false
+            })
+        })
+    }
+
+    // addToCart = (product, index) => {
+
+    //     var { userData } = this.props
+    //     // console.log("userData", userData?.token)
+
+    //     if (userData?.token !== null || userData?.user?.cartID !== undefined) {
+
+    //         if (product?.type_id == "virtual" || product?.type_id == "simple") {
+
+    //             if (product?.options.length == 0) {
+
+    //                 var obj = {
+    //                     "cartItem": {
+    //                         "sku": product?.sku,
+    //                         "qty": 1,
+    //                         "name": product?.name,
+    //                         "price": product?.price,
+    //                         "product_type": "simple",
+    //                         "quote_id": userData?.user?.cartID
+    //                     }
+    //                 }
+    //                 // console.log("this product does not have options", obj)
+
+    //                 api.post("carts/mine/items", obj, {
+    //                     headers: {
+    //                         Authorization: `Bearer ${userData?.token}`,
+    //                     },
+    //                 }).then((response) => {
+    //                     // console.log("Add to cart Item API response : ", response?.data)
+    //                 }).catch((err) => {
+    //                     console.log("Add to cart item api error:  ", err.response)
+    //                 })
+
+    //             } else {
+    //                 console.log("this product has options")
+    //                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+    //                 return alert("Please select a Product Options!")
+    //             }
+
+    //         } else {
+    //             this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+    //             return alert("Please select a Product varient color!")
+    //         }
+
+    //     }
+
+    //     else {
+    //         alert("Please Login to your account first!")
+    //         this.props.navigation.navigate("Account", { modal: "open" })
+    //     }
+
+    // }
+
+    minusOne = (qty, index) => {
+        var { cartData, cartItems, original, updateCartItems } = this.state
+
+        if (qty > 1) {
+
+            cartItems[index].qty = qty - 1  // for modified List 
+            // original[index].qty = qty - 1  // For update cart API
+            //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
+
+            // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
+            // and index and pick whole object form cartItems to send to update cart API
+            var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
+
+            // a check if id already exist then no need to send it again which can cause duplicates
+            if (check?.item_id !== cartItems[index].item_id) {
+                // console.log("ID PUSHED")
+                updateCartItems.push({ item_id: cartItems[index].item_id, index: index })
+            }
+
+            setImmediate(() => {
+                this.setState({ cartItems, updateCartItems, original })
+            })
+        }
+
+    }
+
+    plusOne = (qty, index) => {
+        var { cartData, cartItems, original, updateCartItems } = this.state
+
+        // increasing quantity
+        cartItems[index].qty = qty + 1  // for modified List 
+        // original[index].qty = qty + 1  // For update cart API
+
+        // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
+        // and index and pick whole object form cartItems to send to update cart API
+        var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
+
+        // a check if id already exist then no need to send it again which can cause duplicates
+        if (check?.item_id !== cartItems[index].item_id) {
+            // console.log("ID PUSHED")
+            updateCartItems.push({ item_id: cartItems[index].item_id, index: index })
+        }
+        //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
+
+        setImmediate(() => {
+            this.setState({ cartItems, updateCartItems, original })
+        })
+    }
+
+
 
     openShipping_TaxModal = () => {
         this.setState({
@@ -554,6 +713,9 @@ class Cart extends Component {
         var { userData: { user, admintoken } } = this.props
         // console.log("Product ID:   ", product);
         // console.log("user ID:   ", user?.id);
+        if (Object.keys(user).length == 0) {
+            return alert("Please login to your account!")
+        }
         const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
         // console.log("base64Credentials:   ", base64Credentials);
 
@@ -703,11 +865,11 @@ class Cart extends Component {
                             <View style={{ flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-around" }}>
                                 {/* Update Cart */}
                                 <TouchableOpacity
-                                    onPress={() => this.updateCart()}
+                                    onPress={() => this.isUserLoggedIn("updateCartItem")}
                                     style={styles.updateCartBtn}>
                                     {loader == true ? <ActivityIndicator size={"small"} color="#020621" /> : <Text style={[styles.text_style, { fontSize: 16, color: "white" }]}>Update Cart</Text>}
                                 </TouchableOpacity>
-                                {/* Checkout Button */}
+                                {/* Proceed Button */}
                                 <TouchableOpacity
                                     onPress={() => this.props.navigation.navigate('Billing_Shipping', { subtotal: subtotal, cartItems: cartItems, })}
                                     style={styles.checkout_btn}>
@@ -743,7 +905,7 @@ class Cart extends Component {
     }
 
     render() {
-        var { cartData, loader, randomProducts,hideSummary, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
+        var { cartData, loader, randomProducts, hideSummary, loaderDot, cartItems, calculating, subtotal, flatrate, shipping } = this.state
 
         const ListEmptyComponent = () => {
             return (
@@ -759,7 +921,7 @@ class Cart extends Component {
                         marginTop: 10,
                     }]}>Looks like you have't added anything to your cart</Text>
                     <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate("Categories")}
+                        onPress={() => this.props.navigation.navigate("HomeScreen")}
                         style={styles.continue_shooping_btn}>
                         <Text style={[styles.text_style, { color: "white", fontSize: 16 }]}>Continue Shopping</Text>
                     </TouchableOpacity>
@@ -886,7 +1048,7 @@ class Cart extends Component {
                                     <ActivityIndicator size={"small"} color="#020621" />
                                     : <FontAwesome5 name='pencil-alt' size={18} color='#020621' style={{ padding: 5 }} />}
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => this.deleteCartItem(item?.item)}>
+                            <TouchableOpacity onPress={() => this.isUserLoggedIn("deleteCartItem", item?.item)}>
                                 <Entypo name='cross' size={24} color='#020621' style={{ padding: 5 }} />
                             </TouchableOpacity>
                         </View>

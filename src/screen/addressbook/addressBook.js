@@ -100,8 +100,41 @@ class AddressBook extends Component {
             }
         }
         else {
-            console.log("No credentials found for login")
+            var guestCartKey = await AsyncStorage.getItem("@aljaber_guestCartKey")
+            var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+            if (guestCartKey == null || guestCartID == null) {
+                this.getGuestCartKey()
+            } else {
+
+                //   console.log("Guest Key exists");
+                actions.guestCartKey(guestCartKey)
+                actions.guestCartID(JSON.parse(guestCartID))
+                //   console.log("No credentials found for login")
+            }
         }
+    }
+
+    getGuestCartKey = async () => {
+        var { actions } = this.props
+        await api.post("guest-carts")
+            .then(async (result) => {
+                //   console.log("Guest Cart Key in addressBook.js:", result?.data);
+                var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+                if (guestCartID == null) {
+                    await api.post("guest-carts" + result?.data)
+                        .then((res) => {
+                            // console.log("Guest Cart ID in addressBook.js:", res?.data);
+                            AsyncStorage.setItem("@aljaber_guestCartID", JSON.stringify(res?.data));
+                            AsyncStorage.setItem("@aljaber_guestCartKey", result?.data);
+                            actions.guestCartKey(result?.data)
+                            actions.guestCartID(res?.data)
+                        }).catch((err) => {
+                            console.log("Guest Cart ID in addressBook.js Error:", err);
+                        })
+                }
+            }).catch((err) => {
+                console.log("Guest Cart Key in addressBook.js Error:", err);
+            })
     }
 
     fetchDefaultAddresses = () => {
@@ -298,7 +331,7 @@ class AddressBook extends Component {
                                     <FlatList
                                         data={addresses}
                                         scrollEnabled={false}
-                                        contentContainerStyle={{ marginBottom: 30,paddingBottom:10, }}
+                                        contentContainerStyle={{ marginBottom: 30, paddingBottom: 10, }}
                                         ListEmptyComponent={() => {
                                             return (
                                                 <Text style={{ color: "black" }}>You have no other address entries in your address book.</Text>
@@ -311,7 +344,7 @@ class AddressBook extends Component {
 
                                                         (user?.default_billing == item?.id || user?.default_shipping == item?.id) ?
                                                             <>
-                                                                {index == 0 && <Text style={{ color: "black",fontSize:16,marginTop:10 }}>You have no other address entries in your address book.</Text>}
+                                                                {index == 0 && <Text style={{ color: "black", fontSize: 16, marginTop: 10 }}>You have no other address entries in your address book.</Text>}
                                                             </>
                                                             :
                                                             < View

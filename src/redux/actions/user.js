@@ -1,5 +1,5 @@
 import {
-    LANGUAGE, TOKEN, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
+    LANGUAGE, TOKEN, GUESTCARTKEY, GUESTCARTID, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
     SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES, OFFERS, OFFERSOBJ,
@@ -29,6 +29,18 @@ export function user(userObject) {
     return {
         type: USER,
         payload: userObject
+    }
+}
+export function guestCartKey(key) {
+    return {
+        type: GUESTCARTKEY,
+        payload: key,
+    }
+}
+export function guestCartID(id) {
+    return {
+        type: GUESTCARTID,
+        payload: id,
     }
 }
 export function offersObj(offers) {

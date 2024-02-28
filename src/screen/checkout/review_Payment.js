@@ -151,7 +151,38 @@ class Review_Payment extends Component {
 
     }
     cancelCoupon = () => {
+        // this.setState({
+        //     couponCode: "Null",
+        // })
+        // this.applyCoupon()
+        var { userData: { admintoken, token, user: { cartID } } } = this.props
 
+
+        this.setState({ couponLoader: true })
+
+        console.log("this.state.couponCode", this.state.couponCode)
+        console.log("this.state.cartData?.id", cartID)
+        console.log("admintoken", admintoken)
+
+        // this api should give result in cath error because we are giving "Null" instead of 
+        // couponCode so api gives error but also removes the previously applied coupon
+
+        api.put('carts/' + cartID + '/coupons/' + "Null", {}, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            },
+        }).then((res) => {
+            // console.log("Apply coupon API Result", res?.data)
+            alert("Coupon Removed Successfully")
+            this.createNewSummary()
+            this.setState({ couponLoader: false, couponCode: "" })
+            
+        }).catch((err) => {
+            console.log("Remove coupon API Error", err.response?.data)
+            this.setState({ couponLoader: false , couponCode: "" })
+            this.createNewSummary()
+            alert("Coupon Removed Successfully")
+        })
     }
 
     createNewSummary = () => {

@@ -1,6 +1,8 @@
 export const TOKEN = 'TOKEN';
 export const LANGUAGE = 'LANGUAGE';
 export const USER = 'USER_DATA';
+export const GUESTCARTKEY = 'GUESTCARTKEY';
+export const GUESTCARTID = 'GUESTCARTID';
 export const ADMINTOKEN = 'ADMINTOKEN';
 export const DEFAULTCAT = 'DEFAULTCAT';
 export const CREATEDDEFAULTCAT = 'CREATEDDEFAULTCAT';

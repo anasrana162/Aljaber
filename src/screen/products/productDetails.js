@@ -1346,33 +1346,7 @@ class ProductDetails extends Component {
 
                 if (this.state.custom_options_left.length !== 0 && this.state.custom_options_right.length !== 0) {
                     let check = false;
-                    // for (let l = 0; l < this.state.selectedItemLeft.length; l++) {
-                    //     // var findRight = this.state.selectedItemRight.filter((data) => data?.val?.option_type_id == this.state.selectedItemLeft[l]?.val?.option_type_id)[0]
-                    //     // this.state.selectedItemLeft[l]?.val?.option_type_id == findRight?.val?.option_type_id &&
-                    //     // this.state.selectedItemLeft[l]?.title== findRight?.title
-                    //     // console.log("findRight", findRight)
-                    //     // console.log("this.state.custom_options_left", this.state.custom_options_left)
 
-                    //     for (let r = 0; r < this.state.selectedItemRight.length; r++) {
-
-
-                    //         console.log("this.state.selectedItemLeft[l]?.val", this.state.selectedItemLeft[l]?.val)
-                    //         console.log("this.state.selectedItemRight[l]?.val", this.state.selectedItemRight[r]?.val)
-
-                    //         if (this.state.selectedItemLeft[l]?.val?.option_type_id == this.state.selectedItemRight[r]?.val?.option_type_id) {
-                    //             check = true
-                    //         } else {
-                    //             check = false
-                    //             breaker = true
-                    //             // break;
-                    //         }
-                    //     }
-
-                    //     if(breaker== true){
-                    //         break;
-                    //     }
-
-                    // }
                     for (let l = 0; l < this.state.selectedItemLeft.length; l++) {
                         var findRight = this.state.selectedItemRight.filter((data) => data?.val?.option_type_id == this.state.selectedItemLeft[l]?.val?.option_type_id)[0]
                         // console.log("findRight", findRight)
@@ -1383,9 +1357,7 @@ class ProductDetails extends Component {
                             check = true
                         }
                     }
-                    // const equalValues = (this.state.custom_options_left.length === this.state.custom_options_right.length) &&
-                    //     this.state.custom_options_left.every((value, index) => value.val?.option_type_id === this.state.custom_options_right[index]?.val?.option_type_id);
-                    // console.log("check", check)
+
                     if (check == true
                     ) {
                         obj = {

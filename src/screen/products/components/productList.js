@@ -275,7 +275,7 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
                     flexWrap: (screenName == "Home" || screenName == "Cart") ? null : "wrap",
                     marginBottom: (screenName == "Home" || screenName == "Cart") ? 60 : 320,
                 }]}> */}
-            {console.log("data", data)}
+            {/* {console.log("data", data)} */}
             {data == null || data.length == 0 ?
                 <>{screenName == undefined &&
                     < Text

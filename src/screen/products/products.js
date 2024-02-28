@@ -301,7 +301,7 @@ class Products extends Component {
 
             // offers
             case 72:
-                console.log("OFFERS",offers);
+                console.log("OFFERS", offers);
                 this.createData(offers)
                 break;
 
@@ -1970,6 +1970,70 @@ class Products extends Component {
 
     }
 
+    isUserLoggedIn = (product, index) => {
+        var { userData: { user, } } = this.props
+        if (Object.keys(user).length == 0) {
+            this.addToCartGuest(product, index)
+        } else {
+            this.addToCart(product, index)
+        }
+    }
+
+    addToCartGuest = (product, index) => {
+
+        var { userData } = this.props
+
+        if (userData?.admintoken !== null || userData?.guestcartkey !== null) {
+            // console.log("product",product);
+            // if (product?.type_id == "virtual" || product?.type_id == "simple") {
+
+            //     if (product?.options.length == 0) {
+
+            var obj = {
+                "cartItem": {
+                    "sku": product?.sku,
+                    "qty": 1,
+                    "name": product?.name,
+                    "price": product?.price,
+                    "product_type": "simple",
+                    "quote_id": userData?.guestcartid?.id
+                }
+            }
+            console.log("this product does not have options", obj)
+
+            api.post("guest-carts/" + userData?.guestcartkey + "/items", obj, {
+                headers: {
+                    Authorization: `Bearer ${userData?.admintoken}`,
+                },
+            }).then((response) => {
+                console.log(" Guest Add to cart Item API response : ", response?.data)
+                alert("Product Added to Cart!")
+            }).catch((err) => {
+                alert(err?.response.data.message)
+                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                console.log("Add to cart item api error:  ", err)
+            })
+
+            //     } else {
+            //         console.log("this product has options")
+            //         this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+            //         return alert("Please select a Product Options!")
+            //     }
+
+            // } else {
+            //     // this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+            //     return alert("Please select a Product varient color!")
+            // }
+
+        }
+
+        else {
+            alert("Something Went wrong!")
+            // this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+    }
+
     openDrawer = () => {
         // console.log("drawer opened");
         this.setState({
@@ -2043,7 +2107,7 @@ class Products extends Component {
                     sortBY={(key) => this.sortBy(key)}
                     openFilterBoard={() => this.openFilterBoard()}
                     loaderFilter={this.state.loaderFilter}
-                    addToCart={(product, index) => this.addToCart(product, index)}
+                    addToCart={(product, index) => this.isUserLoggedIn(product, index)}
                     totalProductsLength={this.state.productSkuLength}
                     addToWishList={(id) => this.addToWishList(id)}
                 />
