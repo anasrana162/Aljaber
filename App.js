@@ -319,6 +319,7 @@ class App extends Component {
     else {
       var guestCartKey = await AsyncStorage.getItem("@aljaber_guestCartKey")
       var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+      console.log("kjabnfhjdbsjhfbj   ",guestCartID,"    ",guestCartKey);
       if (guestCartKey == null || guestCartID == null) {
         this.getGuestCartKey()
       } else {

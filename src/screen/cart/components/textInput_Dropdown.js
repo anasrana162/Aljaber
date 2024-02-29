@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import Dropdown from './dropdown';
 
-const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, openDropDown, onChangeText, defaultSelected, dataDropdown, selectItem, }) => {
+const TextInput_Dropdown = ({ type, titleEN, titleAR,style, isModalOpen, purpose, openDropDown, onChangeText, defaultSelected, dataDropdown, selectItem, }) => {
 
     const [countrySelected, setCountrySelected] = useState(defaultSelected)
     const [provinceSelected, setProvinceSelected] = useState(defaultSelected)
@@ -28,7 +28,7 @@ const TextInput_Dropdown = ({ type, titleEN, titleAR, isModalOpen, purpose, open
         }
     }
     return (
-        <View style={styles.mainContainer}>
+        <View style={[styles.mainContainer,style]}>
             <Text style={styles.title}>{titleEN}</Text>
             <View style={styles.boxContainer}>
                 {type == 'txtinp' &&

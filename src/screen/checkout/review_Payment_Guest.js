@@ -22,10 +22,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Entypo from 'react-native-vector-icons/Entypo';
 import Loading from '../../components_reusable/loading';
 import HeaderComp from '../../components_reusable/headerComp';
+import CustomTextInp from './components/CustomTextInp';
+import TextInput_Dropdown from '../cart/components/textInput_Dropdown';
 
-class Review_Payment extends Component {
+class Review_Payment_Guest extends Component {
     constructor(props) {
         super(props);
+        var { userData: { countries } } = this.props
         this.state = {
             isPaymentMethodSelected: false,
             paymentMethodSelected: "",
@@ -38,7 +41,21 @@ class Review_Payment extends Component {
             country_billing_shipping: "",
             openBillingAddresses: false,
             isBillingAddressSelected: false,
-            countries: [],
+            country_id: null,
+            countries: countries == undefined ? [] : countries,
+            countryDDSelected: "",
+            openCountryDD: false,
+            country: null,
+            province: null,
+            firstname: null,
+            lastname: null,
+            email: null,
+            zipcode: null,
+            phone: null,
+            addressLine1: null,
+            addressLine2: null,
+            city: null,
+            region: null,
             selectedBillingAddress: this.props?.route?.params?.bill_ship_address == undefined ? "" : this.props?.route.params.bill_ship_address?.addressInformation?.billing_address,
             confirmBillingAddress: "",
             couponCode: '',
@@ -51,7 +68,6 @@ class Review_Payment extends Component {
     }
 
     componentDidMount = () => {
-        this.getCountries()
         this.checkSummary()
         this.isCouponApplied()
     }
@@ -84,19 +100,6 @@ class Review_Payment extends Component {
 
     }
 
-    getCountries = () => {
-
-        api.get("aljaber/getallcountry").then((result) => {
-            // console.log("Get Country Api Result: ", result?.data)
-            setImmediate(() => {
-                this.setState({ countries: result?.data })
-            })
-        }).catch(err => {
-            console.log("Get Country Api Error: ", err)
-        })
-
-    }
-
     checkSummary = () => {
         let { route: { params: { order_summary, billing_shipping_address, country } }, userData } = this.props
         this.setState({
@@ -109,32 +112,19 @@ class Review_Payment extends Component {
         })
         // console.log("bill_ship_address checkSummary:", bill_ship_address?.addressInformation?.shipping_address);
     }
-    selectBillingAddress = (address) => {
-        console.log("");
-        console.log("address in func", address);
-        console.log("");
-        setImmediate(() => {
-
-            this.setState({
-                selectedBillingAddress: address,
-                openBillingAddresses: false,
-                isBillingAddressSelected: true,
-            })
-        })
-    }
 
     applyCoupon = () => {
-        var { userData: { admintoken, token, user: { cartID } } } = this.props
+        var { userData: { admintoken, token, guestcartid } } = this.props
 
 
         this.setState({ couponLoader: true })
 
-        console.log("this.state.couponCode", this.state.couponCode)
-        console.log("this.state.cartData?.id", cartID)
-        console.log("admintoken", admintoken)
+        // console.log("this.state.couponCode", this.state.couponCode)
+        // console.log("this.state.cartData?.id", guestcartid?.id)
+        // console.log("admintoken", admintoken)
 
 
-        api.put('carts/' + cartID + '/coupons/' + this.state.couponCode, {}, {
+        api.put('carts/' + guestcartid?.id + '/coupons/' + this.state.couponCode, {}, {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
@@ -155,19 +145,19 @@ class Review_Payment extends Component {
         //     couponCode: "Null",
         // })
         // this.applyCoupon()
-        var { userData: { admintoken, token, user: { cartID } } } = this.props
+        var { userData: { admintoken, token, guestcartid } } = this.props
 
 
         this.setState({ couponLoader: true })
 
-        console.log("this.state.couponCode", this.state.couponCode)
-        console.log("this.state.cartData?.id", cartID)
-        console.log("admintoken", admintoken)
+        // console.log("this.state.couponCode", this.state.couponCode)
+        // console.log("this.state.cartData?.id", guestcartid?.id)
+        // console.log("admintoken", admintoken)
 
         // this api should give result in cath error because we are giving "Null" instead of 
         // couponCode so api gives error but also removes the previously applied coupon
 
-        api.put('carts/' + cartID + '/coupons/' + "Null", {}, {
+        api.put('carts/' + guestcartid?.id + '/coupons/' + "Null", {}, {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
@@ -176,28 +166,24 @@ class Review_Payment extends Component {
             alert("Coupon Removed Successfully")
             this.createNewSummary()
             this.setState({ couponLoader: false, couponCode: "" })
-            
+
         }).catch((err) => {
             console.log("Remove coupon API Error", err.response?.data)
-            this.setState({ couponLoader: false , couponCode: "" })
+            this.setState({ couponLoader: false, couponCode: "" })
             this.createNewSummary()
             alert("Coupon Removed Successfully")
         })
     }
 
     createNewSummary = () => {
-        var { userData: { admintoken, token, user: { cartID } } } = this.props
+        var { userData: { admintoken, token, guestcartkey } } = this.props
         this.setState({ loader: true })
-        api.post("carts/mine/shipping-information", this.state.bill_ship_address,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+
+
+        api.post("guest-carts/" + guestcartkey + "/shipping-information", this.state.bill_ship_address)
             .then((res) => {
 
-                console.log("res shipping information API", res?.data)
-
+                console.log("fetch order data review_Payment_Guest:", res?.data);
                 this.setState({
                     order_summary: res?.data,
                     order_summary_original: res?.data,
@@ -209,74 +195,136 @@ class Review_Payment extends Component {
                     loader: false
                 })
                 this.isCouponApplied1()
-                // this.checkSummary()
+
             }).catch((err) => {
                 this.setState({ loader: false })
-                console.log("shipping information API ERR", err)
+                console.log("fetch order data review_Payment_Guest API ERR", err.response.data.message)
             })
+
     }
 
-    onUpdate = () => {
-        var { selectedBillingAddress } = this.state
-        var tempAddress = this.state.bill_ship_address
-        var { userData: { user: { email, firstname, lastname }, token } } = this.props
-        this.setState({ loader: true })
-
-        // console.log("");
-        // console.log("selectedBillingAddress", selectedBillingAddress);
-        // console.log("");
-
-        let obj = {
-
-            "region": selectedBillingAddress?.region?.region,
-            "region_id": selectedBillingAddress?.region.region_id,
-            "region_code": selectedBillingAddress?.region?.region_code,
-            "country_id": selectedBillingAddress?.country_id,
-            "street": selectedBillingAddress?.street,
-            "postcode": selectedBillingAddress?.postcode,
-            "city": selectedBillingAddress?.city,
-            "email": email,
-            "firstname": firstname,
-            "lastname": lastname,
-            "telephone": selectedBillingAddress?.telephone
-
+    onChangeText = (txt, key) => {
+        switch (key) {
+            case "email":
+                setImmediate(() => {
+                    this.setState({ email: txt });
+                })
+                break;
+            case "firstname":
+                setImmediate(() => {
+                    this.setState({ firstname: txt });
+                })
+                break;
+            case "lastname":
+                setImmediate(() => {
+                    this.setState({ lastname: txt });
+                })
+                break;
+            case "phone":
+                setImmediate(() => {
+                    this.setState({ phone: txt });
+                })
+                break;
+            case "country":
+                setImmediate(() => {
+                    this.setState({ country: txt });
+                })
+                break;
+            case "province":
+                setImmediate(() => {
+                    this.setState({ province: txt });
+                })
+                break;
+            case "addressLine1":
+                setImmediate(() => {
+                    this.setState({ addressLine1: txt });
+                })
+                break;
+            case "addressLine2":
+                setImmediate(() => {
+                    this.setState({ addressLine2: txt });
+                })
+                break;
+            case "city":
+                setImmediate(() => {
+                    this.setState({ city: txt });
+                })
+                break;
+            case "zip_code":
+                setImmediate(() => {
+                    this.setState({ zipcode: txt });
+                })
+                break;
         }
+    }
 
-        tempAddress.addressInformation.billing_address = obj
+    openDropDowns = (key) => {
+        switch (key) {
+            case "country":
+                this.setState({ openCountryDD: !this.state.openCountryDD })
+                break;
+        }
+    }
 
-        // console.log("");
-        // console.log("tempAddress", tempAddress);
-        // console.log("");
+    selectItem = (val, key) => {
+        console.log("country selected", val);
 
-        api.post("carts/mine/shipping-information", tempAddress,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
-            .then((res) => {
-
-                console.log("res shipping information API onUpdate review_payment", res?.data)
+        switch (key) {
+            case "country":
 
                 this.setState({
-                    order_summary: res?.data,
-                    // order_summary_original: res?.data,
-                    bill_ship_address: this.state.bill_ship_address,
-                    selectedBillingAddress: selectedBillingAddress,
-                    isBillingAddressSelected: false,
-                    // original_ship_bill_address: this.state.bill_ship_address,
-                    // country_billing_shipping: country,
-                    // updateBillingAddress: false,
-                    key: this.state.key + 1,
-                    loader: false
+                    country: val?.country,
+                    country_id: val?.country_id,
+                    countryDDSelected: val,
+                    openCountryDD: !this.state.openCountryDD
                 })
+        }
+    }
 
-                // this.checkSummary()
-            }).catch((err) => {
-                this.setState({ loader: false, })
-                console.log("shipping information API ERR", err.response)
-            })
+    checkInputFeilds = () => {
+        var { city, country_id, country, province, zipcode, phone, email, addressLine1, addressLine2, firstname, lastname } = this.state
+        // if (email == null) {
+        //     console.log("email");
+        //     return true
+        // }
+        if (firstname == null) {
+            console.log("firstname");
+            return true
+        }
+        if (lastname == null) {
+            console.log("lastname");
+            return true
+        }
+        if (phone == null) {
+            console.log("phone");
+            return true
+        }
+        if (addressLine1 == null) {
+            console.log("addressLIne1");
+            return true
+        }
+        if (country == null) {
+            console.log("country");
+            return true
+        }
+        if (country_id == null) {
+            console.log("country_id");
+            return true
+        }
+        if (province == null) {
+            console.log("province");
+            return true
+        }
+        if (zipcode == null) {
+            console.log("zipcode");
+            return true
+        }
+        if (city == null) {
+            console.log("city");
+            return true
+        }
 
+        return false
     }
 
     onDeselect = () => {
@@ -287,6 +335,7 @@ class Review_Payment extends Component {
         // setTimeout(() => {
         this.setState({
             bill_ship_address,
+            billingUpdated: false,
             selectedBillingAddress: billing_shipping_address?.addressInformation?.shipping_address,
             key: this.state.key + 1
         })
@@ -294,59 +343,115 @@ class Review_Payment extends Component {
         // console.log("bill_ship_address shipping Address BEFORE UPDATE", this.state.selectedBillingAddress)
     }
 
+    onUpdate = () => {
+        var { city, country_id, country, province, zipcode, phone, email, addressLine1, addressLine2, firstname, lastname } = this.state
+        var tempAddress = this.state.bill_ship_address
+        var { userData: { guestcartkey } } = this.props
+        this.setState({ loader: true })
+
+        // console.log("");
+        // console.log("selectedBillingAddress", selectedBillingAddress);
+        // console.log("");
+
+        const check = this.checkInputFeilds()
+
+        if (check == true) {
+            this.setState({ loader: false });
+            return alert("Please fill all feilds!");
+        }
+
+        let obj = {
+
+            "region": province,
+            "region_id": 509,
+            "region_code": province,
+            "country_id": country_id,
+            "street": [addressLine1, addressLine2],
+            "postcode": zipcode,
+            "city": city,
+            "email": tempAddress.addressInformation.billing_address?.email,
+            "firstname": firstname,
+            "lastname": lastname,
+            "telephone": phone
+
+        }
+
+        tempAddress.addressInformation.billing_address = obj
+
+        // console.log("");
+        // console.log("tempAddress", tempAddress);
+        // console.log("");
+
+        api.post("guest-carts/" + guestcartkey + "/shipping-information", tempAddress)
+            .then((res) => {
+
+                console.log("res shipping information API onUpdate review_payment_guest", res?.data)
+
+                this.setState({
+                    order_summary: res?.data,
+                    bill_ship_address: this.state.bill_ship_address,
+                    billingUpdated: true,
+                    selectedBillingAddress: obj,
+                    isBillingAddressSelected: false,
+                    // isBillShipSame: !this.state.isBillShipSame,
+                    key: this.state.key + 1,
+                    loader: false
+                })
+
+                // this.checkSummary()
+            }).catch((err) => {
+                this.setState({ loader: false, })
+                console.log("review_payment_guest shipping information API ERR", err)
+            })
+
+    }
+
     placeOrder = () => {
-        var { userData: { token }, actions } = this.props
-        console.log("Payment Method", this.state.paymentMethodSelected);
-        console.log("token", token);
+        var { userData: { guestcartkey, admintoken }, actions } = this.props
+        console.log("Payment Method",  this.state.paymentMethodSelected);
+        // console.log("token", token);
+        if(this.state.paymentMethodSelected == ""){
+            return (alert("Select a Payment method"))
+        }
         this.setState({ loader: true })
         let obj = {
+            "email": this.state.bill_ship_address.addressInformation.billing_address?.email,
             "paymentMethod": {
                 "method": this.state.paymentMethodSelected
             }
         }
-        api.post("carts/mine/payment-information", obj,
+        api.post("guest-carts/" + guestcartkey + "/payment-information", obj,
             {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${admintoken}`,
                 },
             })
             .then((res) => {
 
-                console.log("res Create Order API", res?.data)
+                console.log("res Guest Create Order API", res?.data)
                 alert("Order Created!")
                 setTimeout(() => {
-                    // console.log("Actions Redex", actions)
-                    // actions.userToken("")
-                    // actions.adminToken("")
-                    // actions.user("")
-                    // actions.myOrders("")
                     actions.cartItems(null)
+                    actions.guestCartKey(null)
+                    actions.guestCartID(null)
+                    AsyncStorage.removeItem("@aljaber_guestCartKey")
+                    AsyncStorage.removeItem("@aljaber_guestCartID")
                     AsyncStorage.setItem("@aljaber_userLoginData", "")
                 }, 1000)
-
                 this.props.navigation.navigate("HomeScreen")
                 // this.setState({ loader: false })
 
             }).catch((err) => {
                 this.setState({ loader: false })
-                console.log("Create Order API ERR", err.response.data.message)
+                console.log("Create Guest Order API ERR", err.response.data.message)
             })
 
     }
 
-    componentWillUnmount = () => {
-        this.setState({ loader: false })
-    }
-
-
-
 
     render() {
-
-        var { userData } = this.props
         var { order_summary, bill_ship_address, selectedBillingAddress } = this.state
-        // console.log("Order Summary from Params:", selectedBillingAddress)
-
+        // console.log( this.state.bill_ship_address?.addressInformation?.shipping_address);
         return (
             <View key={this.state.key} style={styles.mainContainer}>
                 <View style={styles.header_comp}>
@@ -464,53 +569,160 @@ class Review_Payment extends Component {
                                                         {/* userData?.user?.addresses */}
                                                         {/* When payment method is selected and Billing And Shipping address are not same */}
 
-                                                        <TouchableOpacity
-                                                            onPress={() => this.setState({ openBillingAddresses: !this.state.openBillingAddresses })}
-                                                            style={styles.billingAddressOptionCont}>
-                                                            <Text numberOfLines={1} style={[styles.billingAddressText, { marginTop: 0, color: "black", marginLeft: 10, }]}>{this.state.selectedBillingAddress?.firstname} {this.state.selectedBillingAddress?.lastname}, {this.state.selectedBillingAddress?.street[0]}, {this.state.selectedBillingAddress?.city}, {this.state.selectedBillingAddress?.postcode}</Text>
-                                                        </TouchableOpacity>
-                                                        {this.state.openBillingAddresses == true &&
-                                                            < View style={styles.billingAddressListMainCont}>
-                                                                {userData?.user?.addresses.map((item, index) => {
-                                                                    console.log("item in map", item)
-                                                                    var country = this.state.countries.filter((data) => data?.country_id == item?.country_id)[0]
-                                                                    return (
-                                                                        <TouchableOpacity
-                                                                            onPress={() => this.selectBillingAddress(item)}
-                                                                            style={styles.billingAddressListItemCont}>
-                                                                            <Text numberOfLines={3} style={styles.billingAddressText}>{item?.firstname} {item?.lastname}, {item.street[0]}, {item?.city}, {item?.postcode},
-                                                                                {" "}{country?.country}, {item?.telephone}</Text>
-                                                                        </TouchableOpacity>
-                                                                    )
-                                                                })}
-                                                            </View>
-                                                        }
-                                                        {
-                                                            this.state.isBillingAddressSelected &&
-                                                            <View style={{ flexDirection: "row", columnGap: 10 }}>
+                                                        {/* Email */}
+                                                        {/* <CustomTextInp
+                                                            // value={this.state.firstname}
+                                                            titleEN={"Email *"}
+                                                            onChangeText={(txt) => this.onChangeText(txt, "email")}
+                                                            style={{ width: width - 180, alignSelf: "flex-start", marginTop: 20 }}
+                                                        /> */}
 
-                                                                <TouchableOpacity
-                                                                    onPress={() => this.onDeselect()}
-                                                                    style={[styles.updateBtn, { backgroundColor: "white", borderWidth: 1 }]}>
-                                                                    {
-                                                                        this.state?.updateBillingAddress ?
-                                                                            <ActivityIndicator size={"small"} color="#ffffff" />
+                                                        {
+                                                            this.state.billingUpdated ?
+                                                                <View style={{ alignSelf: "flex-start", marginLeft: 30 }}>
+                                                                    {/* When payment method is selected and Billing And Shipping address are same */}
+
+                                                                    {/* First and Last Name */}
+                                                                    <Text style={styles.billingAddressText}>
+                                                                        {selectedBillingAddress?.firstname} {selectedBillingAddress?.lastname}
+                                                                    </Text>
+                                                                    {/* Location */}
+                                                                    <Text style={styles.billingAddressText}>
+                                                                        {selectedBillingAddress?.street[0] == undefined ?
+                                                                            ""
                                                                             :
-                                                                            <Text style={{ fontSize: 16, fontWeight: "600", color: "black" }}>Cancel</Text>
-                                                                    }
-                                                                </TouchableOpacity>
-                                                                <TouchableOpacity
-                                                                    onPress={() => this.onUpdate()}
-                                                                    style={styles.updateBtn}>
-                                                                    {
-                                                                        this.state?.updateBillingAddress ?
-                                                                            <ActivityIndicator size={"small"} color="#ffffff" />
-                                                                            :
-                                                                            <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>Update</Text>
-                                                                    }
-                                                                </TouchableOpacity>
-                                                            </View>
+                                                                            selectedBillingAddress?.street[0]
+                                                                        }
+                                                                    </Text>
+                                                                    {/* City and Postal Code */}
+                                                                    <Text style={styles.billingAddressText}>
+                                                                        {selectedBillingAddress?.city},  {selectedBillingAddress?.postcode}
+                                                                    </Text>
+                                                                    {/* Country */}
+                                                                    <Text style={styles.billingAddressText}>
+                                                                        {this.state.country_billing_shipping}
+                                                                    </Text>
+                                                                    {/* Telephone */}
+                                                                    <Text style={[styles.billingAddressText, { marginBottom: 10, }]}>
+                                                                        {selectedBillingAddress?.telephone}
+                                                                    </Text>
+                                                                </View>
+                                                                :
+                                                                <>
+
+                                                                    {/* First Name */}
+                                                                    <CustomTextInp
+                                                                        // value={this.state.firstname}
+                                                                        titleEN={" First Name*"}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "firstname")}
+                                                                        style={{ width: width - 180, alignSelf: "flex-start", marginTop: 20 }}
+                                                                    />
+
+                                                                    {/* Last Name */}
+                                                                    <CustomTextInp
+                                                                        // value={this.state.lastname}
+                                                                        titleEN={" Last Name*"}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "lastname")}
+                                                                        style={{ width: width - 180, alignSelf: "flex-start" }}
+                                                                    />
+
+                                                                    {/* Phone Number */}
+                                                                    <CustomTextInp
+                                                                        // value={this.state.phone}
+                                                                        titleEN={"Phone*"}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "phone")}
+                                                                        style={{ width: width - 180, alignSelf: "flex-start" }}
+                                                                    />
+
+                                                                    <Text style={[styles.title, { alignSelf: "flex-start" }]}>Address</Text>
+
+                                                                    <Text style={[styles.title, { marginTop: 10, color: "black", alignSelf: "flex-start" }]}>Street Address*</Text>
+                                                                    {/* Street Address Line1 */}
+                                                                    <CustomTextInp
+                                                                        // value={this.state.street1}
+                                                                        titleEN={"Street Address: Line 1 *"}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "addressLine1")}
+                                                                        style={{ width: width - 60, alignSelf: "flex-start" }}
+                                                                    />
+
+                                                                    {/* Street Address Line2 */}
+                                                                    <CustomTextInp
+                                                                        // titleEN={"Street Address: Line 1 *"}
+                                                                        // value={this.state.street2}
+                                                                        // style={{  }}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "addressLine2")}
+                                                                        style={{ width: width - 60, alignSelf: "flex-start", marginTop: -3 }}
+                                                                    />
+
+                                                                    {/* Country */}
+                                                                    <TextInput_Dropdown
+                                                                        dataDropdown={this.state.countries}
+                                                                        titleEN={"Country *"}
+                                                                        titleAR={""}
+                                                                        type={"dropdown"}
+                                                                        defaultSelected={""}
+                                                                        purpose={"country"}
+                                                                        isModalOpen={this.state.openCountryDD}
+                                                                        openDropDown={() => this.openDropDowns("country")}
+                                                                        selectItem={(val) => this.selectItem(val, "country")}
+                                                                        style={{ width: width - 180, alignSelf: "flex-start" }}
+                                                                    />
+
+                                                                    {/* Province */}
+                                                                    <CustomTextInp
+                                                                        // value={this.state.province}
+                                                                        titleEN={"State / Province *"}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "province")}
+                                                                        style={{ width: width - 180, alignSelf: "flex-start" }}
+                                                                    />
+
+                                                                    {/* City */}
+                                                                    <CustomTextInp
+                                                                        // value={this.state.city}
+                                                                        titleEN={"City *"}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "city")}
+                                                                        style={{ width: width - 180, alignSelf: "flex-start" }}
+                                                                    />
+
+                                                                    {/* ZIP/POSTAL CODE */}
+                                                                    <CustomTextInp
+                                                                        // value={this.state.zipcode}
+                                                                        keyboardType={"numeric"}
+                                                                        titleEN={"Zip / Postal Code *"}
+                                                                        onChangeText={(txt) => this.onChangeText(txt, "zip_code")}
+                                                                        style={{ width: width - 180, alignSelf: "flex-start" }}
+                                                                    />
+
+
+                                                                    <View style={{ flexDirection: "row", columnGap: 10 }}>
+
+                                                                        <TouchableOpacity
+                                                                            onPress={() => {
+                                                                                this.setState({ isBillShipSame: !this.state.isBillShipSame, })
+                                                                                this.onDeselect()
+                                                                            }}
+                                                                            style={[styles.updateBtn, { backgroundColor: "white", borderWidth: 1 }]}>
+                                                                            {
+                                                                                this.state?.updateBillingAddress ?
+                                                                                    <ActivityIndicator size={"small"} color="#ffffff" />
+                                                                                    :
+                                                                                    <Text style={{ fontSize: 16, fontWeight: "600", color: "black" }}>Cancel</Text>
+                                                                            }
+                                                                        </TouchableOpacity>
+                                                                        <TouchableOpacity
+                                                                            onPress={() => this.onUpdate()}
+                                                                            style={styles.updateBtn}>
+                                                                            {
+                                                                                this.state?.updateBillingAddress ?
+                                                                                    <ActivityIndicator size={"small"} color="#ffffff" />
+                                                                                    :
+                                                                                    <Text style={{ fontSize: 16, fontWeight: "600", color: "white" }}>Update</Text>
+                                                                            }
+                                                                        </TouchableOpacity>
+                                                                    </View>
+                                                                </>
                                                         }
+
 
 
 
@@ -713,6 +925,7 @@ class Review_Payment extends Component {
         )
     }
 }
+
 {/* {---------------redux State ------------} */ }
 const mapStateToProps = state => ({
     userData: state.userData
@@ -728,7 +941,7 @@ const mapDispatchToProps = dispatch => ({
     actions: bindActionCreators(ActionCreators, dispatch),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Review_Payment);
+export default connect(mapStateToProps, mapDispatchToProps)(Review_Payment_Guest);
 
 const styles = StyleSheet.create({
     mainContainer: {
@@ -738,6 +951,13 @@ const styles = StyleSheet.create({
         width: width,
         height: height,
         backgroundColor: "white"
+    },
+    title: {
+        fontWeight: "500",
+        color: "#08c",
+        fontSize: 18,
+        marginTop: 30,
+        alignItems: "flex-start",
     },
     inner_main: {
         width: width - 40,

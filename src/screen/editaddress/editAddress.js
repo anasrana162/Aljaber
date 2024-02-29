@@ -216,39 +216,39 @@ class EditAddress extends Component {
             var guestCartKey = await AsyncStorage.getItem("@aljaber_guestCartKey")
             var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
             if (guestCartKey == null || guestCartID == null) {
-              this.getGuestCartKey()
+                this.getGuestCartKey()
             } else {
-      
-            //   console.log("Guest Key exists");
-            actions.guestCartKey(guestCartKey)
-            actions.guestCartID(JSON.parse(guestCartID))
-            //   console.log("No credentials found for login")
+
+                //   console.log("Guest Key exists");
+                actions.guestCartKey(guestCartKey)
+                actions.guestCartID(JSON.parse(guestCartID))
+                //   console.log("No credentials found for login")
             }
-          }
         }
-      
-        getGuestCartKey = async () => {
-          var { actions } = this.props
-          await api.post("guest-carts")
+    }
+
+    getGuestCartKey = async () => {
+        var { actions } = this.props
+        await api.post("guest-carts")
             .then(async (result) => {
-            //   console.log("Guest Cart Key in editAddress.js:", result?.data);
-              var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
-              if (guestCartID == null) {
-                await api.post("guest-carts" + result?.data)
-                  .then((res) => {
-                    // console.log("Guest Cart ID in editAddress.js:", res?.data);
-                    AsyncStorage.setItem("@aljaber_guestCartID", JSON.stringify(res?.data));
-                    AsyncStorage.setItem("@aljaber_guestCartKey", result?.data);
-                    actions.guestCartKey(result?.data)
-                    actions.guestCartID(res?.data)
-                  }).catch((err) => {
-                    console.log("Guest Cart ID in editAddress.js Error:", err);
-                  })
-              }
+                //   console.log("Guest Cart Key in editAddress.js:", result?.data);
+                var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
+                if (guestCartID == null) {
+                    await api.post("guest-carts" + result?.data)
+                        .then((res) => {
+                            // console.log("Guest Cart ID in editAddress.js:", res?.data);
+                            AsyncStorage.setItem("@aljaber_guestCartID", JSON.stringify(res?.data));
+                            AsyncStorage.setItem("@aljaber_guestCartKey", result?.data);
+                            actions.guestCartKey(result?.data)
+                            actions.guestCartID(res?.data)
+                        }).catch((err) => {
+                            console.log("Guest Cart ID in editAddress.js Error:", err);
+                        })
+                }
             }).catch((err) => {
-              console.log("Guest Cart Key in editAddress.js Error:", err);
+                console.log("Guest Cart Key in editAddress.js Error:", err);
             })
-        }
+    }
 
     render() {
 

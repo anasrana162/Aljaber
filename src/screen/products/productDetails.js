@@ -69,7 +69,7 @@ class ProductDetails extends Component {
             rightEyeQuantity: 1,
             more_info_loader: false,
             refreshing: false,
-            drawer:false,
+            drawer: false,
         };
     }
 
@@ -945,18 +945,18 @@ class ProductDetails extends Component {
 
     plusOne = () => {
         var { product_details: { extension_attributes: { stock_item } }, quantity } = this.state
-        var qty = stock_item?.qty
+        // var qty = stock_item?.qty
         // console.log("qty", qty, " ", quantity)
-        if (quantity <= qty) {
+        // if (quantity <= qty) {
             quantity = quantity + 1
             setImmediate(() => {
                 this.setState({
                     quantity
                 })
             })
-        } else {
-            console.log("Quantity Exceeded Maximum limit")
-        }
+        // } else {
+        //     console.log("Quantity Exceeded Maximum limit")
+        // }
 
     }
 
@@ -1313,6 +1313,207 @@ class ProductDetails extends Component {
         }, 1000)
     }
 
+    isUserLoggedIn = (product, index) => {
+        var { userData: { user, } } = this.props
+        if (Object.keys(user).length == 0) {
+            this.addToCartGuest(product, index)
+        } else {
+            this.addToCart(product, index)
+        }
+    }
+
+    addToCartGuest = (product, index) => {
+
+        var { userData: { admintoken, guestcartkey, guestcartid } } = this.props
+
+        setImmediate(() => {
+            this.setState({ loader: true })
+        })
+
+        if (admintoken !== null || guestcartkey !== null) {
+
+            // if product selected doesn't have options
+            if (this.state.product_details?.options?.length == 0) {
+
+                let obj = {
+                    "cartItem": {
+                        "sku": product?.sku,
+                        "qty": this.state.quantity,
+                        "name": product?.name,
+                        "price": product?.price,
+                        "product_type": product?.type_id == undefined ? product?.type : product?.type_id,
+                        "quote_id": guestcartid?.id
+                    }
+                }
+                // console.log("this product does not have options", obj)
+
+                this.addToCartGuestApi(obj)
+
+            } else {
+
+                // if product selected have options
+
+                let obj = {}
+                // console.log("this.state.checked", typeof this.state.checked)
+                if (this.state.checked == true) {
+                    let breaker = false
+                    // console.log("Reached Here", this.state.custom_options_left.length, " ", this.state.custom_options_right.length)
+
+                    if (this.state.custom_options_left.length !== 0 && this.state.custom_options_right.length !== 0) {
+                        let check = false;
+
+                        for (let l = 0; l < this.state.selectedItemLeft.length; l++) {
+                            var findRight = this.state.selectedItemRight.filter((data) => data?.val?.option_type_id == this.state.selectedItemLeft[l]?.val?.option_type_id)[0]
+                            // console.log("findRight", findRight)
+                            if (findRight == undefined) {
+                                check = false
+                                break;
+                            } else {
+                                check = true
+                            }
+                        }
+
+                        if (check == true
+                        ) {
+                            obj = {
+                                "cartItem": {
+                                    "sku": product?.sku,
+                                    "qty": this.state.leftEyeQuantity + this.state.rightEyeQuantity,
+                                    "name": product?.name,
+                                    "price": product?.price,
+                                    "product_type": product?.type_id == undefined ? product?.type : product?.type_id,
+                                    "quote_id": guestcartid?.id,
+                                    "product_option": {
+                                        "extension_attributes": {
+                                            "custom_options": this.state.custom_options_left,
+                                            "configurable_item_options": this.state.configurable_item_options
+                                        }
+                                    }
+                                }
+                            }
+                            console.log("obj for left and right have same values", obj?.cartItem)
+                            this.addToCartGuestApi(obj)
+                            // break;
+                        }
+                        else {
+
+                            obj = {
+                                "cartItem": {
+                                    "sku": product?.sku,
+                                    "qty": this.state.leftEyeQuantity,
+                                    "name": product?.name,
+                                    "price": product?.price,
+                                    "product_type": product?.type_id == undefined ? product?.type : product?.type_id,
+                                    "quote_id": guestcartid?.id,
+                                    "product_option": {
+                                        "extension_attributes": {
+                                            "custom_options": this.state.custom_options_left,
+                                            "configurable_item_options": this.state.configurable_item_options
+                                        }
+                                    }
+                                }
+                            }
+                            // console.log("obj for left", obj?.cartItem)
+                            // console.log("obj for left", obj?.cartItem?.product_option?.extension_attributes)
+
+                            this.addToCartGuestApi(obj)
+
+                            obj = {
+                                "cartItem": {
+                                    "sku": product?.sku,
+                                    "qty": this.state.rightEyeQuantity,
+                                    "name": product?.name,
+                                    "price": product?.price,
+                                    "product_type": product?.type_id == undefined ? product?.type : product?.type_id,
+                                    "quote_id": guestcartid?.id,
+                                    "product_option": {
+                                        "extension_attributes": {
+                                            "custom_options": this.state.custom_options_right,
+                                            "configurable_item_options": this.state.configurable_item_options
+                                        }
+                                    }
+                                }
+                            }
+                            // console.log("obj for right", obj?.cartItem)
+                            // console.log("obj for right", obj?.cartItem?.product_option?.extension_attributes)
+
+                            this.addToCartGuestApi(obj)
+                        }
+                    } else {
+                        alert("Please Select Values for Left and Right Eye")
+                    }
+
+                } else {
+                    if (this.state.custom_options.length !== 0) {
+
+                        obj = {
+                            "cartItem": {
+                                "sku": product?.sku,
+                                "qty": this.state.quantity,
+                                "name": product?.name,
+                                "price": product?.price,
+                                "product_type": product?.type_id == undefined ? product?.type : product?.type_id,
+                                "quote_id":guestcartid?.id,
+                                "product_option": {
+                                    "extension_attributes": {
+                                        "custom_options": this.state.custom_options,
+                                        "configurable_item_options": this.state.configurable_item_options
+                                    }
+                                }
+                            }
+                        }
+
+                        // console.log("when checked false  obj", obj?.cartItem?.product_option?.extension_attributes)
+                        this.addToCartGuestApi(obj)
+                    } else {
+                        setImmediate(() => {
+                            this.setState({
+                                loader: false,
+                            })
+                        })
+                        alert("Select Options for Product")
+                    }
+
+                }
+
+
+            }
+
+        } else {
+            console.log("addToCartGuest productDetails cart key or token is invalid or null");
+        }
+
+
+
+    }
+    addToCartGuestApi = async (obj) => {
+        var { userData } = this.props
+
+        api.post("guest-carts/" + userData?.guestcartkey + "/items", obj, {
+            headers: {
+                Authorization: `Bearer ${userData?.admintoken}`,
+            },
+        }).then((response) => {
+            console.log(" addToCartGuestApi productDetails Item API response : ", response?.data)
+            alert("Product Added to Cart!")
+            setImmediate(() => {
+                this.setState({
+                    cartLoader: false,
+                    loader: false
+                })
+            })
+        }).catch((err) => {
+            alert(err?.response?.data?.message)
+            console.log("addToCartGuestApi productDetails api error:  ", err.response)
+            setImmediate(() => {
+                this.setState({
+                    cartLoader: false,
+                    loader: false
+                })
+            })
+        })
+
+    }
     addToCart = (product, index) => {
 
         var { userData: { token, user: { cartID } } } = this.props
@@ -1468,18 +1669,6 @@ class ProductDetails extends Component {
     }
 
     addToCartApi = async (obj) => {
-        // console.log("")
-        // console.log('')
-        // console.log("---------------------------------------")
-        // console.log("Before Going to API in FUnc")
-        // console.log("")
-        // console.log("this product does have options ", obj)
-        // console.log("")
-        // console.log("obj extension_attributes", obj?.cartItem?.product_option?.extension_attributes)
-        // console.log("")
-        // console.log("---------------------------------------")
-        // console.log("")
-        // console.log('')
         var { userData } = this.props
         await api.post("carts/mine/items", obj, {
             headers: {
@@ -1487,23 +1676,10 @@ class ProductDetails extends Component {
             },
         }).then((response) => {
             alert("Product Added to Cart")
-            // console.log("")
-            // console.log("---------------------------------------")
-            // console.log("")
-            // console.log("API RESPONSE")
-            // console.log('')
-            // console.log("Add to cart Item API response : ", response?.data)
-            // console.log("")
-            // console.log("---------------------------------------")
-            // console.log("")
-            // console.log('')
             setImmediate(() => {
                 this.setState({
                     cartLoader: false,
                     loader: false
-                    // custom_options: [],
-                    // custom_options_left: [],
-                    // custom_options_right: []
                 })
             })
 
@@ -1599,7 +1775,7 @@ class ProductDetails extends Component {
             <View style={styles.mainContainer}>
                 {this.state.loader && <Loading />}
                 {/* Header */}
-                <HomeHeader navProps={this.props.navigation}   openDrawer={() => this.openDrawer()} />
+                <HomeHeader navProps={this.props.navigation} openDrawer={() => this.openDrawer()} />
 
                 <Drawer
                     props={this.props}
@@ -1696,7 +1872,7 @@ class ProductDetails extends Component {
 
                             {/* Add to Cart */}
                             <TouchableOpacity
-                                onPress={() => this.addToCart(product_details, product_index)}
+                                onPress={() => this.isUserLoggedIn(product_details, product_index)}
                                 style={styles.add_to_cart}
                             >
                                 {

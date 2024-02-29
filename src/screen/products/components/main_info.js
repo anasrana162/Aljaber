@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View,Dimensions } from 'react-native'
 import React from 'react'
-
+const width = Dimensions.get("screen").width
 const Main_Info = ({ data }) => {
     return (
         <View style={styles.mainContainer}>
@@ -245,14 +245,16 @@ const styles = StyleSheet.create({
         width: "100%",
         justifyContent: "center",
         alignItems: "flex-start",
-        marginTop: 20
+        marginTop: 20,
+        // backgroundColor:"red"
     },
     inner_main: {
         width: "100%",
+        // backgroundColor:"green",
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "flex-start",
-        marginLeft: 10,
+        justifyContent: "space-around",
+        // marginLeft: 10,
         marginTop: 10,
     },
     divide_view: {

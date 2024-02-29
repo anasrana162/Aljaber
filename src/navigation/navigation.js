@@ -13,6 +13,8 @@ import Contact_us from '../screen/account/contact_us';
 import Cart from '../screen/cart/cart';
 import Search from '../screen/search/search';
 import Billing_Shipping from '../screen/checkout/billing_Shipping';
+import Billing_Shipping_Guest from '../screen/checkout/billing_Shipping_Guest';
+import Review_Payment_Guest from '../screen/checkout/review_Payment_Guest';
 import Review_Payment from '../screen/checkout/review_Payment';
 import Order_Details from '../screen/account/orders_details';
 import ChangeUserData from '../screen/account/changeUserData';
@@ -42,6 +44,8 @@ export default class Navigation extends Component {
                     <Stack.Screen name="Wishlist" component={Wishlist} />
                     <Stack.Screen name="Billing_Shipping" component={Billing_Shipping} />
                     <Stack.Screen name="Review_Payment" component={Review_Payment} />
+                    <Stack.Screen name="Billing_Shipping_Guest" component={Billing_Shipping_Guest} />
+                    <Stack.Screen name="Review_Payment_Guest" component={Review_Payment_Guest} />
                     <Stack.Screen name="Search" component={Search} />
                     <Stack.Screen name="Account" component={Account} />
                     <Stack.Screen name="AddressBook" component={AddressBook} />

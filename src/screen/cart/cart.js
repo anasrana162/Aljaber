@@ -78,6 +78,10 @@ class Cart extends Component {
                 case "updateCartItem":
                     this.updateGuestCart()
                     break
+
+                case "proceed":
+                    this.props.navigation.navigate('Billing_Shipping_Guest', { subtotal: this.state.subtotal, cartItems: this.state.cartItems, })
+                    break;
             }
         } else {
             // if user is logged in 
@@ -89,11 +93,15 @@ class Cart extends Component {
 
                 case "deleteCartItem":
                     this.deleteCartItem(delete_cart_item_product)
-                    break
+                    break;
 
                 case "updateCartItem":
                     this.updateCart()
-                    break
+                    break;
+
+                case "proceed":
+                    this.props.navigation.navigate('Billing_Shipping', { subtotal: this.state.subtotal, cartItems: this.state.cartItems, })
+                    break;
             }
 
         }
@@ -871,7 +879,7 @@ class Cart extends Component {
                                 </TouchableOpacity>
                                 {/* Proceed Button */}
                                 <TouchableOpacity
-                                    onPress={() => this.props.navigation.navigate('Billing_Shipping', { subtotal: subtotal, cartItems: cartItems, })}
+                                    onPress={() => this.isUserLoggedIn("proceed")}
                                     style={styles.checkout_btn}>
                                     <Text style={[styles.text_style, { fontSize: 16, color: "white", fontWeight: "600" }]}>Proceed</Text>
                                 </TouchableOpacity>

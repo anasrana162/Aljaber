@@ -662,9 +662,9 @@ class HomeScreen extends Component {
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
-            if (product?.type_id == "virtual" || product?.type_id == "simple") {
+            // if (product?.type_id == "virtual" || product?.type_id == "simple") {
 
-                if (product?.options.length == 0) {
+                // if (product?.options.length == 0) {
 
                     var obj = {
                         "cartItem": {
@@ -686,19 +686,21 @@ class HomeScreen extends Component {
                         console.log("Add to cart Item API response : ", response?.data)
                         alert("Product Added to Cart!")
                     }).catch((err) => {
+                        alert(err?.response.data.message)
+                        this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                         console.log("Add to cart item api error:  ", err)
                     })
 
-                } else {
-                    console.log("this product has options")
-                    this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                    return alert("Please select a Product Options!")
-                }
+                // } else {
+                //     console.log("this product has options")
+                //     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                //     return alert("Please select a Product Options!")
+                // }
 
-            } else {
-                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                return alert("Please select a Product varient color!")
-            }
+            // } else {
+            //     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+            //     return alert("Please select a Product varient color!")
+            // }
 
         }
 
