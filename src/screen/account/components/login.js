@@ -237,6 +237,7 @@ class Login extends Component {
     // }
 
     render() {
+        console.log("this.props.navigatiom",this.props.navigation);
         return (
             <View style={styles.mainContainer}>
 
@@ -264,7 +265,7 @@ class Login extends Component {
 
                 {/** forgot pasword button */}
                 <TouchableOpacity
-                    //onPress={() => this.goHome()}
+                    onPress={() => this.props.props.navigation.navigate("ChangeUserData", { screen: "forgetpassword" })}
                     style={{ alignSelf: "flex-start", marginLeft: 35 }}>
                     <Text style={styles.forgot_password}>Forgot password?</Text>
                 </TouchableOpacity>

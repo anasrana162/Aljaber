@@ -1924,46 +1924,49 @@ class Products extends Component {
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
-            if (product?.type_id == "virtual" || product?.type_id == "simple") {
+            // if (product?.type_id == "virtual" || product?.type_id == "simple") {
 
-                if (product?.options.length == 0) {
+            //     if (product?.options.length == 0) {
 
-                    var obj = {
-                        "cartItem": {
-                            "sku": product?.sku,
-                            "qty": 1,
-                            "name": product?.name,
-                            "price": product?.price,
-                            "product_type": "simple",
-                            "quote_id": userData?.user?.cartID
-                        }
-                    }
-                    // console.log("this product does not have options", obj)
-
-                    api.post("carts/mine/items", obj, {
-                        headers: {
-                            Authorization: `Bearer ${userData?.token}`,
-                        },
-                    }).then((response) => {
-                        // console.log("Add to cart Item API response : ", response?.data)
-                    }).catch((err) => {
-                        console.log("Add to cart item api error:  ", err)
-                    })
-
-                } else {
-                    // console.log("this product has options")
-                    this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                    return alert("Please select a Product Options!")
+            var obj = {
+                "cartItem": {
+                    "sku": product?.sku,
+                    "qty": 1,
+                    "name": product?.name,
+                    "price": product?.price,
+                    "product_type": "simple",
+                    "quote_id": userData?.user?.cartID
                 }
-
-            } else {
-                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                return alert("Please select a Product varient color!")
             }
+            // console.log("this product does not have options", obj)
 
-        }
+            api.post("carts/mine/items", obj, {
+                headers: {
+                    Authorization: `Bearer ${userData?.token}`,
+                },
+            }).then((response) => {
+                // console.log("Add to cart Item API response : ", response?.data)
+                alert("Product Added to Cart!")
+            }).catch((err) => {
 
-        else {
+                alert(err?.response.data.message)
+
+                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                console.log("Add to cart item api error:  ", err)
+            })
+
+            //     } else {
+            //         // console.log("this product has options")
+            //         this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+            //         return alert("Please select a Product Options!")
+            //     }
+
+            // } else {
+            //     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+            //     return alert("Please select a Product varient color!")
+            // }
+
+        } else {
             alert("Please Login to your account first!")
             this.props.navigation.navigate("Account", { modal: "open" })
         }
@@ -1973,6 +1976,7 @@ class Products extends Component {
     isUserLoggedIn = (product, index) => {
         var { userData: { user, } } = this.props
         if (Object.keys(user).length == 0) {
+            console.log("userLogged in");
             this.addToCartGuest(product, index)
         } else {
             this.addToCart(product, index)
@@ -1984,7 +1988,7 @@ class Products extends Component {
         var { userData } = this.props
 
         if (userData?.admintoken !== null || userData?.guestcartkey !== null) {
-            // console.log("product",product);
+            console.log("userData?.admintoken", userData?.guestcartid);
             // if (product?.type_id == "virtual" || product?.type_id == "simple") {
 
             //     if (product?.options.length == 0) {

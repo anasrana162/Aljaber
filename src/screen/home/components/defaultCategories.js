@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         justifyContent: 'center',
         alignItems: "center",
-        marginBottom: 20,
+        marginBottom: 0,
     },
     flatList_Cont: {
         justifyContent: "center",

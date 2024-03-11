@@ -97,6 +97,15 @@ class ChangeUserData extends Component {
         // }
 
         console.log("check", lastname, "  ", firstname);
+        if (this.props.route?.params?.screen !== undefined) {
+            if (this.props.route?.params?.screen == "forgetpassword") {
+
+                var fetchToken = await this.passwordResetToken()
+                alert("Reset Password Link sent to your email Address")
+                console.log("fetchToken", fetchToken);
+            }
+
+        }
 
         // if user hasn't checked email box and changed only first or last name
         if (check_email == false &&
@@ -133,7 +142,7 @@ class ChangeUserData extends Component {
 
         }
 
-        if (check_password == true && email == user?.email) {
+        if (email == user?.email) {
             // if user changes lastname or firstname
             if ((lastname !== user?.lastname || lastname == "") ||
                 (firstname !== user?.firstname || firstname == "")) {
@@ -201,113 +210,146 @@ class ChangeUserData extends Component {
     };
 
     render() {
+
+
+
         return (
             <View style={styles.mainContainer}>
 
-                <HeaderComp titleEN={"Edit Account Information"} navProps={this.props.navigation} />
+                {this.props.route?.params?.screen == undefined ?
+                    <>
+                        <HeaderComp titleEN={"Edit Account Information"} navProps={this.props.navigation} />
 
-                <ScrollView>
-                    <View style={styles.subMainCont}>
+                        <ScrollView>
+                            <View style={styles.subMainCont}>
 
-                        {/* Sub Heading */}
-                        <Text style={[styles.subHeading, { marginTop: 30, }]}>Account Information</Text>
-
-                        {/* First Name */}
-                        <CustomTextInp
-                            value={this.state.firstname}
-                            titleEN={" First Name*"}
-                            onChangeText={(txt) => this.onChangeText(txt, "firstname")}
-                            style={{ width: width - 180, alignSelf: "flex-start", marginTop: 20 }}
-                        />
-
-                        {/* Last Name */}
-                        <CustomTextInp
-                            value={this.state.lastname}
-                            titleEN={" Last Name*"}
-                            onChangeText={(txt) => this.onChangeText(txt, "lastname")}
-                            style={{ width: width - 180, alignSelf: "flex-start" }}
-                        />
-
-                        {/* CheckBoxes */}
-
-                        {/* Email */}
-                        <TouchableOpacity
-                            onPress={() => this.onPress("check_email")}
-                            style={styles.checkBoxCont}>
-                            {this.state.check_email ?
-                                <AntDesign name="checkcircle" size={20} color="black" />
-                                :
-                                <Entypo name="circle" size={20} color="black" />
-
-                            }
-                            <Text style={styles.check_text}>Change Email</Text>
-                        </TouchableOpacity>
-
-                        {/* Password */}
-                        <TouchableOpacity
-                            onPress={() => this.onPress("check_password")}
-                            style={[styles.checkBoxCont, { marginTop: 10 }]}>
-                            {this.state.check_password ?
-                                <AntDesign name="checkcircle" size={20} color="black" />
-                                :
-                                <Entypo name="circle" size={20} color="black" />
-
-                            }
-                            <Text style={styles.check_text}>Change Password</Text>
-                        </TouchableOpacity>
-
-                        {this.state.check_email &&
-                            <>
-                                <CustomTextInp
-                                    value={this.state.email}
-                                    titleEN={"Email*"}
-                                    onChangeText={(txt) => this.onChangeText(txt, "email")}
-                                    style={{ width: width - 100, alignSelf: "flex-start", marginTop: 20 }}
-                                />
-                                {/* <CustomTextInp
-                                    // value={this.state.lastname}
-                                    titleEN={"Current Password*"}
-                                    onChangeText={(txt) => this.onChangeText(txt, "currentpassword")}
-                                    style={{ width: width - 100, alignSelf: "flex-start" }}
-                                /> */}
-                            </>
-                        }
-
-                        {this.state.check_password &&
-                            <>
                                 {/* Sub Heading */}
-                                <Text style={[styles.subHeading, { marginTop: 30 }]}>Change Password</Text>
+                                <Text style={[styles.subHeading, { marginTop: 30, }]}>Account Information</Text>
 
+                                {/* First Name */}
                                 <CustomTextInp
-                                    // value={this.state.email}
-                                    placeholder={"Enter email "}
-                                    titleEN={"Email*"}
-                                    onChangeText={(txt) => this.onChangeText(txt, "email")}
-                                    style={{ width: width - 100, alignSelf: "flex-start", marginTop: 10 }}
+                                    value={this.state.firstname}
+                                    titleEN={" First Name*"}
+                                    onChangeText={(txt) => this.onChangeText(txt, "firstname")}
+                                    style={{ width: width - 180, alignSelf: "flex-start", marginTop: 20 }}
                                 />
-                                {/* <CustomTextInp
-                                    // value={this.state.email}
-                                    titleEN={"New Password*"}
-                                    onChangeText={(txt) => this.onChangeText(txt, "newpassword")}
-                                    style={{ width: width - 100, alignSelf: "flex-start", marginTop: 20 }}
-                                />
+
+                                {/* Last Name */}
                                 <CustomTextInp
-                                    // value={this.state.lastname}
-                                    titleEN={"Confirm New Password*"}
-                                    onChangeText={(txt) => this.onChangeText(txt, "confirmpassword")}
-                                    style={{ width: width - 100, alignSelf: "flex-start" }}
-                                /> */}
-                            </>
-                        }
+                                    value={this.state.lastname}
+                                    titleEN={" Last Name*"}
+                                    onChangeText={(txt) => this.onChangeText(txt, "lastname")}
+                                    style={{ width: width - 180, alignSelf: "flex-start" }}
+                                />
 
-                        <TouchableOpacity
-                            onPress={() => this.onSave()}
-                            style={styles.saveBtn}>
-                            <Text style={[styles.heading, { fontSize: 18, marginTop: 0 }]}>Save</Text>
-                        </TouchableOpacity>
+                                {/* CheckBoxes */}
 
-                    </View>
-                </ScrollView>
+                                {/* Email */}
+                                <TouchableOpacity
+                                    onPress={() => this.onPress("check_email")}
+                                    style={styles.checkBoxCont}>
+                                    {this.state.check_email ?
+                                        <AntDesign name="checkcircle" size={20} color="black" />
+                                        :
+                                        <Entypo name="circle" size={20} color="black" />
+
+                                    }
+                                    <Text style={styles.check_text}>Change Email</Text>
+                                </TouchableOpacity>
+
+                                {/* Password */}
+                                <TouchableOpacity
+                                    onPress={() => this.onPress("check_password")}
+                                    style={[styles.checkBoxCont, { marginTop: 10 }]}>
+                                    {this.state.check_password ?
+                                        <AntDesign name="checkcircle" size={20} color="black" />
+                                        :
+                                        <Entypo name="circle" size={20} color="black" />
+
+                                    }
+                                    <Text style={styles.check_text}>Change Password</Text>
+                                </TouchableOpacity>
+
+                                {this.state.check_email &&
+                                    <>
+                                        <CustomTextInp
+                                            value={this.state.email}
+                                            titleEN={"Email*"}
+                                            onChangeText={(txt) => this.onChangeText(txt, "email")}
+                                            style={{ width: width - 100, alignSelf: "flex-start", marginTop: 20 }}
+                                        />
+                                        {/* <CustomTextInp
+                              // value={this.state.lastname}
+                              titleEN={"Current Password*"}
+                              onChangeText={(txt) => this.onChangeText(txt, "currentpassword")}
+                              style={{ width: width - 100, alignSelf: "flex-start" }}
+                          /> */}
+                                    </>
+                                }
+
+
+
+                                {this.state.check_password &&
+                                    <>
+                                        {/* Sub Heading */}
+                                        <Text style={[styles.subHeading, { marginTop: 30 }]}>Change Password</Text>
+
+                                        <CustomTextInp
+                                            // value={this.state.email}
+                                            placeholder={"Enter email "}
+                                            titleEN={"Email*"}
+                                            onChangeText={(txt) => this.onChangeText(txt, "email")}
+                                            style={{ width: width - 100, alignSelf: "flex-start", marginTop: 10 }}
+                                        />
+                                        {/* <CustomTextInp
+                              // value={this.state.email}
+                              titleEN={"New Password*"}
+                              onChangeText={(txt) => this.onChangeText(txt, "newpassword")}
+                              style={{ width: width - 100, alignSelf: "flex-start", marginTop: 20 }}
+                          />
+                          <CustomTextInp
+                              // value={this.state.lastname}
+                              titleEN={"Confirm New Password*"}
+                              onChangeText={(txt) => this.onChangeText(txt, "confirmpassword")}
+                              style={{ width: width - 100, alignSelf: "flex-start" }}
+                          /> */}
+                                    </>
+                                }
+
+                                <TouchableOpacity
+                                    onPress={() => this.onSave()}
+                                    style={styles.saveBtn}>
+                                    <Text style={[styles.heading, { fontSize: 18, marginTop: 0 }]}>Save</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                        </ScrollView>
+                    </>
+                    :
+                    <>
+                        <View style={styles.subMainCont}>
+                            <HeaderComp titleEN={"Forget Password"} navProps={this.props.navigation} />
+                            {/* Sub Heading */}
+                            <Text style={[styles.subHeading, { marginTop: 30 }]}>Change Password</Text>
+
+                            <CustomTextInp
+                                // value={this.state.email}
+                                placeholder={"Enter email "}
+                                titleEN={"Email*"}
+                                onChangeText={(txt) => this.onChangeText(txt, "email")}
+                                style={{ width: width - 100, alignSelf: "flex-start", marginTop: 10 }}
+                            />
+
+                            <TouchableOpacity
+                                onPress={() => this.onSave()}
+                                style={styles.saveBtn}>
+                                <Text style={[styles.heading, { fontSize: 18, marginTop: 0 }]}>Save</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </>
+
+                }
+
             </View>
         )
     }

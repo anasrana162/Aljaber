@@ -9,7 +9,7 @@ const width = Dimensions.get("screen").width
 
 
 
-const AuthSelector = ({ props,style }) => {
+const AuthSelector = ({ props, style }) => {
 
 
     /** States */
@@ -32,9 +32,9 @@ const AuthSelector = ({ props,style }) => {
         }
     }
 
-
+    console.log("navigation", props.navigation);
     return (
-        <View style={[styles.mainContainer,style]}>
+        <View style={[styles.mainContainer, style]}>
 
             {/** selector Button */}
             <View style={styles.selector_btn_cont}>
@@ -67,9 +67,9 @@ const AuthSelector = ({ props,style }) => {
             </View>
             <ScrollView>
 
-                {login && <Login props={props} />}
+                {login && <Login props={props} navProps={props.navigation} />}
 
-                {reg && <Register props={props} />}
+                {reg && <Register props={props} navProps={props.navigation} />}
 
 
             </ScrollView>

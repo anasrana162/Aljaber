@@ -70,15 +70,15 @@ class Account extends Component {
 
     Logout = () => {
         var { actions } = this.props
-        this.props.navigation.navigate("HomeScreen")
-        setTimeout(() => {
-            // console.log("Actions Redex", actions)
-            actions.userToken("")
-            actions.adminToken("")
-            actions.user("")
-            actions.myOrders("")
-            AsyncStorage.setItem("@aljaber_userLoginData", "")
-        }, 1000)
+        actions.userToken("")
+        actions.adminToken("")
+        actions.user("")
+        actions.myOrders("")
+        AsyncStorage.setItem("@aljaber_userLoginData", "")
+        // setTimeout(() => {
+        //     // console.log("Actions Redex", actions)
+        //     this.props.navigation.navigate("HomeScreen")
+        // }, 1000)
 
     }
 
@@ -180,18 +180,24 @@ class Account extends Component {
                     <>
                         <HeaderComp titleEN={"My Account"} navProps={this.props.navigation} />
                         {/** Modal for login/register */}
+                        <View style={styles.inner_cont_main}>
+                            <ScrollView
+                                showsVerticalScrollIndicator={false}
+                                style={{ width: "100%", }}>
+                                <Image
+                                    source={require("../../../assets/aljabirlogo.png")}
+                                    style={{ width: 180, height: 150, marginTop: 40,alignSelf:"center" }}
+                                />
+                                {/* <View style={styles.modal_cont}>                               */}
+                                {/** Login or Register */}
+                                <AuthSelector
+                                    props={this.props}
+                                    style={{ backgroundColor: "#f0f0f0", marginTop: 30 }}
+                                />
 
+                            </ScrollView>
+                        </View>
                         {/* Image */}
-                        <Image
-                            source={require("../../../assets/aljabirlogo.png")}
-                            style={{ width: 180, height: 150, marginTop: 40 }}
-                        />
-                        {/* <View style={styles.modal_cont}>                               */}
-                        {/** Login or Register */}
-                        <AuthSelector
-                            props={this.props}
-                            style={{ backgroundColor: "#f0f0f0", marginTop: 30 }}
-                        />
                         {/* </View> */}
 
 

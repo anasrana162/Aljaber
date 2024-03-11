@@ -41,7 +41,7 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress, admintoken }) => {
 
             <View style={{
                 width: width - 15,
-                height: 120,
+                height: 50,
                 borderRadius: 5,
                 overflow: "hidden"
             }}>
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         justifyContent: 'center',
         alignItems: "center",
-        marginBottom: 40,
+        marginBottom: 10,
         marginTop: 10
         //backgroundColor:"red",
     },

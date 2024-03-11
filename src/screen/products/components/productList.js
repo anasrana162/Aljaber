@@ -129,7 +129,7 @@ const ProductList = ({ data, loader, screenName, totalProductsLength, onFlatList
             {screenName == "Home" &&
                 <View style={{
                     width: width - 15,
-                    height: 120,
+                    height: 50,
                     borderRadius: 5,
                     overflow: "hidden"
                 }}>

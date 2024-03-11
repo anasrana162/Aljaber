@@ -34,6 +34,8 @@ class Billing_Shipping extends Component {
             provinceSelected: "",
             selectedAddress: {},
             selectedAddressIndex: 0,
+            indexOfAddressToEdit: 0,
+            editAddress: false,
             // shipping: "free",
             // flatrate: 0,
             newAddressModal: false,
@@ -155,7 +157,7 @@ class Billing_Shipping extends Component {
     addNewAddress = () => {
 
         var { addresses, address, addressLine1, addressLine2, firstName, lastName, city, countrySelected, provinceSelected, zipCode, phone, region } = this.state
-        var { userData: { user, admintoken, token } } = this.props
+        var { userData: { user, admintoken, token }, actions } = this.props
         if (addressLine1 !== "") {
             address.push(addressLine1)
         }
@@ -233,25 +235,32 @@ class Billing_Shipping extends Component {
             ).then((res) => {
                 console.log("Res customer profile update API (Save to address Book):", res?.data)
                 let obj = {
-                    "city": city,
-                    "country_id": countrySelected?.country_id,
+
                     "status": "added",
                     "firstname": firstName,
                     "lastname": lastName,
                     "region": {
                         "region": region == "" ? provinceSelected?.title : region,
+                        "region": region == "" ? provinceSelected?.title : region,
+                        "regionId": 0,
                     },
+                    "postcode": zipCode,
                     "street": address,
-                    "telephone": phone
+                    "city": city,
+                    "telephone": phone,
+                    "countryId": countrySelected?.country_id
                 }
+                actions.user(res?.data)
                 addresses.push(obj)
+         
                 setImmediate(() => {
                     this.setState({
-                        addresses
+                        addresses,
+                        newAddressModal: !this.state.newAddressModal
                     })
                 })
             }).catch((err) => {
-                console.log("Err customer profile update API (Save to address Book)", err?.response)
+                console.log("Err customer profile update API (Save to address Book)", err?.response.data.message)
             })
 
 
@@ -259,24 +268,30 @@ class Billing_Shipping extends Component {
 
         } else {
             let obj = {
-                "city": city,
-                "country_id": countrySelected?.country_id,
-                "status": "added",
                 "firstname": firstName,
                 "lastname": lastName,
                 "region": {
                     "region": region == "" ? provinceSelected?.title : region,
+                    "region": region == "" ? provinceSelected?.title : region,
+                    "regionId": 0,
                 },
+                "postcode": zipCode,
                 "street": address,
-                "telephone": phone
+                "city": city,
+                "telephone": phone,
+                "countryId": countrySelected?.country_id
             }
+            user.addresses.push(obj)
+            actions.user(user)
             addresses.push(obj)
             setImmediate(() => {
                 this.setState({
                     addresses,
-                    addressAdded: true
+                    addressAdded: true,
+                    newAddressModal: !this.state.newAddressModal
                 })
             })
+            this.checkAddress()
         }
 
 
@@ -349,9 +364,31 @@ class Billing_Shipping extends Component {
         })
     }
 
-    onEditAddress = (item, country) => {
+    saveEditedAdress = () => {
+        var { userData: { user: { addresses }, user }, actions } = this.props
+        var { indexOfAddressToEdit,firstName, lastName, addressLine1, addressLine2, city, region, countrySelected, phone, zipCode } = this.state
+        // console.log("country", country);
+        addresses[indexOfAddressToEdit].firstname = firstName;
+        addresses[indexOfAddressToEdit].lastname = lastName;
+        addresses[indexOfAddressToEdit].street = [addressLine1, addressLine2];
+        addresses[indexOfAddressToEdit].region.region = region;
+        addresses[indexOfAddressToEdit].region.region_code = region;
+        addresses[indexOfAddressToEdit].country_id = countrySelected?.country_id;
+        addresses[indexOfAddressToEdit].telephone = phone;
+        addresses[indexOfAddressToEdit].city = city;
+        addresses[indexOfAddressToEdit].postcode = zipCode
+        actions.user(user)
+
+        this.openNewAddressModal()
+
+    }
+
+    onEditAddress = (item, country, index) => {
+
+
         this.setState({
             newAddressModal: !this.state.newAddressModal,
+            editAddress: true,
             firstName: item?.item?.firstname,
             lastName: item?.item?.lastname,
             addressLine1: item?.item?.street[0],
@@ -360,6 +397,7 @@ class Billing_Shipping extends Component {
             region: item?.item?.region?.region,
             countrySelected: country,
             phone: item?.item?.telephone,
+            indexOfAddressToEdit: index,
         })
     }
 
@@ -473,7 +511,7 @@ class Billing_Shipping extends Component {
                     {item?.item?.status == undefined ?
                         <></>
                         :
-                        <TouchableOpacity onPress={() => this.onEditAddress(item, country)} style={{ padding: 5, }}>
+                        <TouchableOpacity onPress={() => this.onEditAddress(item, country, item?.index)} style={{ padding: 5, }}>
                             <Text style={[styles.itemText, { color: "#08c", marginTop: 10 }]}>Edit</Text>
                         </TouchableOpacity>
                     }
@@ -494,7 +532,34 @@ class Billing_Shipping extends Component {
 
                     {this.state.addressEmpty == true ?
                         <>
+                            <View style={{
+                                width: "100%",
+                                height: 100,
+                                justifyContent: "center",
+                                alignItems: "center",
+                                alignSelf: "center",
+                                borderWidth: 1,
+                                marginTop: 30,
+                                borderColor: "#08c"
+                            }}>
+                                <View style={{
+                                    width: "60%",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    alignSelf: "center",
+                                }}>
+                                    <Text style={{ color: "black", fontSize: 16, fontWeight: "600", textAlign: "center" }}>No addresses available, Please add new Address</Text>
+                                </View>
+                            </View>
 
+                            {/* Add New Address Button */}
+                            {this.state.addressAdded == false &&
+                                <TouchableOpacity
+                                    onPress={() => this.openNewAddressModal()}
+                                    style={[styles.add_new_address_btn, { alignSelf: "center" }]}>
+                                    <AntDesign name="plus" size={18} color="#848484" />
+                                    <Text style={styles.add_new_address_btn_text}>New Address</Text>
+                                </TouchableOpacity>}
                         </>
 
                         :
@@ -752,6 +817,8 @@ class Billing_Shipping extends Component {
                     countries={countries}
                     selectItem={(val, key) => this.itemSelected(val, key)}
                     addNewAddress={() => this.addNewAddress()}
+                    editAddress={this.state.editAddress}
+                    saveAddress={() => this.saveEditedAdress()}
                     onChangeText={(val, key) => this.onChangeText(val, key)}
                     check={this.state.saveToAddressBook}
                     addressToEdit={this.state.addressToEdit}

@@ -20,6 +20,8 @@ const Add_NewAddress = ({
     selectItem,
     props,
     addNewAddress,
+    editAddress,
+    saveAddress,
     // data
     firstName,
     lastName,
@@ -188,12 +190,27 @@ const Add_NewAddress = ({
                                 style={styles.cancel_Btn}>
                                 <Text style={styles.cancel_Btn_text}>Cancel</Text>
                             </TouchableOpacity>
-                            {/* Ship Here Button */}
-                            <TouchableOpacity
-                                onPress={addNewAddress}
-                                style={styles.shipHere_Btn}>
-                                <Text style={styles.shipHere_Btn_text}>Ship Here</Text>
-                            </TouchableOpacity>
+
+                            {editAddress ?
+                                <>
+                                    {/* Save Button */}
+                                    <TouchableOpacity
+                                        onPress={saveAddress}
+                                        style={styles.shipHere_Btn}>
+                                        <Text style={styles.shipHere_Btn_text}>Save</Text>
+                                    </TouchableOpacity>
+                                </> :
+                                <>
+                                    {/* Ship Here Button */}
+                                    <TouchableOpacity
+                                        onPress={addNewAddress}
+                                        style={styles.shipHere_Btn}>
+                                        <Text style={styles.shipHere_Btn_text}>Ship Here</Text>
+                                    </TouchableOpacity>
+                                </>
+                            }
+
+
                         </View>
                     </View>
                 </View>
@@ -216,6 +233,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignSelf: "center",
         position: "absolute",
+        top: height / 7,
         zIndex: 300,
         borderRadius: 20,
         shadowColor: "#000",

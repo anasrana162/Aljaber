@@ -249,7 +249,7 @@ class HomeScreen extends Component {
                 console.log("Guest Cart Key in Home.js:", result?.data);
                 var guestCartID = await AsyncStorage.getItem("@aljaber_guestCartID")
                 if (guestCartID == null) {
-                    await api.post("guest-carts" + result?.data)
+                    await api.get("guest-carts/" + result?.data)
                         .then((res) => {
                             console.log("Guest Cart ID in Home.js:", res?.data);
                             AsyncStorage.setItem("@aljaber_guestCartID", JSON.stringify(res?.data));
@@ -257,7 +257,7 @@ class HomeScreen extends Component {
                             actions.guestCartKey(result?.data)
                             actions.guestCartID(res?.data)
                         }).catch((err) => {
-                            console.log("Guest Cart ID in Home.js Error:", err);
+                            console.log("Guest Cart ID in Home.js Error:", err.response.data.message);
                         })
                 }
             }).catch((err) => {
