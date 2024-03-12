@@ -227,6 +227,7 @@ class Account extends Component {
                                 {/* <Text style={styles.track_order_text}>Track your orders and check out quicker</Text> */}
                                 <AccountOptions
                                     props={this.props.userData.user}
+                                    dataProps={this.props}
                                     Logout={() => this.Logout()}
                                     orders={this.state.orders}
                                     navProps={this.props.navigation}

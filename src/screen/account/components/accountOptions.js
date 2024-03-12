@@ -5,16 +5,17 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import Entypo from "react-native-vector-icons/Entypo"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import moment from 'moment'
+import NewsLetter from '../../../components_reusable/newsLetter'
 
 const width = Dimensions.get("screen").width
 
-const AccountOptions = ({ navProps,props, Logout, orders, country_ship_add, country_bill_add, def_bill_add, def_ship_add }) => {
+const AccountOptions = ({ navProps, props, dataProps, Logout, orders, country_ship_add, country_bill_add, def_bill_add, def_ship_add }) => {
     const [openOrders, setOpenOrders] = useState(false)
     const [openNL, setOpenNL] = useState(false)
     const [openAB, setOpenAB] = useState(false)
-// console.log("props",props)
+    console.log("props", props)
     return (
-        <View style={{ width: width - 20, alignSelf: "center",  marginTop: 15,justifyContent:"center",alignItems:"center" }}>
+        <View style={{ width: width - 20, alignSelf: "center", marginTop: 15, justifyContent: "center", alignItems: "center" }}>
             <View style={{ width: width - 20, alignSelf: "center", height: 1, backgroundColor: "#020621", marginTop: 15 }} />
             <TouchableOpacity
                 activeOpacity={0.8}
@@ -38,10 +39,10 @@ const AccountOptions = ({ navProps,props, Logout, orders, country_ship_add, coun
                             <Text style={styles.middle_block_text}>You are subscribed to "General Subscription".</Text>
                             :
                             <NewsLetter
-                                props={this.props}
+                                props={dataProps}
                                 style={{ backgroundColor: "white", marginLeft: -5, width: width - 60, }}
                                 innerMainStyle={{ marginVertical: 10 }}
-                                txtInpStyle={{ width: width - 80 }}
+                                txtInpStyle={{ width: width - 130 }}
                                 paraStyle={{ width: width - 80 }}
                             />
                     }
@@ -49,9 +50,9 @@ const AccountOptions = ({ navProps,props, Logout, orders, country_ship_add, coun
                 </View>
                 {/* Lower Conatiner */}
                 <View style={styles.lower_block_cont}>
-                    <TouchableOpacity style={{ padding: 5 }}>
+                    {/* <TouchableOpacity style={{ padding: 5 }}>
                         <Text style={styles.lower_block_text}>Edit</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                 </View>
             </View>}
 
@@ -172,9 +173,9 @@ const AccountOptions = ({ navProps,props, Logout, orders, country_ship_add, coun
                                             </Text>
                                             <Text style={styles.flex_row_title_text}>Action:
                                                 <TouchableOpacity
-                                                onPress={()=> navProps.navigate("Order_Details",{
-                                                    "order_detail":item,
-                                                })}
+                                                    onPress={() => navProps.navigate("Order_Details", {
+                                                        "order_detail": item,
+                                                    })}
                                                 >
                                                     <Text style={[styles.flex_row_title_text, {
                                                         color: "#3F51B5",
