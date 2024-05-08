@@ -25,6 +25,7 @@ import MyReviews from '../screen/account/myReviews';
 import EditAddress from '../screen/editaddress/editAddress';
 import Eyetest from '../screen/appointment/eyetest';
 import Mobile_Bus from '../screen/appointment/mobile_bus';
+import PaymentWebView from '../screen/payment/PaymentWebView';
 
 const Stack = createNativeStackNavigator();
 export default class Navigation extends Component {
@@ -61,6 +62,7 @@ export default class Navigation extends Component {
                     <Stack.Screen name="Categories" component={Categories} />
                     <Stack.Screen name="Products" component={Products} options={{ gestureEnabled: false }} />
                     <Stack.Screen name="ProductDetails" component={ProductDetails} />
+                    <Stack.Screen name="PaymentWebView" component={PaymentWebView} />
                 </Stack.Navigator>
             </NavigationContainer>
         )

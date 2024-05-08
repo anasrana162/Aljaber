@@ -260,7 +260,7 @@ class Billing_Shipping extends Component {
                     })
                 })
             }).catch((err) => {
-                console.log("Err customer profile update API (Save to address Book)", err?.response.data.message)
+                console.log("billing Err customer profile update API (Save to address Book)", err?.response.data.message)
             })
 
 
@@ -475,7 +475,7 @@ class Billing_Shipping extends Component {
                 // this.checkAddress()
             }).catch((err) => {
                 this.setState({ loadNext: false })
-                console.log("shipping information API ERR", err)
+                console.log("shipping information API ERRs", err.response)
             })
 
     }
@@ -611,7 +611,7 @@ class Billing_Shipping extends Component {
                             <Text style={styles.shipping_method_title}>SHIPPING METHODS* (PLEASE SELECT)</Text>
 
                             {/* Shipping Methods */}
-                            <View style={[styles.shipping_method_cont, { opacity: this.state.addresses.length == 0 ? 0.3 : 1 }]}>
+                            <View style={[styles.shipping_method_cont, { opacity: this.state.addresses?.length == 0 ? 0.3 : 1 }]}>
                                 {this.state.isShippingFree ?
                                     <>
 
@@ -645,7 +645,7 @@ class Billing_Shipping extends Component {
                                             <>
                                                 <TouchableOpacity
                                                     style={{ paddingVertical: 10 }}
-                                                    disabled={this.state.addresses.length == 0}
+                                                    disabled={this.state.addresses?.length == 0}
                                                     onPress={() => this.setState({ shippingSelected: !this.state.shippingSelected })}>
                                                     <AntDesign name="checkcircle" size={18} color="black" />
                                                 </TouchableOpacity>
@@ -657,7 +657,7 @@ class Billing_Shipping extends Component {
                                             <>
                                                 <TouchableOpacity
                                                     style={{ paddingVertical: 10 }}
-                                                    disabled={this.state.addresses.length == 0}
+                                                    disabled={this.state.addresses?.length == 0}
                                                     onPress={() => this.setState({ shippingSelected: !this.state.shippingSelected })}>
                                                     <Entypo name="circle" size={18} color="black" />
                                                 </TouchableOpacity>

@@ -7,13 +7,14 @@ import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
 
+import { encode as base64encode } from "base-64";
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
 const imageUrl = "https://aljaberoptical.com/media/catalog/product/"
 
-import api from '../../api/api';
+import api, { basis_auth, custom_api_url } from '../../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -24,6 +25,7 @@ import Loading from '../../components_reusable/loading';
 import HeaderComp from '../../components_reusable/headerComp';
 import CustomTextInp from './components/CustomTextInp';
 import TextInput_Dropdown from '../cart/components/textInput_Dropdown';
+import PaymentWebView from '../payment/PaymentWebView';
 
 class Review_Payment_Guest extends Component {
     constructor(props) {
@@ -64,6 +66,11 @@ class Review_Payment_Guest extends Component {
             updateBillingAddress: false,
             key: 0,
             loader: false,
+            source: {
+                html: ``,
+              },
+              flagforwebview: false,
+              buttomButton: false,
         };
     }
 
@@ -405,10 +412,83 @@ class Review_Payment_Guest extends Component {
             })
 
     }
-
+    createngenius_paymentOrder = (orderId) => {
+        const base64Credentials = base64encode(
+          `${basis_auth.Username}:${basis_auth.Password}`
+        );
+    
+        let params = {
+          orderId: orderId,
+          amount: this.state?.order_summary?.totals?.grand_total,
+          email: this.state.bill_ship_address.addressInformation.billing_address?.email
+        };
+        api
+          .post(custom_api_url + "func=ngenius_payment", params, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Basic ${base64Credentials}`,
+            },
+          })
+          .then((response) => {
+            this.setState({
+              source: { html: response?.data },
+              loader: false,
+              flagforwebview: true,
+            });
+            this.interval = setInterval(() => {
+              this.orderStatus(orderId);
+            }, 3000);
+          })
+          .catch((error) => {
+            console.log(error, error.response);
+          });
+      };
+    
+      orderStatus = (orderId) => {
+        const base64Credentials = base64encode(
+          `${basis_auth.Username}:${basis_auth.Password}`
+        );
+    
+        let params = {
+          orderId: orderId,
+        };
+        api.post(custom_api_url + "func=ngenius_payment_status_check", params, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Basic ${base64Credentials}`,
+            },
+          })
+          .then((response) => {
+            console.log(response.data, "=====status check new");
+    
+            if (
+              (response?.data?.payment_status == "PAID" &&
+                response?.data?.payment_response) ||
+              (response?.data?.payment_status == "UNPAID" &&
+                response?.data?.payment_response)
+            ) {
+                setTimeout(() => {
+                    actions.cartItems(null)
+                    actions.guestCartKey(null)
+                    actions.guestCartID(null)
+                    AsyncStorage.removeItem("@aljaber_guestCartKey")
+                    AsyncStorage.removeItem("@aljaber_guestCartID")
+                    AsyncStorage.setItem("@aljaber_userLoginData", "")
+                }, 1000)
+                // this.props.navigation.navigate("HomeScreen")
+    
+              this.setState({ loader: false, buttomButton: true });
+            }
+          })
+          .catch((error) => {
+            this.setState({ loader: false, buttomButton: true });
+    
+            console.log(error, error.response);
+          });
+      };
     placeOrder = () => {
         var { userData: { guestcartkey, admintoken }, actions } = this.props
-        console.log("Payment Method",  this.state.paymentMethodSelected);
+        console.log("Payment Method---",  this.state.paymentMethodSelected);
         // console.log("token", token);
         if(this.state.paymentMethodSelected == ""){
             return (alert("Select a Payment method"))
@@ -427,23 +507,23 @@ class Review_Payment_Guest extends Component {
                 },
             })
             .then((res) => {
-
-                console.log("res Guest Create Order API", res?.data)
-                alert("Order Created!")
-                setTimeout(() => {
-                    actions.cartItems(null)
-                    actions.guestCartKey(null)
-                    actions.guestCartID(null)
-                    AsyncStorage.removeItem("@aljaber_guestCartKey")
-                    AsyncStorage.removeItem("@aljaber_guestCartID")
-                    AsyncStorage.setItem("@aljaber_userLoginData", "")
-                }, 1000)
-                this.props.navigation.navigate("HomeScreen")
+                console.log("res Guest Create Order APIwwww", res?.data)
+                this.createngenius_paymentOrder(res?.data)
+                // alert("Order Created!")
+                // setTimeout(() => {
+                //     actions.cartItems(null)
+                //     actions.guestCartKey(null)
+                //     actions.guestCartID(null)
+                //     AsyncStorage.removeItem("@aljaber_guestCartKey")
+                //     AsyncStorage.removeItem("@aljaber_guestCartID")
+                //     AsyncStorage.setItem("@aljaber_userLoginData", "")
+                // }, 1000)
+                // this.props.navigation.navigate("HomeScreen")
                 // this.setState({ loader: false })
 
             }).catch((err) => {
                 this.setState({ loader: false })
-                console.log("Create Guest Order API ERR", err.response.data.message)
+                console.log("Create Guest Order API ERR",err.response, err.response.data.message)
             })
 
     }
@@ -921,6 +1001,12 @@ class Review_Payment_Guest extends Component {
                 </ScrollView >
 
                 {this.state.loader && <Loading screenName={""} />}
+                <PaymentWebView
+          flagforwebview={this.state?.flagforwebview}
+          source={this.state?.source}
+          buttomButton={this.state?.buttomButton}
+          navigation={this.props.navigation}
+        />
             </View >
         )
     }

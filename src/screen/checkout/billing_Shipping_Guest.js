@@ -263,7 +263,7 @@ class Billing_Shipping_Guest extends Component {
                 // this.checkAddress()
             }).catch((err) => {
                 this.setState({ loadNext: false })
-                console.log("shipping information API ERR", err.response.data.message)
+                console.log("shipping information API ERRa", err.response.data.message)
             })
 
     }

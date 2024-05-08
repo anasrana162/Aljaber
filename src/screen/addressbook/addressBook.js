@@ -230,7 +230,7 @@ class AddressBook extends Component {
             this.loginUser()
 
         }).catch((err) => {
-            console.log("Err customer profile update API (Save to address Book) Address Book Screen", err?.response)
+            console.log("sErr customer profile update API (Save to address Book) Address Book Screen", err?.response)
         })
 
     }
@@ -383,7 +383,7 @@ class AddressBook extends Component {
             actions.user(res?.data)
             this.fetchDefaultAddresses()
         }).catch((err) => {
-            console.log("Err customer profile update API (Save to address Book)", err?.response)
+            console.log("wErr customer profile update API (Save to address Book)", err?.response)
         })
     }
 

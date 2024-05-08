@@ -150,7 +150,7 @@ class EditAddress extends Component {
             this.loginUser()
 
         }).catch((err) => {
-            console.log("Err customer profile update API Edit Addess Screen", err.response)
+            console.log(" edit  Edit Addess Screen", err.response)
         })
     }
     loginUser = async () => {
