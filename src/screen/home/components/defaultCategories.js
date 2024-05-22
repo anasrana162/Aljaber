@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         width: width,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 20
+        marginTop: 10
     },
     flatList_outerCont: {
         width: width - 10,

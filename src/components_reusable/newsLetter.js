@@ -14,6 +14,8 @@ const NewsLetter = ({ innerMainStyle,paraStyle,txtInpStyle,style,screenName, pro
             "email": email,
         }).then((res) => {
             console.log("letter Subscription, ", res?.data)
+            alert("Subscribed Sucessfully")
+            setEmail("")
         }).catch((err) => {
             console.log("NewsLtter Subscription Error", err)
         })
@@ -33,7 +35,7 @@ const NewsLetter = ({ innerMainStyle,paraStyle,txtInpStyle,style,screenName, pro
                 <TextInput
                     placeholder='Email'
                     placeholderTextColor={"#bbb"}
-                    // value={}
+                    value={email}
                     style={[styles.txtinp,txtInpStyle]}
                     onChangeText={(txt) => setEmail(txt.toLowerCase())}
                 />

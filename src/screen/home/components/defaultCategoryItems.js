@@ -33,6 +33,7 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress, admintoken }) => {
             imageLinkMain: image,
             otherCats: data,
 
+
         })
     }
 
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
         width: width,
         justifyContent: "flex-start",
         alignItems: "center",
-        marginTop: 20
+        marginTop: 0
     },
     flatList_outerCont: {
         width: width - 10,
