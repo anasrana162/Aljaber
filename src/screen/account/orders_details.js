@@ -16,6 +16,7 @@ import axios from 'axios';
 import api, { custom_api_url } from '../../api/api';
 import OrderInfo from './components/orderInfo';
 import HeaderComp from '../../components_reusable/headerComp';
+import Loading from '../../components_reusable/loading';
 
 class Order_Details extends Component {
     constructor(props) {
@@ -29,24 +30,70 @@ class Order_Details extends Component {
             countries: [],
             orders: null,
             selector: "items_ordered",
-            product_options: []
+            product_options: [],
+            reOrderItems: [],
+            reOrdering: false,
         };
     }
 
     componentDidMount = () => {
         this.getItem()
         this.getCountries()
+        this.createReorderItems()
+    }
+
+
+    createReorderItems = () => {
+        var { order_detail, order_detail: { items } } = this.props.route.params
+        var arr = []
+        if (order_detail == undefined || order_detail?.length == 0 || order_detail == null) {
+            return
+        } else {
+            for (let i = 0; i < items.length; i++) {
+                console.log("items", items[i]?.product_option == undefined ? '' : items[i]?.product_option?.extension_attributes);
+
+                // var obj = {
+                //     "item_id": items[i]?.item_id,
+                //     "name": items[i]?.name,
+                //     "price": items[i]?.price,
+                //     "product_type": items[i]?.product_type,
+                //     "qty": items[i]?.qty_ordered,
+                //     "quote_id": items[i]?.quote_item_id,
+                //     "sku": items[i]?.sku
+                // }
+                var obj = {
+                    "cartItem": {
+                        "sku": items[i]?.sku,
+                        "qty": items[i]?.qty_ordered,
+                        "name": items[i]?.name,
+                        "price": items[i]?.price,
+                        "product_type": items[i]?.product_type,
+                        "quote_id": items[i]?.quote_item_id,
+                        "product_option": items[i]?.product_option,
+                    }
+                }
+
+                console.log("Obj", obj);
+                arr.push(obj)
+            }
+        }
+        console.log("ARR REORDER", arr);
+        setImmediate(() => {
+            this.setState({
+                reOrderItems: arr
+            })
+        })
     }
 
     getItem = () => {
         var { order_detail } = this.props.route.params
-        // console.log('order_detail :>> ', order_detail?.items);
+        // console.log('order_detail :>> ', order_detail);
     }
 
     getCountries = () => {
 
         api.get("aljaber/getallcountry").then((result) => {
-            console.log("Get Country Api Result: ", result?.data)
+            // console.log("Get Country Api Result: ", result?.data)
             setImmediate(() => {
                 this.setState({ countries: result?.data })
             })
@@ -105,7 +152,7 @@ class Order_Details extends Component {
 
                 <ScrollView
                     showsVerticalScrollIndicator={false}
-                    style={{ marginBottom:20}}
+                    style={{ marginBottom: 20 }}
                 >
 
                     {/* Main Body */}
@@ -159,13 +206,16 @@ class Order_Details extends Component {
                                 this.state.selector == "items_ordered" &&
                                 <ItemsOrdered
                                     order_detail_items={order_detail?.items}
+                                    reOrderItems={this.state.reOrderItems}
                                     showMore={(options, index) => this.showMore(options, index)}
+                                    reOrderBegin={() => this.setState({ reOrdering: !this.state.reOrdering })}
                                     product_options={this.state.product_options}
                                     subtotal={order_detail?.base_subtotal}
                                     shipping_method={order_detail?.shipping_description}
                                     shipping_handling={order_detail?.shipping_amount}
                                     total={order_detail?.grand_total}
                                     navProps={this.props.navigation}
+                                    props={this.props}
                                 />
                             }
                             {
@@ -198,6 +248,7 @@ class Order_Details extends Component {
                         countries={this.state.countries}
                     />
 
+                    {this.state.reOrdering && <Loading />}
 
                 </ScrollView>
 
@@ -274,7 +325,7 @@ const styles = StyleSheet.create({
         alignItems: "flex-start",
         alignSelf: "center",
         marginTop: 20,
-       
+
     },
     page_sheet: {
         width: width - 20,

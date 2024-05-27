@@ -36,7 +36,7 @@ class MyOrders extends Component {
 
     render() {
         var { userData: { orders } } = this.props
-        // console.log("Orders",orders);
+        console.log("Orders",orders);
         return (
             <View style={styles.mainContainer}>
                 {/* <HeaderComp titleEN={"My Orders"} /> */}

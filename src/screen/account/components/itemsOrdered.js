@@ -1,7 +1,41 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
+import api from '../../../api/api'
 
-const ItemsOrdered = ({ order_detail_items, showMore, product_options, subtotal, shipping_handling, total, navProps }) => {
+const ItemsOrdered = ({ order_detail_items, reOrderBegin, reOrderItems, props, showMore, product_options, subtotal, shipping_handling, total, navProps }) => {
+
+
+    const reOrder = async () => {
+        var { userData } = props
+        console.log("reOrderItems", reOrderItems);
+        reOrderBegin()
+        for (let i = 0; i < reOrderItems.length; i++) {
+
+            await api.post("carts/mine/items", reOrderItems[i], {
+                headers: {
+                    Authorization: `Bearer ${userData?.token}`,
+                },
+            }).then((response) => {
+                if (i == reOrderItems?.length - 1) {
+                    // console.log("reaching end");
+                    alert("Products Added to Cart")
+                    reOrderBegin()
+                    navProps.navigate("Cart")
+                }
+            }).catch((err) => {
+                // if (err?.response?.data?.message == "You need to choose options for your item.")
+                alert(err?.response?.data?.message)
+                console.log("Add to cart item api error:  ", err.response)
+
+
+            })
+
+        }
+
+
+    }
+
+
     return (
         <>
             <View style={styles.page_sheet_view_inner_view}>
@@ -140,12 +174,19 @@ const ItemsOrdered = ({ order_detail_items, showMore, product_options, subtotal,
             <Text style={[styles.total_subtotal_shipping_text, { marginTop: 20, }]}>Subtotal:{"              "}AED {subtotal}</Text>
             <Text style={styles.total_subtotal_shipping_text}>Shipping & Handling:{"              "}AED {shipping_handling}</Text>
             <Text style={[styles.total_subtotal_shipping_text, { fontWeight: "700" }]}>Estimated Total:{"              "}AED {total}</Text>
+            <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-around", alignItems: "center", marginTop: 25, marginBottom: 20, }}>
 
-            <TouchableOpacity
-                onPress={() => navProps.pop()}
-                style={{ padding: 15, alignSelf: "flex-start", marginTop: 25, marginBottom: 20, }}>
-                <Text style={styles.back_to_my_orders_text}>Back to My Orders</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navProps.pop()}
+                    style={{ padding: 10, alignSelf: "flex-start", }}>
+                    <Text style={styles.back_to_my_orders_text}>Back to My Orders</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => reOrder()}
+                    style={{ padding: 10, alignSelf: "flex-start", borderWidth: 1, borderRadius: 30, borderColor: "#08c", }}>
+                    <Text style={styles.back_to_my_orders_text}>Reorder</Text>
+                </TouchableOpacity>
+            </View>
         </>
     )
 }

@@ -218,7 +218,7 @@ class Cart extends Component {
                     Authorization: `Bearer ${token}`,
                 },
             }).then((res) => {
-                // console.log("REsponse Get cart ITems APi", res?.data)
+                console.log("REsponse Get cart ITems APi", res?.data)
                 setImmediate(() => {
                     this.setState({ original: res?.data })
                 })
