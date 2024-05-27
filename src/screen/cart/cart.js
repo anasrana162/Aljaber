@@ -100,6 +100,7 @@ class Cart extends Component {
                     break;
 
                 case "proceed":
+                    console.log(" this.state.cartItems", this.state.cartItems,`${"\n"}`,this.state.subtotal);
                     this.props.navigation.navigate('Billing_Shipping', { subtotal: this.state.subtotal, cartItems: this.state.cartItems, })
                     break;
             }

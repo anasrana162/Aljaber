@@ -153,6 +153,7 @@ class HomeScreen extends Component {
             randomProducts: null,
             topCategoryData: this.props.userData?.topcatdata,
             drawer: false,
+            banners: [],
         };
     }
 
@@ -167,9 +168,21 @@ class HomeScreen extends Component {
         }, 1000)
         this.defaultCategories()
         this.randomProducts()
+        this.getBanners()
         this.unsubscribe()
 
         // 
+    }
+
+    getBanners = () => {
+        axios.get(custom_api_url + "func=get_home_banners").then((res) => {
+            console.log("fethch Banners Api Res", res?.data);
+            setImmediate(() => {
+                this.setState({ banners: res?.data })
+            })
+        }).catch((err) => {
+            console.log("Get Banners api Error:", err);
+        })
     }
 
     loginUser = async () => {
@@ -625,7 +638,7 @@ class HomeScreen extends Component {
                     }
                     console.log("this product does not have options", obj)
 
-                    api.post("guest-carts/"+ userData?.guestcartkey +"/items", obj, {
+                    api.post("guest-carts/" + userData?.guestcartkey + "/items", obj, {
                         headers: {
                             Authorization: `Bearer ${userData?.admintoken}`,
                         },
@@ -664,38 +677,38 @@ class HomeScreen extends Component {
 
             // if (product?.type_id == "virtual" || product?.type_id == "simple") {
 
-                // if (product?.options.length == 0) {
+            // if (product?.options.length == 0) {
 
-                    var obj = {
-                        "cartItem": {
-                            "sku": product?.sku,
-                            "qty": 1,
-                            "name": product?.name,
-                            "price": product?.price,
-                            "product_type": "simple",
-                            "quote_id": userData?.user?.cartID
-                        }
-                    }
-                    console.log("this product does not have options", obj)
+            var obj = {
+                "cartItem": {
+                    "sku": product?.sku,
+                    "qty": 1,
+                    "name": product?.name,
+                    "price": product?.price,
+                    "product_type": "simple",
+                    "quote_id": userData?.user?.cartID
+                }
+            }
+            console.log("this product does not have options", obj)
 
-                    api.post("carts/mine/items", obj, {
-                        headers: {
-                            Authorization: `Bearer ${userData?.token}`,
-                        },
-                    }).then((response) => {
-                        console.log("Add to cart Item API response : ", response?.data)
-                        alert("Product Added to Cart!")
-                    }).catch((err) => {
-                        alert(err?.response.data.message)
-                        this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                        console.log("Add to cart item api error:  ", err)
-                    })
+            api.post("carts/mine/items", obj, {
+                headers: {
+                    Authorization: `Bearer ${userData?.token}`,
+                },
+            }).then((response) => {
+                console.log("Add to cart Item API response : ", response?.data)
+                alert("Product Added to Cart!")
+            }).catch((err) => {
+                alert(err?.response.data.message)
+                this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                console.log("Add to cart item api error:  ", err)
+            })
 
-                // } else {
-                //     console.log("this product has options")
-                //     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                //     return alert("Please select a Product Options!")
-                // }
+            // } else {
+            //     console.log("this product has options")
+            //     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+            //     return alert("Please select a Product Options!")
+            // }
 
             // } else {
             //     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
@@ -780,7 +793,10 @@ class HomeScreen extends Component {
 
                 <ScrollView>
                     {/** Swiper below header */}
-                    <Swiper data={sliderImages} />
+                    <Swiper
+                        data={this.state.banners}
+                        navProps={this.props.navigation}
+                        admintoken={this.props.userData.admintoken} />
 
                     {/* * Default Categories */}
                     {this.state.loader == false && <DefaultCategories

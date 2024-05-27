@@ -6,7 +6,7 @@ const width = Dimensions.get("screen").width
 
 const DefaultCategoryItems = ({ data, navProps, onNextPress, admintoken }) => {
 
-    selectedItems = async (item, index, key) => {
+    selectedItems = async (item) => {
 
         var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
         await api.get("categories/" + item?.id, {

@@ -318,7 +318,7 @@ class Products extends Component {
 
     createData = async (savedProducts) => {
         var { item, productApiCounter } = this.state;
-        const { userData: { admintoken, }, actions, route: { params: { sub_category_id } } } = this.props
+        const { userData: { admintoken, }, actions, route: { params: { sub_category_id, whereAbouts } } } = this.props
 
         // opening Loaders
         setImmediate(() => {
@@ -348,8 +348,16 @@ class Products extends Component {
 
             // Reversing Array because data is showing from wrong end
             result.data = result?.data?.reverse()
+            // console.log("ub_category_id.toString()", result.data);
+            if (whereAbouts == undefined) {
+                actions.savedProducts(sub_category_id.toString(), result?.data)
+            }
+            else {
+                if (whereAbouts == 'banner') {
 
-            actions.savedProducts(sub_category_id.toString(), result.data)
+                }
+            }
+
             setImmediate(() => {
 
                 this.setState({
@@ -2085,20 +2093,21 @@ class Products extends Component {
                 {/** Top Image & Category Name */}
                 < ImageView
                     source={{ uri: "https://aljaberoptical.com" + imageLinkMain }}
-                    textEN={item?.name}
+                    textEN={item?.name == undefined ? item?.title : item?.name}
                     textAR={""}
                 />
 
                 {/** Categories if it exists */}
+                {/* {console.log("categories Products", this.state.categories)} */}
                 {
-                    this.state.categories !== null &&
-                    <CategoryList
-                        categories={this.state.categories}
-                        selectedItem={(item, index) => {
-                            this.fetchSubFilterData(item)
-                            this.createSubData(item)
-                        }}
-                    />
+                    this.state.categories == null ? <></> :
+                        <CategoryList
+                            categories={this.state.categories}
+                            selectedItem={(item, index) => {
+                                this.fetchSubFilterData(item)
+                                this.createSubData(item)
+                            }}
+                        />
                 }
 
                 {/* Product List */}

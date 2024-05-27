@@ -55,6 +55,14 @@ export default class Drawer extends Component {
                 onDismiss()
                 navigation.navigate("Mobile_Bus")
                 break;
+            case "contact_us":
+                onDismiss()
+                navigation.navigate("Contact_us")
+                break;
+            case "about_us":
+                onDismiss()
+                navigation.navigate("About_us")
+                break;
             case "offers":
                 console.log("Offers", offersobj);
 
@@ -135,8 +143,8 @@ export default class Drawer extends Component {
                                                 <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
                                             </TouchableOpacity>
 
-                                              {/* Offers */}
-                                              <TouchableOpacity
+                                            {/* Offers */}
+                                            <TouchableOpacity
                                                 onPress={() => this.onPress("offers")}
                                                 style={styles.touchable}>
                                                 <Text style={styles.text_touchable}>Offers</Text>
@@ -145,6 +153,20 @@ export default class Drawer extends Component {
                                                         rotate: "90deg"
                                                     }], marginRight: 6
                                                 }} />
+                                            </TouchableOpacity>
+                                            {/* Contact Us */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("contact_us")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>Contact Us</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
+                                            {/* About Us */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("about_us")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>About Us</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
                                             </TouchableOpacity>
                                         </>
                                         :
@@ -232,6 +254,21 @@ export default class Drawer extends Component {
                                                 </TouchableOpacity>
                                             </View>}
 
+                                            {/* Contact Us */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("contact_us")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>Contact Us</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
+
+                                            {/* About Us */}
+                                            <TouchableOpacity
+                                                onPress={() => this.onPress("about_us")}
+                                                style={styles.touchable}>
+                                                <Text style={styles.text_touchable}>About Us</Text>
+                                                <MaterialCommunityIcons name="chevron-right" color='#3F51B5' size={30} />
+                                            </TouchableOpacity>
 
                                             {/* Offers */}
                                             <TouchableOpacity
@@ -244,6 +281,7 @@ export default class Drawer extends Component {
                                                     }], marginRight: 6
                                                 }} />
                                             </TouchableOpacity>
+
 
                                             {/* Logout */}
                                             <TouchableOpacity

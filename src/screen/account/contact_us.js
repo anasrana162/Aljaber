@@ -7,6 +7,11 @@ import Drawer from '../../components_reusable/drawer';
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height
 
+{/* {---------------Redux Imports------------} */ }
+import { connect } from 'react-redux';
+import * as userActions from "../../redux/actions/user"
+import { bindActionCreators } from 'redux';
+
 export class Contact_us extends Component {
 
     constructor(props) {
@@ -225,7 +230,22 @@ export class Contact_us extends Component {
 
 
 
-export default Contact_us
+{/* {---------------redux State ------------} */ }
+const mapStateToProps = state => ({
+    userData: state.userData
+});
+
+{/* {---------------redux Actions ------------} */ }
+
+const ActionCreators = Object.assign(
+    {},
+    userActions,
+);
+const mapDispatchToProps = dispatch => ({
+    actions: bindActionCreators(ActionCreators, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Contact_us);
 const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
