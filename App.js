@@ -266,7 +266,7 @@ class App extends Component {
 
     var LoginData = await AsyncStorage.getItem("@aljaber_userLoginData")
     var objLoginData = JSON.parse(LoginData)
-    console.log("LoginData", objLoginData)
+    // console.log("LoginData", objLoginData)
     if (objLoginData !== null) {
 
       var customerToken = await api.post('integration/customer/token', {
