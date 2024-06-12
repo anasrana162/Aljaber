@@ -484,16 +484,34 @@ const FilterBoard = ({
                                         <>
                                             {otherCats?.children_data.length == 0 ? <></> : <View style={styles.otherCatsCont}>
                                                 {/* Title */}
-                                                <Text style={styles.otherCatsContTitle}>{otherCats?.name}</Text>
+                                                <Text style={styles.otherCatsContTitle}>{otherCats?.name?.toUpperCase()}</Text>
 
                                                 <FlatList
                                                     data={otherCats?.children_data}
                                                     renderItem={({ item, index }) => {
+                                                        switch (item?.id) {
+                                                            case 81:
+                                                                item.is_active = false
+                                                                break;
+                                                            case 74:
+                                                                item.is_active = false
+                                                                break;
+                                                            case 45:
+                                                                item.is_active = false
+                                                                break;
+                                                            case 34:
+                                                                item.is_active = false
+                                                                break;
+                                                        }
                                                         // console.log("items", item);
                                                         return (
-                                                            <TouchableOpacity onPress={() => selectedCat(item)}>
-                                                                <Text style={styles.otherCatsContItemTitle}>{item?.name}</Text>
-                                                            </TouchableOpacity>
+                                                            <>
+                                                                {item?.is_active == true &&
+                                                                    <TouchableOpacity onPress={() => selectedCat(item)}>
+                                                                        <Text style={styles.otherCatsContItemTitle}>{item?.name}</Text>
+                                                                    </TouchableOpacity>}
+                                                            </>
+
                                                         )
                                                     }}
                                                 />
@@ -843,16 +861,16 @@ const styles = StyleSheet.create({
     },
     otherCatsContTitle: {
         fontWeight: "600",
-        fontSize: 15,
+        fontSize: 14,
         color: "black",
         textAlign: 'left',
-        width: 130,
+        width: "80%",
         marginLeft: 10,
         marginTop: 10,
         marginBottom: 0,
     },
     otherCatsContItemTitle: {
-        fontWeight: "500",
+        fontWeight: "400",
         fontSize: 14,
         color: "black",
         textAlign: 'left',

@@ -357,7 +357,7 @@ class App extends Component {
 
   fetchUserOrders = () => {
     var { userData: { user }, actions } = this.props
-    // console.log("customer?.id", user?.id)
+    console.log("customer?.id", user?.id)
     api.get("orders?searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bfield%5d=" + "customer_id"
       + "&searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bvalue%5d=" + user?.id
       + "searchCriteria%5bfilterGroups%5d%5b0%5d%5bfilters%5d%5b0%5d%5bconditionType%5d=eq",

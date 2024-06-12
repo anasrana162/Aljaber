@@ -1,22 +1,57 @@
-import { Text, StyleSheet, View, Dimensions, FlatList, NativeModules, TouchableOpacity, Platform, Image } from 'react-native'
+import { Text, StyleSheet, View, Dimensions, FlatList, NativeModules, TouchableOpacity, Platform, Image, KeyboardAvoidingView } from 'react-native'
 import React, { Component, PureComponent, memo, useEffect } from 'react'
 import DefaultCategoryItems from './defaultCategoryItems'
-
+import api from '../../../api/api'
 const width = Dimensions.get("screen").width
 
-const DefaultCategories = ({ data, navProps, firstSubItem,admintoken }) => {
+const DefaultCategories = ({ data, navProps, firstSubItem, admintoken, loaderDot }) => {
     // console.log("")
     // console.log("Default CAtegories:::::; ", firstSubItem)
 
     var [selectedItem, setSelectedItem] = React.useState(firstSubItem)
     const [selectedItemIndex, setSelectedItemIndex] = React.useState(0)
-    var [categories, setCategories] = React.useState([])
-    const [showItem, setShowItem] = React.useState(true)
+
+    const [keyADD, setKeyADD] = React.useState(0)
     const selectedItems = (item, index) => {
         // console.log("Selected Item: ", item)
+        if (selectedItem?.id == item?.id) {
+            return mainSelectedItems(item)
+        }
         setImmediate(() => {
             setSelectedItem(item)
             setSelectedItemIndex(index)
+            setKeyADD(keyADD + 1)
+        })
+    }
+
+    const mainSelectedItems = async (item) => {
+
+        var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
+        await api.get("categories/" + item?.id, {
+            headers: {
+                Authorization: `Bearer ${admintoken}`,
+            }
+        }).then((res) => {
+            // console.log("Response for Top Category API:", res?.data)
+            for (let r = 0; r < res?.data?.custom_attributes.length; r++) {
+                if (res?.data?.custom_attributes[r].attribute_code == "image") {
+                    image = res?.data?.custom_attributes[r]?.value
+                    break;
+                }
+
+            }
+        }).catch((err) => {
+            console.log("Err Fetching image in DefaultCategoryItems: ", err)
+        })
+
+        navProps.navigate("Products", {
+            item,
+            mainCat_selected: data?.position,
+            sub_category_id: item?.id,
+            imageLinkMain: image,
+            otherCats: item,
+            whereAbouts: "fullcats",
+
         })
     }
 
@@ -34,30 +69,36 @@ const DefaultCategories = ({ data, navProps, firstSubItem,admintoken }) => {
         }
 
     }
+    // console.log("data", data);
 
     return (
-        <View style={styles.mainContainer}>
+
+
+        <View style={styles.mainContainer} key={keyADD}>
 
             <View style={styles.flatList_outerCont}>
 
                 {
                     data?.map((item, index) => {
                         // console.log("firstSubItem:::::; ", firstSubItem?.id)
-                        // console.log("selectedItem:::::; ", selectedItem)
-                        // console.log("item:::::;111", item?.id, " ", item?.name, " ", item?.is_active)
-
-
+                        // console.log("selectedItem:::::; ", item?.visibe_menu)
+                        // console.log("item:::::;111", item?.id, " ", item?.name, " ", item?.include_in_menu)
                         return (
                             <View
                                 key={String(index)}
                             >
 
-                                {item?.is_active == true &&
+                                {item?.visibe_menu == 1 &&
                                     <TouchableOpacity
+
                                         onPress={() => selectedItems(item, index)}
                                         activeOpacity={0.9}
                                         style={styles.flatList_Cont}>
-                                        <Image source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={[styles.image_cont, { borderWidth: item?.id == selectedItem?.id ? 3 : 0, }]} />
+                                        <Image
+                                            resizeMethod='resize'
+                                            source={{ uri: item?.image }}
+                                            resizeMode='cover'
+                                            style={[styles.image_cont, { borderWidth: item?.id == selectedItem?.id ? 3 : 0, }]} />
                                         <Text numberOfLines={1} style={styles.text_item}>{item?.name}</Text>
                                         <View style={{
                                             width: "100%",
@@ -67,22 +108,26 @@ const DefaultCategories = ({ data, navProps, firstSubItem,admintoken }) => {
                                             marginBottom: 10,
                                             marginTop: 2
                                         }} />
-                                    </TouchableOpacity>}
+                                    </TouchableOpacity>
+                                }
                             </View>
                         )
                     })
                 }
             </View>
 
-            <DefaultCategoryItems
-                data={selectedItem == null ? firstSubItem : selectedItem}
-                selectedItemIndex={selectedItemIndex}
-                mainCats={data}
-                navProps={navProps}
-                onNextPress={() => onNextPress()}
-                admintoken={admintoken}
-            />
+  
+                <DefaultCategoryItems
+                    data={selectedItem == null ? firstSubItem : selectedItem}
+                    selectedItemIndex={selectedItemIndex}
+                    mainCats={data}
+                    navProps={navProps}
+                    onNextPress={() => onNextPress()}
+                    admintoken={admintoken}
+                />
+            
         </View>
+
     )
 }
 

@@ -33,7 +33,23 @@ class MyOrders extends Component {
             drawer: !this.state.drawer
         })
     }
-
+    // obj = {
+    //     "cartItem": {
+    //         "sku": product?.sku,
+    //         "qty": this.state.rightEyeQuantity,
+    //         "name": product?.name,
+    //         "price": product?.price,
+    //         "product_type": product?.type_id == undefined ? product?.type : product?.type_id,
+    //         "quote_id": cartID,
+    //         "product_option": {
+    //             "extension_attributes": {
+    //                 "custom_options": this.state.custom_options_right,
+    //                 "configurable_item_options": this.state.configurable_item_options
+    //             }
+    //         }
+    //     }
+    // }
+    
     render() {
         var { userData: { orders } } = this.props
         console.log("Orders",orders);

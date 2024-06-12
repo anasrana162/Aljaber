@@ -5,7 +5,7 @@ import TabNavigator from '../../components_reusable/TabNavigator';
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
-import api from '../../api/api';
+import api, { custom_api_url } from '../../api/api';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -31,7 +31,7 @@ class Categories extends Component {
     defaultCategories = () => {
         const { userData: { createddefaultcategory } } = this.props
 
-        // console.log("userData", createddefaultcategory)
+        console.log("userData", createddefaultcategory)
         setImmediate(() => {
 
             this.setState({
@@ -44,10 +44,33 @@ class Categories extends Component {
         const { userData: { admintoken } } = this.props
         switch (key) {
             case 'main':
-                // console.log("Selected Item: ", item)
-                setImmediate(() => {
-                    this.setState({ selectedCat: item })
-                })
+                var tempArr = []
+                console.log("Selected Item: ", item)
+                for (let i = 0; i < item?.children_data?.length; i++) {
+
+                    await api.get(custom_api_url + "func=get_category_image&catid=" + item?.children_data[i]?.id)
+                        .then((res) => {
+
+                            item.children_data[i].image = "https://aljaberoptical.com" + res?.data?.image
+                            item.children_data[i].visibe_menu = res?.data?.visibe_menu
+                            if (item.children_data[i].visibe_menu == "1") {
+
+                                tempArr.push(item?.children_data[i])
+                            }
+                            if (item?.children_data?.length - 1 == i) {
+                                item.children_data = tempArr
+                                setImmediate(() => {
+                                    this.setState({
+                                        selectedCat: item
+                                    })
+                                })
+                            }
+
+                        }).catch((err) => {
+                            console.log("Err Fetching image in DefaultCategoryItems: ", err)
+                        })
+                }
+
                 break;
 
             case 'sub':
@@ -102,8 +125,7 @@ class Categories extends Component {
                             return (
                                 <>
                                     {/* item?.index != 0 this condition is for hiding shop by brand */}
-                                    {item?.item?.is_active == true && item?.index != 0 &&
-                                        item?.item?.id != 72 && item?.item?.id != 49 && item?.item?.id != 128 && item?.item?.id != 89 &&
+                                    {item?.item?.visibe_menu == "1" &&
                                         <TouchableOpacity
 
                                             onPress={() => this.selectedItems(item?.item, index, 'main')}
@@ -145,34 +167,34 @@ class Categories extends Component {
                         {
                             this.state.selectedCat?.children_data.map((item, index) => {
                                 // console.log(item)
-                                switch (item?.id) {
-                                    case 81:
-                                        item.is_active = false
-                                        break;
-                                    case 74:
-                                        item.is_active = false
-                                        break;
-                                    case 45:
-                                        item.is_active = false
-                                        break;
-                                    case 34:
-                                        item.is_active = false
-                                        break;
-                                    // case 72:
-                                    //     item.is_active = false
-                                    //     break;
-                                    // case 89:
-                                    //     item.is_active = false
-                                    //     break;
-                                    // case 128:
-                                    //     item.is_active = false
-                                    //     break;
-                                }
+                                // switch (item?.id) {
+                                //     case 81:
+                                //         item.is_active = false
+                                //         break;
+                                //     case 74:
+                                //         item.is_active = false
+                                //         break;
+                                //     case 45:
+                                //         item.is_active = false
+                                //         break;
+                                //     case 34:
+                                //         item.is_active = false
+                                //         break;
+                                //     // case 72:
+                                //     //     item.is_active = false
+                                //     //     break;
+                                //     // case 89:
+                                //     //     item.is_active = false
+                                //     //     break;
+                                //     // case 128:
+                                //     //     item.is_active = false
+                                //     //     break;
+                                // }
                                 return (
                                     <View
                                         key={String(index)}
                                     >
-                                        {item?.is_active == true &&
+                                        {item?.visibe_menu == "1" &&
                                             <TouchableOpacity
                                                 onPress={() => this.selectedItems(item, index, 'sub')}
 
@@ -186,14 +208,9 @@ class Categories extends Component {
                                                     zIndex: 150,
                                                 }}>
 
-                                                {item?.parent_id == 102 && <View style={[styles.image_Cont, {
-                                                    justifyContent: "center",
-                                                    alignItems: "center",
-                                                }]}>
-                                                    <Text numberOfLines={1} style={[styles.text_item, { color: "black", marginTop: 5, }]}>{item?.name}</Text>
-                                                </View>}
-                                                {item?.parent_id !== 102 && <Image resizeMode='stretch' source={{ uri: "https://aljaberoptical.com/pub/media/catalog/category_mobile/" + item?.id + ".jpg" }} style={styles.image_Cont} />}
-                                                {item?.parent_id !== 102 && <Text numberOfLines={1} style={[styles.text_item, { color: "black", marginTop: 5 }]}>{item?.name}</Text>}
+
+                                                <Image resizeMode='cover' source={{ uri: item?.image }} style={styles.image_Cont} />
+                                                <Text numberOfLines={1} style={[styles.text_item, { color: "black", marginTop: 5 }]}>{item?.name}</Text>
 
                                             </TouchableOpacity>
                                         }

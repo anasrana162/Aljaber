@@ -353,7 +353,7 @@ class Products extends Component {
                 actions.savedProducts(sub_category_id.toString(), result?.data)
             }
             else {
-                if (whereAbouts == 'banner') {
+                if (whereAbouts == 'banner' || whereAbouts == "otherCats") {
 
                 }
             }

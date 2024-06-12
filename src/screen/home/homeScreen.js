@@ -176,7 +176,7 @@ class HomeScreen extends Component {
 
     getBanners = () => {
         axios.get(custom_api_url + "func=get_home_banners").then((res) => {
-            console.log("fethch Banners Api Res", res?.data);
+            // console.log("fethch Banners Api Res", res?.data);
             setImmediate(() => {
                 this.setState({ banners: res?.data })
             })
@@ -394,42 +394,72 @@ class HomeScreen extends Component {
         // }
     }
 
-    defaultCategories = () => {
+    defaultCategories = async () => {
         const { actions, userData: { defaultcategory, admintoken } } = this.props
 
         var { children_data } = defaultcategory
         // console.log("tempArray1", defaultcategory)
-        actions?.createdDefaultCategories(children_data)
-
+        // actions?.createdDefaultCategories(children_data)
+        setImmediate(() => {
+            this.setState({ loader: true })
+        })
         // this to to hide some categories ID's are specified in switch
         var tempArr = []
         for (let i = 0; i < children_data?.length; i++) {
-            switch (children_data[i].id) {
-                case 50:
-                    children_data[i].is_active = false
-                    break;
-                case 72:
-                    children_data[i].parent_position = defaultcategory.position
-                    actions.offersObj(children_data[i])
-                    children_data[i].is_active = false
-                    break;
-                case 89:
-                    children_data[i].is_active = false
-                    break;
-                case 128:
-                    children_data[i].is_active = false
-                    break;
 
-                default:
-                    // /children_data[i].is_active = true
-                    tempArr.push(children_data[i])
-                    break;
-            }
+            // var image = "/pub/media/wysiwyg/smartwave/porto/theme_assets/images/banner2.jpg"
+            await api.get(custom_api_url + "func=get_category_image&catid=" + children_data[i]?.id)
+                .then((res) => {
+                    // console.log("Response for Top Category API:", res?.data)
+
+
+                    // console.log("Image fetch", res?.data);
+
+                    
+                    children_data[i].image = "https://aljaberoptical.com" + res?.data?.image
+                    children_data[i].visibe_menu = res?.data?.visibe_menu
+                    // console.log("children_data defaultCategories", children_data[i]);
+                    if(children_data[i].visibe_menu == "1"){
+
+                        tempArr.push(children_data[i])
+                    }
+                    // switch (children_data[i].id) {
+                    //     case 50:
+                    //         children_data[i].is_active = false
+                    //         break;
+                    //     case 72:
+                    //         children_data[i].parent_position = defaultcategory.position
+                    //         actions.offersObj(children_data[i])
+                    //         children_data[i].is_active = false
+                    //         break;
+                    //     case 89:
+                    //         children_data[i].is_active = false
+                    //         break;
+                    //     case 128:
+                    //         children_data[i].is_active = false
+                    //         break;
+
+                    //     default:
+                    //         // /children_data[i].is_active = true
+                    //         tempArr.push(children_data[i])
+                    //         break;
+                    // }
+
+
+
+                }).catch((err) => {
+                    console.log("Err Fetching image in DefaultCategoryItems: ", err)
+                })
+
         }
+        // console.log(tempArr);
+        actions?.createdDefaultCategories(tempArr)
         this.setState({
             defaultCategories1: tempArr,
-            firstSubItem: tempArr[0]
+            firstSubItem: tempArr[0],
+            loader: false,
         });
+        tempArr = []
         // this.topCatData(tempArr)
         // this.topCategoryData()
     }
@@ -488,7 +518,7 @@ class HomeScreen extends Component {
         }
         setImmediate(() => {
             this.setState({
-                loader: false,
+                // loader: false,
                 topCategoryData
             })
         })
@@ -804,6 +834,7 @@ class HomeScreen extends Component {
                         navProps={this.props.navigation}
                         firstSubItem={this.state.firstSubItem}
                         admintoken={this.props.userData.admintoken}
+
                     />}
 
                     {/** Categories like men, women etc */}
