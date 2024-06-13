@@ -74,6 +74,7 @@ class Account extends Component {
         actions.adminToken("")
         actions.user("")
         actions.myOrders("")
+        actions.cartItems("")
         AsyncStorage.setItem("@aljaber_userLoginData", "")
         // setTimeout(() => {
         //     // console.log("Actions Redex", actions)

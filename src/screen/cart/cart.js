@@ -98,10 +98,13 @@ class Cart extends Component {
                 case "updateCartItem":
                     this.updateCart()
                     break;
+                case "updateCartItem":
+                    this.updateCart()
+                    break;
 
                 case "proceed":
-                    console.log(" this.state.cartItems", this.state.cartItems,`${"\n"}`,this.state.subtotal);
-                    this.props.navigation.navigate('Billing_Shipping', { subtotal: this.state.subtotal, cartItems: this.state.cartItems, })
+                    this.updateCartThenProceed()
+
                     break;
             }
 
@@ -359,6 +362,66 @@ class Cart extends Component {
             })
     }
 
+    updateCartThenProceed = async () => {
+
+        var { updateCartItems, cartItems } = this.state
+        var { userData } = this.props
+        // console.log("working updateCart FUnc")
+        if (updateCartItems.length == 0) {
+            return console.log("working updateCart FUnc")
+        }
+        var cartItemsToSend = JSON.parse(JSON.stringify(cartItems))
+        for (let i = 0; i < updateCartItems.length; i++) {
+            // console.log("updateCartItems OBJ", updateCartItems[i])
+            if (cartItems[updateCartItems[i]?.index]?.item_id == updateCartItems[i]?.item_id) {
+                var obj = { "cartItem": cartItems[updateCartItems[i]?.index] }
+                // delete obj?.cartItem?.item_id;
+                delete obj?.cartItem?.image;
+                delete obj?.cartItem?.subtotal
+                if (cartItems[updateCartItems[i]?.index]?.product_option !== undefined) {
+
+                    for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options.length; u++) {
+                        // console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u])
+                        delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_title
+                        delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.custom_options[u].option_value_name
+                    }
+
+                    if (cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options == undefined) {
+                    } else {
+                        for (let u = 0; u < cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options.length; u++) {
+                            // console.log("cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options", cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u])
+                            delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_title
+                            delete cartItems[updateCartItems[i]?.index]?.product_option?.extension_attributes?.configurable_item_options[u].option_value_name
+                        }
+
+                    }
+                }
+                // console.log("Final OBJ", cartItems[updateCartItems[i]?.index].product_option?.extension_attributes)
+
+                await api.post("carts/mine/items", obj, {
+                    headers: {
+                        Authorization: `Bearer ${userData?.token}`,
+                    },
+                }).then((response) => {
+
+                    // console.log("Update Cart Item API response : ", response?.data)
+                    if (i == updateCartItems.length - 1) {
+                        setImmediate(() => {
+                            this.setState({ cartItems:cartItemsToSend})
+                        })
+                        // console.log(" this.state.cartItems", this.state.cartItems, `${"\n"}`, this.state.subtotal);
+                        this.props.navigation.navigate('Billing_Shipping', { subtotal: this.state.subtotal, cartItems: cartItemsToSend, })
+                        // cartItemsToSend= null
+                        this.getCartData()
+                        this.getCartItemDetails()
+                    }
+                }).catch((err) => {
+                    console.log("Update Cart item api error:  ", err)
+                })
+            }
+        }
+
+    }
     updateCart = async () => {
 
         var { updateCartItems, cartItems } = this.state
@@ -587,14 +650,14 @@ class Cart extends Component {
     // }
 
     minusOne = (qty, index) => {
-        var { cartData, cartItems, original, updateCartItems } = this.state
+        var { cartData, cartItems, original, updateCartItems, subtotal } = this.state
 
         if (qty > 1) {
 
             cartItems[index].qty = qty - 1  // for modified List 
             // original[index].qty = qty - 1  // For update cart API
-            //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
-
+            cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
+            subtotal = subtotal - cartItems[index].price
             // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
             // and index and pick whole object form cartItems to send to update cart API
             var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
@@ -604,21 +667,22 @@ class Cart extends Component {
                 // console.log("ID PUSHED")
                 updateCartItems.push({ item_id: cartItems[index].item_id, index: index })
             }
-
+            // this.calculateShipping()
             setImmediate(() => {
-                this.setState({ cartItems, updateCartItems, original })
+                this.setState({ cartItems, updateCartItems, original, subtotal })
             })
         }
 
     }
 
     plusOne = (qty, index) => {
-        var { cartData, cartItems, original, updateCartItems } = this.state
+        var { cartData, cartItems, original, updateCartItems, subtotal } = this.state
 
         // increasing quantity
         cartItems[index].qty = qty + 1  // for modified List 
         // original[index].qty = qty + 1  // For update cart API
-
+        cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
+        subtotal = subtotal + cartItems[index].price
         // we are saving the ID's and index of the object in updateCartItems so when we update cart we can match the id 
         // and index and pick whole object form cartItems to send to update cart API
         var check = updateCartItems.filter((data) => data?.item_id == cartItems[index].item_id)[0]
@@ -631,7 +695,7 @@ class Cart extends Component {
         //cartItems[index].subtotal = cartItems[index].price * cartItems[index].qty
 
         setImmediate(() => {
-            this.setState({ cartItems, updateCartItems, original })
+            this.setState({ cartItems, updateCartItems, original, subtotal })
         })
     }
 

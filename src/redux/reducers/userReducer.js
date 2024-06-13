@@ -1,8 +1,10 @@
 import {
     LANGUAGE, TOKEN, USER, GUESTCARTKEY, GUESTCARTID, ADMINTOKEN, DEFAULTCAT, CREATEDDEFAULTCAT, TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
+    // Main Categories
+    SUNGLASSES, CONTACTLENSES, EYEGLASSES, ACCESSEORIES, COMPUTERGLASSES, READINGGLASSES, OFFERS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
-    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES, OFFERS, OFFERSOBJ,
+    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES, OFFERSOBJ,
     // Cart
     CARTITEMS,
     //Orders
@@ -20,7 +22,6 @@ const initialState = {
     guestcartid: null,
     language: null,
     countries: [],
-    offers: null,
     offersobj: {},
     admintoken: null,
     defaultcategory: null,
@@ -31,6 +32,15 @@ const initialState = {
     searchproducts: null,
     orders: null,
     wishlist: [],
+    // Main Categories
+    sunglasses: [],
+    contactlenses: [],
+    eyeglasses: [],
+    accessories: [],
+    computerglasses: [],
+    readinglasses: [],
+    offers: [],
+    //Sub Categories
     clearpres: [],
     color: [],
     toric: [],
@@ -95,11 +105,7 @@ const userReducer = (state = initialState, action) => {
                 ...state,
                 offersobj: action.payload
             }
-        case OFFERS:
-            return {
-                ...state,
-                offers: action.payload
-            }
+
         case CREATEDDEFAULTCAT:
             return {
                 ...state,
@@ -145,6 +151,45 @@ const userReducer = (state = initialState, action) => {
                 ...state,
                 countries: action.payload
             }
+
+        // MAIN CATEGORIES
+        case CONTACTLENSES:
+            return {
+                ...state,
+                contactlenses: action.payload
+            };
+        case SUNGLASSES:
+            return {
+                ...state,
+                sunglasses: action.payload
+            };
+        case EYEGLASSES:
+            return {
+                ...state,
+                eyeglasses: action.payload
+            };
+
+        case COMPUTERGLASSES:
+            return {
+                ...state,
+                computerglasses: action.payload
+            }
+        case READINGGLASSES:
+            return {
+                ...state,
+                readinglasses: action.payload
+            }
+        case ACCESSEORIES:
+            return {
+                ...state,
+                accessories: action.payload
+            }
+        case OFFERS:
+            return {
+                ...state,
+                offers: action.payload
+            }
+
 
         // SUB CATEGORIES
 
@@ -244,6 +289,9 @@ const userReducer = (state = initialState, action) => {
                 ...state,
                 swimgoggles: action.payload
             }
+
+        case "":
+            return state
 
         default:
             return state;

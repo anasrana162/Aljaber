@@ -248,10 +248,10 @@ class Order_Details extends Component {
                         countries={this.state.countries}
                     />
 
-                    {this.state.reOrdering && <Loading />}
 
                 </ScrollView>
 
+                    {this.state.reOrdering && <Loading />}
 
 
 

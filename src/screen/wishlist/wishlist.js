@@ -11,6 +11,7 @@ import api, { custom_api_url, basis_auth } from '../../api/api';
 import { encode as base64encode } from 'base-64';
 import { FlatList } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
+import Loading from '../../components_reusable/loading';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
@@ -96,7 +97,7 @@ class Wishlist extends Component {
     removeItem = (productId) => {
         var { userData: { user: { id } } } = this.props
         console.log("IDS", id, "       ", productId, "      ", base64Credentials);
-
+        this.setState({ loader: true })
         api.delete(`${custom_api_url}func=del_wishlist`, {
             data: {
                 "productId": productId,
@@ -121,7 +122,7 @@ class Wishlist extends Component {
 
         var { userData } = this.props
         // console.log("userData", userData?.token)
-
+        this.setState({ loader: true })
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
             if (product?.type == "virtual" || product?.type == "simple") {
@@ -228,6 +229,7 @@ class Wishlist extends Component {
                     }
                     }
                 />
+                {this.state.loader &&<Loading/>}
 
             </View >
         )

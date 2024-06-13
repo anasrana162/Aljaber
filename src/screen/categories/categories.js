@@ -6,10 +6,14 @@ import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
 import api, { custom_api_url } from '../../api/api';
+import Loading from '../../components_reusable/loading';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
+
+import AntDesign from "react-native-vector-icons/AntDesign"
 
 class Categories extends Component {
 
@@ -18,7 +22,7 @@ class Categories extends Component {
         this.state = {
             defaultCategories: null,
             loader: false,
-            selectedCat: this.props?.userData?.createddefaultcategory[1],
+            selectedCat: null,
             selectedSubCat: null,
             tempArray: [],
         };
@@ -28,10 +32,41 @@ class Categories extends Component {
         this.defaultCategories()
     }
 
-    defaultCategories = () => {
+    defaultCategories = async () => {
         const { userData: { createddefaultcategory } } = this.props
+        // this.props?.userData?.createddefaultcategory[1]
+        var firstItem = this.props?.userData?.createddefaultcategory[0]
+        // console.log("userData", createddefaultcategory)
+        var tempArr = []
+        setImmediate(() => {
+            this.setState({
+                loader: true
+            })
+        })
+        for (let i = 0; i < firstItem?.children_data?.length; i++) {
+            await api.get(custom_api_url + "func=get_category_image&catid=" + firstItem?.children_data[i]?.id)
+                .then((res) => {
 
-        console.log("userData", createddefaultcategory)
+                    firstItem.children_data[i].image = "https://aljaberoptical.com" + res?.data?.image
+                    firstItem.children_data[i].visibe_menu = res?.data?.visibe_menu
+                    if (firstItem.children_data[i].visibe_menu == "1") {
+
+                        tempArr.push(firstItem?.children_data[i])
+                    }
+                    if (firstItem?.children_data?.length - 1 == i) {
+                        firstItem.children_data = tempArr
+                        setImmediate(() => {
+                            this.setState({
+                                selectedCat: firstItem,
+                                loader: false,
+                            })
+                        })
+                    }
+
+                }).catch((err) => {
+                    console.log("Err Fetching image in DefaultCategoryItems: ", err)
+                })
+        }
         setImmediate(() => {
 
             this.setState({
@@ -45,7 +80,13 @@ class Categories extends Component {
         switch (key) {
             case 'main':
                 var tempArr = []
-                console.log("Selected Item: ", item)
+                setImmediate(() => {
+                    this.setState({
+                        selectedCat: null,
+                        loader: true
+                    })
+                })
+                // console.log("Selected Item: ", item)
                 for (let i = 0; i < item?.children_data?.length; i++) {
 
                     await api.get(custom_api_url + "func=get_category_image&catid=" + item?.children_data[i]?.id)
@@ -61,7 +102,8 @@ class Categories extends Component {
                                 item.children_data = tempArr
                                 setImmediate(() => {
                                     this.setState({
-                                        selectedCat: item
+                                        selectedCat: item,
+                                        loader: false,
                                     })
                                 })
                             }
@@ -99,7 +141,8 @@ class Categories extends Component {
                     sub_category_id: item?.id,
                     defaultCategories: this.state.defaultCategories,
                     mainCat_selected: this.state.selectedCat?.position,
-                    imageLinkMain: image
+                    imageLinkMain: image,
+                    otherCats: this.state.selectedCat,
                 })
         }
     }
@@ -162,8 +205,99 @@ class Categories extends Component {
                         } */}
                 </View>
                 <ScrollView style={{ width: width }}>
+                    <View style={{ width: width - 30, alignSelf: "center" }}>
 
-                    <View style={styles.flatList_outerCont_sub}>
+                        <View style={styles.flatList_outerCont_sub_new}>
+                            {
+                                this.state.selectedCat?.children_data.map((item, index) => {
+
+                                    return (
+                                        <View
+                                            key={String(index)}
+                                        >
+                                            {item?.visibe_menu == "1" &&
+                                                <TouchableOpacity
+                                                    onPress={() => this.selectedItems(item, index, 'sub')}
+
+                                                    style={{
+                                                        width: 180,
+                                                        height: 200,
+                                                        borderColor: "#020621",
+                                                        marginBottom: 20,
+                                                        overflow: "hidden",
+                                                        marginHorizontal: 10,
+                                                        zIndex: 150,
+                                                        borderRadius: 10,
+                                                        alignItems: "center",
+                                                        // alignSelf:"flex-end",
+                                                        justifyContent: "center",
+                                                    }}>
+                                                    <LinearGradient
+                                                        colors={["#54595fee", "#54595fee", "#54595fee",
+                                                            "#54595fee", "#54595fd1", "#54595fc9", "#54595f8b", "#54595f68",
+                                                            "#54595f5d", "#54595f3f", "#54595f2f", "#54595f0f", "#54595f00",
+                                                            "#54595f00", "#54595f00", "#54595f00", "#54595f00", "#54595f00",
+                                                            "#54595f00", "#54595f00", "#54595f00", "#54595f00", "#54595f00", "#54595f00", "#54595f00"].reverse()}
+                                                        // start={{ x: 0, y: 0.5 }} // Start from left
+                                                        // end={{ x: 1, y: 0.5 }} // End at right
+                                                        style={{
+                                                            width: "100%",
+                                                            height: "100%",
+                                                            position: "absolute",
+                                                            zIndex: 250,
+                                                            justifyContent: "center",
+                                                            alignItems: "center",
+                                                        }}>
+
+                                                    </LinearGradient>
+                                                    <Image
+                                                        source={require('../../../assets/giflogo.gif')}
+                                                        style={[styles.image_Cont_new, { position: "absolute" }]}
+                                                    />
+                                                    {/* <View style={{
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    backgroundColor: "black",
+                                                    opacity: 0.2,
+                                                    position: "absolute",
+                                                    zIndex: 250,
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                }}>
+
+                                                </View> */}
+                                                    <View style={{
+                                                        width: 140,
+                                                        flexDirection: "row", position: "absolute",
+                                                        alignSelf: "center",
+                                                        zIndex: 250,
+                                                        justifyContent: "center",
+                                                        alignItems: "center",
+                                                        bottom: 15
+                                                    }}>
+
+                                                        <Text style={[styles.text_item, {
+                                                            color: "#ffffff",
+                                                            marginTop: 5,
+                                                            fontSize: 16,
+                                                            fontWeight: "bold"
+                                                            // marginRight: 5
+                                                        }]}>{item?.name}</Text>
+                                                        {/* <AntDesign name="right" size={20} color="white" /> */}
+                                                    </View>
+
+
+                                                    <Image resizeMode='cover' source={{ uri: item?.image }} style={styles.image_Cont_new} />
+
+                                                </TouchableOpacity>
+                                            }
+                                        </View>
+                                    )
+                                })
+                            }
+                        </View>
+                    </View>
+                    {/* <View style={styles.flatList_outerCont_sub}>
                         {
                             this.state.selectedCat?.children_data.map((item, index) => {
                                 // console.log(item)
@@ -218,8 +352,9 @@ class Categories extends Component {
                                 )
                             })
                         }
-                    </View>
+                    </View> */}
                 </ScrollView>
+                {this.state.loader && <Loading />}
                 {/** Tab Navigator */}
                 <TabNavigator screenName={"category"} navProps={this.props.navigation} />
             </View>
@@ -281,12 +416,28 @@ const styles = StyleSheet.create({
         marginTop: 20
         //backgroundColor:"red",
     },
+    flatList_outerCont_sub_new: {
+        width: "100%",
+        alignSelf: "center",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: 'flex-start',
+        alignItems: "center",
+        marginBottom: 200,
+        // marginLeft:20,
+        marginTop: 20
+        //backgroundColor:"red",
+    },
     image_Cont: {
         width: 160,
         height: 150,
         borderWidth: 1,
         borderRadius: 20,
         borderColor: "#020621",
+    },
+    image_Cont_new: {
+        width: "100%",
+        height: "100%",
     },
     flatList_Cont: {
         padding: 5,

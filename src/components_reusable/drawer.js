@@ -102,6 +102,7 @@ export default class Drawer extends Component {
                     actions.adminToken("")
                     actions.user("")
                     actions.myOrders("")
+                    actions.cartItems("")
                     AsyncStorage.setItem("@aljaber_userLoginData", "")
                 }, 1000)
                 break;
@@ -144,7 +145,7 @@ export default class Drawer extends Component {
                                             </TouchableOpacity>
 
                                             {/* Offers */}
-                                            <TouchableOpacity
+                                            {/* <TouchableOpacity
                                                 onPress={() => this.onPress("offers")}
                                                 style={styles.touchable}>
                                                 <Text style={styles.text_touchable}>Offers</Text>
@@ -153,7 +154,7 @@ export default class Drawer extends Component {
                                                         rotate: "90deg"
                                                     }], marginRight: 6
                                                 }} />
-                                            </TouchableOpacity>
+                                            </TouchableOpacity> */}
                                             {/* Contact Us */}
                                             <TouchableOpacity
                                                 onPress={() => this.onPress("contact_us")}
@@ -271,7 +272,7 @@ export default class Drawer extends Component {
                                             </TouchableOpacity>
 
                                             {/* Offers */}
-                                            <TouchableOpacity
+                                            {/* <TouchableOpacity
                                                 onPress={() => this.onPress("offers")}
                                                 style={styles.touchable}>
                                                 <Text style={styles.text_touchable}>Offers</Text>
@@ -280,7 +281,7 @@ export default class Drawer extends Component {
                                                         rotate: "90deg"
                                                     }], marginRight: 6
                                                 }} />
-                                            </TouchableOpacity>
+                                            </TouchableOpacity> */}
 
 
                                             {/* Logout */}

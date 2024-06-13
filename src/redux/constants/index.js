@@ -12,6 +12,18 @@ export const SEARCHPRODUCTS = 'SEARCHPRODUCTS';
 export const RANDOMPRODUCTS = "RANDOMPRODUCTS";
 export const CARTITEMS = "CARTITEMS";
 export const CLEARPRES = "CLEARPRES";
+export const ORDERS = "ORDERS";
+export const WISHLIST = "WISHLIST";
+export const COUNTRIES = "COUNTRIES";
+// Main Categories
+export const SUNGLASSES = "SUNGLASSES";
+export const CONTACTLENSES = "CONTACTLENSES";
+export const EYEGLASSES = "EYEGLASSES";
+export const ACCESSEORIES = "ACCESSEORIES";
+export const COMPUTERGLASSES = "COMPUTERGLASSES";
+export const READINGGLASSES = "READINGGLASSES";
+export const OFFERS = "OFFERS";
+//Sub categories
 export const COLOR = "COLOR";
 export const TORIC = "TORIC";
 export const PRESBYOPIA = "PRESBYOPIA";
@@ -27,11 +39,8 @@ export const SGKIDS = "SGKIDS";
 export const CORDS = "CORDS";
 export const SPRAYCLEANER = "SPRAYCLEANER";
 export const CASES = "CASES";
-export const OFFERS = "OFFERS";
 export const OFFERSOBJ = "OFFERSOBJ";
 export const GIFTCARDS = "GIFTCARDS";
 export const SAFETYGLASSES = "SAFETYGLASSES";
 export const SWIMMIMINGGOGGLES = "SWIMMIMINGGOGGLES";
-export const ORDERS = "ORDERS";
-export const WISHLIST = "WISHLIST";
-export const COUNTRIES = "COUNTRIES";
+

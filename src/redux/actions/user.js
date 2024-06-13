@@ -1,8 +1,10 @@
 import {
     LANGUAGE, TOKEN, GUESTCARTKEY, GUESTCARTID, ADMINTOKEN, USER, DEFAULTCAT, CREATEDDEFAULTCAT, TOPCATDATA, ALLPRODUCTS, RANDOMPRODUCTS, SEARCHPRODUCTS,
+    // Main Categories
+    SUNGLASSES, CONTACTLENSES, EYEGLASSES, ACCESSEORIES, COMPUTERGLASSES, READINGGLASSES, OFFERS,
     // SUb Categories
     CLEARPRES, COLOR, TORIC, PRESBYOPIA, LENSSOL, CGADULTS, CGKIDS, EGMEN, EGWOMEN, EGKIDS,
-    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES, OFFERS, OFFERSOBJ,
+    SGMEN, SGWOMEN, SGKIDS, CORDS, SPRAYCLEANER, CASES, GIFTCARDS, SAFETYGLASSES, SWIMMIMINGGOGGLES, OFFERSOBJ,
     // Cart
     CARTITEMS,
     //Orders
@@ -126,6 +128,43 @@ export function myOrders(orders) {
 export function savedProducts(category_id, savedproducts) {
     switch (category_id) {
 
+        // Main Categories
+        case "4":
+            return {
+                type: CONTACTLENSES,
+                payload: savedproducts
+            }
+        case "24":
+            return {
+                type: COMPUTERGLASSES,
+                payload: savedproducts
+            }
+        case "25":
+            return {
+                type: EYEGLASSES,
+                payload: savedproducts
+            }
+        case "26":
+            return {
+                type: SUNGLASSES,
+                payload: savedproducts,
+            }
+        case "72":
+            return {
+                type: OFFERS,
+                payload: savedproducts
+            }
+        case "102":
+            return {
+                type: ACCESSEORIES,
+                payload: savedproducts
+            }
+        case "34":
+            return {
+                type: READINGGLASSES,
+                payload: savedproducts
+            }
+        // Sub Categories
         // Category Contact Lenses
         case "29":
             return {
@@ -233,12 +272,15 @@ export function savedProducts(category_id, savedproducts) {
             return {
 
             }
-        // Offers
-        case "72":
+
+        default:
+            console.log("reaching default");
             return {
-                type: OFFERS,
+                type: "",
                 payload: savedproducts
             }
+            
+
 
     }
 

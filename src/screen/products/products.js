@@ -16,6 +16,7 @@ import { ImageArray } from '../categories/categoryData';
 import axios from 'axios';
 import FilterBoard from './components/filterBoard';
 import Drawer from '../../components_reusable/drawer';
+import Loading from '../../components_reusable/loading';
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -36,6 +37,7 @@ class Products extends Component {
             original: null,
             loader: false,
             loaderFilter: false,
+            filterMenuLoad: false,
             productApiCounter: 0,
             filterBoardOpen: false,
             filtered_product_ids: [],
@@ -202,9 +204,9 @@ class Products extends Component {
         // setImmediate(() => {
         //     this.setState({ breakLoop: "break", loopInProgress: false })
         // })
-        // setTimeout(() => {
+        setTimeout(() => {
         this.props.navigation.pop()
-        // }, 500)
+        }, 500)
         return true;
     }
     goBack = () => {
@@ -220,19 +222,51 @@ class Products extends Component {
     }
 
     checkExistingProductData = () => {
-        const { userData: { admintoken, allproducts, clearpres, color, toric, pres, lenssol,
-            cgadults, cgkids, egmen, egwomen, egkids, sgmen, sgwomen, offers,
+        const { userData: { admintoken, allproducts,
+            // Main Categories
+            sunglasses,
+            contactlenses,
+            eyeglasses,
+            accessories,
+            computerglasses,
+            readinglasses,
+            offers,
+            // Sub categories
+            clearpres, color, toric, pres, lenssol,
+            cgadults, cgkids, egmen, egwomen, egkids, sgmen, sgwomen,
             sgkids, cords, spraycleaner, cases, giftcards, safetyglasses, swimgoggles },
             actions, userData, route: { params: { sub_category_id, otherCats } } } = this.props
 
         // console.log("otherCats |||||", otherCats)
 
 
-        console.log("swicth working");
+        // console.log("swicth working");
         switch (sub_category_id) {
+
+            case 34:
+                this.createData(readingglasses)
+                break
+            case 102:
+                this.createData(accessories)
+                break
+            case 4:
+                this.createData(contactlenses)
+                break
+            case 24:
+                this.createData(computerglasses)
+                break
+            case 25:
+                this.createData(eyeglasses)
+                break
+            // Main Categories
+            case 26:
+                this.createData(sunglasses)
+                break
+
+            // Sub categories
             // Category Contact Lenses
             case 29:
-                console.log("Working clearpres")
+                // console.log("Working clearpres")
                 this.createData(clearpres)
                 break;
             case 30:
@@ -328,12 +362,12 @@ class Products extends Component {
 
             })
         })
-        console.log("saved Products", savedProducts);
+        // console.log("saved Products", savedProducts);
         let products = []
         if (savedProducts == null || savedProducts.length == 0 || savedProducts == undefined) {
             console.log('sub_category_id :>> ', sub_category_id);
             var result = await api.get(custom_api_url + "func=get_category_products&cid=" + sub_category_id)
-            console.log("result", result.data);
+            // console.log("result", result.data);
             var sorted = result.data.slice().sort(function (a, b) {
                 return a.price - b.price;
             });
@@ -348,15 +382,16 @@ class Products extends Component {
 
             // Reversing Array because data is showing from wrong end
             result.data = result?.data?.reverse()
+            actions.savedProducts(sub_category_id.toString(), result?.data)
             // console.log("ub_category_id.toString()", result.data);
-            if (whereAbouts == undefined) {
-                actions.savedProducts(sub_category_id.toString(), result?.data)
-            }
-            else {
-                if (whereAbouts == 'banner' || whereAbouts == "otherCats") {
+            // if (whereAbouts == undefined) {
+            //     actions.savedProducts(sub_category_id.toString(), result?.data)
+            // }
+            // else {
+            //     if (whereAbouts == 'banner' || whereAbouts == "otherCats") {
 
-                }
-            }
+            //     }
+            // }
 
             setImmediate(() => {
 
@@ -1394,7 +1429,7 @@ class Products extends Component {
         } else {
             mainIndex = mainIndex - 1
         }
-        // console.log("children_data", mainIndex)
+        // console.log("children_data inner_cats", defaultcategory?.children_data[mainIndex]?.children_data[item.position - 1])
         // console.log("defaultCategories", defaultcategory?.children_data[mainIndex]?.children_data[item.position - 1]?.children_data)
 
         var inner_cats = defaultcategory?.children_data[mainIndex]?.children_data[item.position - 1]?.children_data
@@ -1906,9 +1941,27 @@ class Products extends Component {
 
     openFilterBoard = () => {
         // console.log("opening")
+        // setImmediate(() => {
+        //     this.setState({
+        //         filterBoardOpen: !this.state.filterBoardOpen,
+        //         filterMenuLoad: true
+        //     })
+        // })
+
+
+        setTimeout(() => {
+            this.setState({
+                filterBoardOpen: !this.state.filterBoardOpen,
+                // filterMenuLoad: false
+            })
+        }, 1000)
+    }
+
+    closeFilterBoard = () => {
         setImmediate(() => {
             this.setState({
-                filterBoardOpen: !this.state.filterBoardOpen
+                filterBoardOpen: !this.state.filterBoardOpen,
+
             })
         })
     }
@@ -1928,14 +1981,8 @@ class Products extends Component {
     addToCart = (product, index) => {
 
         var { userData } = this.props
-        // console.log("userData", userData?.token)
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
-
-            // if (product?.type_id == "virtual" || product?.type_id == "simple") {
-
-            //     if (product?.options.length == 0) {
-
             var obj = {
                 "cartItem": {
                     "sku": product?.sku,
@@ -1946,7 +1993,6 @@ class Products extends Component {
                     "quote_id": userData?.user?.cartID
                 }
             }
-            // console.log("this product does not have options", obj)
 
             api.post("carts/mine/items", obj, {
                 headers: {
@@ -1956,23 +2002,10 @@ class Products extends Component {
                 // console.log("Add to cart Item API response : ", response?.data)
                 alert("Product Added to Cart!")
             }).catch((err) => {
-
-                alert(err?.response.data.message)
-
+                // alert(err?.response.data.message)
                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                 console.log("Add to cart item api error:  ", err)
             })
-
-            //     } else {
-            //         // console.log("this product has options")
-            //         this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-            //         return alert("Please select a Product Options!")
-            //     }
-
-            // } else {
-            //     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-            //     return alert("Please select a Product varient color!")
-            // }
 
         } else {
             alert("Please Login to your account first!")
@@ -1996,10 +2029,6 @@ class Products extends Component {
         var { userData } = this.props
 
         if (userData?.admintoken !== null || userData?.guestcartkey !== null) {
-            console.log("userData?.admintoken", userData?.guestcartid);
-            // if (product?.type_id == "virtual" || product?.type_id == "simple") {
-
-            //     if (product?.options.length == 0) {
 
             var obj = {
                 "cartItem": {
@@ -2011,7 +2040,6 @@ class Products extends Component {
                     "quote_id": userData?.guestcartid?.id
                 }
             }
-            console.log("this product does not have options", obj)
 
             api.post("guest-carts/" + userData?.guestcartkey + "/items", obj, {
                 headers: {
@@ -2021,21 +2049,10 @@ class Products extends Component {
                 console.log(" Guest Add to cart Item API response : ", response?.data)
                 alert("Product Added to Cart!")
             }).catch((err) => {
-                alert(err?.response.data.message)
+                // alert(err?.response.data.message)
                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                 console.log("Add to cart item api error:  ", err)
             })
-
-            //     } else {
-            //         console.log("this product has options")
-            //         this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-            //         return alert("Please select a Product Options!")
-            //     }
-
-            // } else {
-            //     // this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-            //     return alert("Please select a Product varient color!")
-            // }
 
         }
 
@@ -2158,22 +2175,24 @@ class Products extends Component {
                     applyFilter={(product_ids) => this.applyFilter(product_ids)}
                     removeFilter={(product_ids) => this.removeFilter(product_ids)}
                     updatePriceFilter={(val) => this.updatePriceFilter(val)}
-                    onDismiss={() => this.openFilterBoard()}
+                    onDismiss={() => this.closeFilterBoard()}
                     reloadScreen={() => this.onScreenReload()}
                 />
 
 
                 {this.state.loaderFilter &&
                     <View style={{ position: "absolute", bottom: 0, zIndex: 200, backgroundColor: "#ffffff", width: width, height: 60, justifyContent: "center", alignItems: "center" }}>
-
                         <ActivityIndicator size="small" color="black" />
                     </View>}
+
+                {/* {this.state.filterMenuLoad == true && <Loading />} */}
 
                 <TouchableOpacity
                     onPress={() => this.goBack()}
                     style={styles.home_btn}>
                     <Ionicons name="home" size={22} color="white" />
                 </TouchableOpacity>
+
 
             </View >
         )

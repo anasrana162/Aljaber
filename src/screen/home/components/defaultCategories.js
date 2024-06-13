@@ -62,9 +62,11 @@ const DefaultCategories = ({ data, navProps, firstSubItem, admintoken, loaderDot
         if (data[selectedItemIndex + 1] == undefined) {
             setSelectedItem(firstSubItem)
             setSelectedItemIndex(0)
+            setKeyADD(keyADD + 1)
         } else {
             setSelectedItem(data[selectedItemIndex + 1])
             setSelectedItemIndex(selectedItemIndex + 1)
+            setKeyADD(keyADD + 1)
 
         }
 

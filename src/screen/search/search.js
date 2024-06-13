@@ -1,16 +1,15 @@
-import { Text, StyleSheet, Image,  View, Dimensions, NativeModules, FlatList, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Text, StyleSheet, Image, View, Dimensions, NativeModules, FlatList, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native'
 import React, { Component } from 'react'
 import { TextInput } from 'react-native-gesture-handler';
 {/* {---------------Redux Imports------------} */ }
 import { connect } from 'react-redux';
 import * as userActions from "../../redux/actions/user"
 import { bindActionCreators } from 'redux';
-
+import api, { basis_auth } from '../../api/api';
 import Entypo from "react-native-vector-icons/Entypo"
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import Ionicons from "react-native-vector-icons/Ionicons"
-
-
+import { encode as base64encode } from 'base-64'
 const { StatusBarManager: { HEIGHT } } = NativeModules;
 const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
@@ -73,7 +72,7 @@ class Search extends Component {
 
     selectedItem = (product, index) => {
         console.log("Product Selected:", product)
-        this.props.navigation.navigate("ProductDetails", { product_details:  product, product_index: index })
+        this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
     }
 
     addToCart = (product, index) => {
@@ -83,34 +82,34 @@ class Search extends Component {
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
-            if ( product?.type == "simple") {
+            if (product?.type == "simple") {
 
 
-                    var obj = {
-                        "cartItem": {
-                            "sku": product?.sku,
-                            "qty": 1,
-                            "name": product?.name,
-                            "price": product?.price,
-                            "product_type": product?.type,
-                            "quote_id": userData?.user?.cartID
-                        }
+                var obj = {
+                    "cartItem": {
+                        "sku": product?.sku,
+                        "qty": 1,
+                        "name": product?.name,
+                        "price": product?.price,
+                        "product_type": product?.type,
+                        "quote_id": userData?.user?.cartID
                     }
-                    console.log("this product does not have options", obj)
+                }
+                console.log("this product does not have options", obj)
 
-                    api.post("carts/mine/items", obj, {
-                        headers: {
-                            Authorization: `Bearer ${userData?.token}`,
-                        },
-                    }).then((response) => {
-                        console.log("Add to cart Item API response : ", response?.data)
-                        alert("Product Added to Cart!")
-                    }).catch((err) => {
-                        console.log("Add to cart item api error:  ", err)
-                        this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
-                    })
+                api.post("carts/mine/items", obj, {
+                    headers: {
+                        Authorization: `Bearer ${userData?.token}`,
+                    },
+                }).then((response) => {
+                    console.log("Add to cart Item API response : ", response?.data)
+                    alert("Product Added to Cart!")
+                }).catch((err) => {
+                    console.log("Add to cart item api error:  ", err)
+                    this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                })
 
-           
+
 
             } else {
                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
@@ -123,6 +122,33 @@ class Search extends Component {
             alert("Please Login to your account first!")
             this.props.navigation.navigate("Account", { modal: "open" })
         }
+
+    }
+    addToWishList = (productId) => {
+        var { userData: { user } } = this.props
+        console.log("Product ID:   ", productId);
+        if (userData?.token !== null || userData?.user?.cartID !== undefined) {
+            const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
+            api.post(custom_api_url + "func=add_wishlist", {
+                "productId": productId,
+                "customerId": user?.id
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Basic ${base64Credentials}`,
+                },
+            }).then((res) => {
+                console.log("Product added to widhlist Home Screen Result:   ", res?.data);
+                alert("Product Successfully Added")
+            }).catch((err) => {
+                console.log("Product added to widhlist Home Screen Error:   ", err?.response?.data?.message);
+            })
+        } else {
+            alert("Please Login to your account first!")
+            this.props.navigation.navigate("Account", { modal: "open" })
+        }
+
+
 
     }
 
@@ -140,7 +166,7 @@ class Search extends Component {
                         style={{
                             width: "90%",
                             height: "100%",
-                            color:"black"
+                            color: "black"
                         }}
                         autoFocus={true}
                         autoCorrect={false}
@@ -179,9 +205,10 @@ class Search extends Component {
             )
         }
 
-    
+
 
         const renderItem = (products) => {
+            // console.log("products",products);
             return (
                 <TouchableOpacity
                     onPress={() => this.selectedItem(products?.item, products?.index)}
@@ -204,7 +231,9 @@ class Search extends Component {
                         <Text style={[styles.product_Name, { fontSize: 13, marginTop: 5 }]}>AED {products?.item?.price}</Text>
 
                         <View style={styles.addToCart_Outer_Cont}>
-                            <TouchableOpacity style={styles.wishlist_button}>
+                            <TouchableOpacity 
+                             onPress={() => this.addToCart(products?.item?.id)}
+                            style={styles.wishlist_button}>
                                 <MaterialCommunityIcons name="cards-heart-outline" size={20} color="black" />
                             </TouchableOpacity>
                             <TouchableOpacity
