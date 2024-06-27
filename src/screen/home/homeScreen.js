@@ -415,11 +415,11 @@ class HomeScreen extends Component {
 
                     // console.log("Image fetch", res?.data);
 
-                    
+
                     children_data[i].image = "https://aljaberoptical.com" + res?.data?.image
                     children_data[i].visibe_menu = res?.data?.visibe_menu
                     // console.log("children_data defaultCategories", children_data[i]);
-                    if(children_data[i].visibe_menu == "1"){
+                    if (children_data[i].visibe_menu == "1") {
 
                         tempArr.push(children_data[i])
                     }
@@ -637,18 +637,39 @@ class HomeScreen extends Component {
 
     }
 
-    isUserLoggedIn = (product, index) => {
+    isUserLoggedIn = (product, index, key) => {
         var { userData: { user, } } = this.props
-        if (Object.keys(user).length == 0) {
-            this.addToCartGuest(product, index)
-        } else {
-            this.addToCart(product, index)
+        switch (key) {
+            case "cart":
+
+                if (Object.keys(user).length == 0) {
+                    console.log("userLogged in");
+                    this.addToCartGuest(product, index)
+                } else {
+                    this.addToCart(product, index)
+                }
+                break;
+
+            case "wishlist":
+                if (Object.keys(user).length == 0) {
+                    console.log("userLogged in");
+                    // this.addToWishList(product, index)
+                    alert("Please Login in to your account")
+                } else {
+                    this.addToWishList(product)
+                }
+                break;
         }
     }
 
     addToCartGuest = (product, index) => {
 
         var { userData } = this.props
+        setImmediate(() => {
+            this.setState({
+                loader: true
+            })
+        })
 
         if (userData?.admintoken !== null || userData?.guestcartkey !== null) {
 
@@ -673,20 +694,40 @@ class HomeScreen extends Component {
                             Authorization: `Bearer ${userData?.admintoken}`,
                         },
                     }).then((response) => {
+                        setImmediate(() => {
+                            this.setState({
+                                loader: false
+                            })
+                        })
                         console.log(" Guest Add to cart Item API response : ", response?.data)
                         alert("Product Added to Cart!")
                     }).catch((err) => {
+                        setImmediate(() => {
+                            this.setState({
+                                loader: false
+                            })
+                        })
                         console.log("Add to cart item api error:  ", err)
                     })
 
                 } else {
                     console.log("this product has options")
+                    setImmediate(() => {
+                        this.setState({
+                            loader: false
+                        })
+                    })
                     this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                     return alert("Please select a Product Options!")
                 }
 
             } else {
                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
+                setImmediate(() => {
+                    this.setState({
+                        loader: false
+                    })
+                })
                 return alert("Please select a Product varient color!")
             }
 
@@ -694,6 +735,11 @@ class HomeScreen extends Component {
 
         else {
             alert("Something Went wrong!")
+            setImmediate(() => {
+                this.setState({
+                    loader: false
+                })
+            })
             // this.props.navigation.navigate("Account", { modal: "open" })
         }
 
@@ -702,6 +748,11 @@ class HomeScreen extends Component {
 
         var { userData } = this.props
         console.log("userData", userData?.token)
+        setImmediate(() => {
+            this.setState({
+                loader: true
+            })
+        })
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
 
@@ -728,8 +779,18 @@ class HomeScreen extends Component {
             }).then((response) => {
                 console.log("Add to cart Item API response : ", response?.data)
                 alert("Product Added to Cart!")
+                setImmediate(() => {
+                    this.setState({
+                        loader: false
+                    })
+                })
             }).catch((err) => {
                 alert(err?.response.data.message)
+                setImmediate(() => {
+                    this.setState({
+                        loader: false
+                    })
+                })
                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                 console.log("Add to cart item api error:  ", err)
             })
@@ -764,6 +825,11 @@ class HomeScreen extends Component {
     addToWishList = (productId) => {
         var { userData: { user } } = this.props
         console.log("Product ID:   ", productId);
+        setImmediate(() => {
+            this.setState({
+                loader: true
+            })
+        })
         const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
         api.post(custom_api_url + "func=add_wishlist", {
             "productId": productId,
@@ -776,7 +842,17 @@ class HomeScreen extends Component {
         }).then((res) => {
             console.log("Product added to widhlist Home Screen Result:   ", res?.data);
             alert("Product Successfully Added")
+            setImmediate(() => {
+                this.setState({
+                    loader: false
+                })
+            })
         }).catch((err) => {
+            setImmediate(() => {
+                this.setState({
+                    loader: false
+                })
+            })
             console.log("Product added to widhlist Home Screen Error:   ", err?.response?.data?.message);
         })
 
@@ -812,6 +888,7 @@ class HomeScreen extends Component {
                 <HomeHeader
                     navProps={this.props.navigation}
                     openDrawer={() => this.openDrawer()}
+                    isLoggedIn={Object.keys(user).length == 0 ? false : true}
                 />
 
                 {/* Drawer */}
@@ -849,8 +926,8 @@ class HomeScreen extends Component {
                         data={this.state.randomProducts}
                         loaderDot={this.state.loaderDot}
                         navProps={this.props.navigation}
-                        addToCart={(product, index) => this.isUserLoggedIn(product, index)}
-                        addToWishList={(id) => this.addToWishList(id)}
+                        addToCart={(product, index) => this.isUserLoggedIn(product, index,"cart")}
+                        addToWishList={(id) => this.isUserLoggedIn(id,"","wishlist")}
                     />
 
 

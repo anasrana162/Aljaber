@@ -116,8 +116,9 @@ class Billing_Shipping extends Component {
 
     checkAddress = () => {
         var { userData } = this.props
-        // console.log("Addresses:  ", userData?.user?.addresses)
+        console.log("Addresses:  ", userData?.user?.addresses)
         // console.log("Addresses:  ", userData?.cartitems)
+
         if (userData?.user?.addresses?.length == 0) {
             setImmediate(() => {
                 this.setState({
@@ -129,6 +130,7 @@ class Billing_Shipping extends Component {
                 this.setState({
                     addressEmpty: false,
                     addresses: userData?.user?.addresses,
+                    selectedAddress:userData?.user?.addresses[0]
                 })
             })
         }
@@ -136,7 +138,7 @@ class Billing_Shipping extends Component {
 
     selectAddress = (item, index, country) => {
         var { subtotal } = this.props?.route?.params
-        // console.log("Selected Address: ", item)
+        console.log("Selected Address: ", item)
         if ((item?.country_id == "AE" || country == "United Arab Emirates") && subtotal >= 150) {
             this.setState({
                 isShippingFree: true
@@ -720,7 +722,8 @@ class Billing_Shipping extends Component {
                                 showsVerticalScrollIndicator={false}
                                 style={{ width: "100%" }}>
 
-                                {cartItems.map((item, index) => {
+                                {cartItems?.map((item, index) => {
+                                    console.log("Item", item);
                                     return (
                                         <View key={index} style={styles.order_summary_item}>
                                             <Image
@@ -739,7 +742,7 @@ class Billing_Shipping extends Component {
                                                     right: 10,
                                                     borderRadius: 20,
                                                 }}>
-                                                    <Text style={[styles.text_style, { fontSize: 13, fontWeight: "700", }]}>AED {item?.price}</Text>
+                                                    <Text style={[styles.text_style, { fontSize: 13, fontWeight: "700", }]}>AED {item?.subtotal}</Text>
                                                 </View>
                                                 {item?.product_option !== undefined &&
 

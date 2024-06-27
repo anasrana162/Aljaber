@@ -65,7 +65,7 @@ const OptionDropdown = ({
                                         style={styles?.dropDown_item_style}>
                                         {selectedItem?.title !== item?.title && <Fontisto name="check" size={16} color="white" style={{ marginLeft: 10 }} />}
                                         {selectedItem?.title == item?.title && <Fontisto name="check" size={16} color="black" style={{ marginLeft: 10 }} />}
-                                        <Text style={styles.dropDown_item_text}>{item?.title}</Text>
+                                        <Text style={styles.dropDown_item_text}>{item?.title}    {item?.price == 0 ? "" : `+ AED ${item?.price}`}</Text>
                                     </TouchableOpacity>
                                 )
                             })

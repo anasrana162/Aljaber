@@ -68,9 +68,9 @@ class Review_Payment_Guest extends Component {
             loader: false,
             source: {
                 html: ``,
-              },
-              flagforwebview: false,
-              buttomButton: false,
+            },
+            flagforwebview: false,
+            buttomButton: false,
         };
     }
 
@@ -414,83 +414,83 @@ class Review_Payment_Guest extends Component {
     }
     createngenius_paymentOrder = (orderId) => {
         const base64Credentials = base64encode(
-          `${basis_auth.Username}:${basis_auth.Password}`
+            `${basis_auth.Username}:${basis_auth.Password}`
         );
-    
+
         let params = {
-          orderId: orderId,
-          amount: this.state?.order_summary?.totals?.grand_total,
-          email: this.state.bill_ship_address.addressInformation.billing_address?.email
+            orderId: orderId,
+            amount: this.state?.order_summary?.totals?.grand_total,
+            email: this.state.bill_ship_address.addressInformation.billing_address?.email
         };
         api
-          .post(custom_api_url + "func=ngenius_payment", params, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Basic ${base64Credentials}`,
-            },
-          })
-          .then((response) => {
-            this.setState({
-              source: { html: response?.data },
-              loader: false,
-              flagforwebview: true,
+            .post(custom_api_url + "func=ngenius_payment", params, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Basic ${base64Credentials}`,
+                },
+            })
+            .then((response) => {
+                this.setState({
+                    source: { html: response?.data },
+                    loader: false,
+                    flagforwebview: true,
+                });
+                this.interval = setInterval(() => {
+                    this.orderStatus(orderId);
+                }, 3000);
+            })
+            .catch((error) => {
+                console.log(error, error.response);
             });
-            this.interval = setInterval(() => {
-              this.orderStatus(orderId);
-            }, 3000);
-          })
-          .catch((error) => {
-            console.log(error, error.response);
-          });
-      };
-    
-      orderStatus = (orderId) => {
+    };
+
+    orderStatus = (orderId) => {
         const base64Credentials = base64encode(
-          `${basis_auth.Username}:${basis_auth.Password}`
+            `${basis_auth.Username}:${basis_auth.Password}`
         );
-    
+
         let params = {
-          orderId: orderId,
+            orderId: orderId,
         };
         api.post(custom_api_url + "func=ngenius_payment_status_check", params, {
             headers: {
-              "Content-Type": "application/json",
-              Authorization: `Basic ${base64Credentials}`,
+                "Content-Type": "application/json",
+                Authorization: `Basic ${base64Credentials}`,
             },
-          })
-          .then((response) => {
-            console.log(response.data, "=====status check new");
-    
-            if (
-              (response?.data?.payment_status == "PAID" &&
-                response?.data?.payment_response) ||
-              (response?.data?.payment_status == "UNPAID" &&
-                response?.data?.payment_response)
-            ) {
-                setTimeout(() => {
-                    actions.cartItems(null)
-                    actions.guestCartKey(null)
-                    actions.guestCartID(null)
-                    AsyncStorage.removeItem("@aljaber_guestCartKey")
-                    AsyncStorage.removeItem("@aljaber_guestCartID")
-                    AsyncStorage.setItem("@aljaber_userLoginData", "")
-                }, 1000)
-                // this.props.navigation.navigate("HomeScreen")
-    
-              this.setState({ loader: false, buttomButton: true });
-            }
-          })
-          .catch((error) => {
-            this.setState({ loader: false, buttomButton: true });
-    
-            console.log(error, error.response);
-          });
-      };
+        })
+            .then((response) => {
+                console.log(response.data, "=====status check new");
+
+                if (
+                    (response?.data?.payment_status == "PAID" &&
+                        response?.data?.payment_response) ||
+                    (response?.data?.payment_status == "UNPAID" &&
+                        response?.data?.payment_response)
+                ) {
+                    setTimeout(() => {
+                        actions.cartItems(null)
+                        actions.guestCartKey(null)
+                        actions.guestCartID(null)
+                        AsyncStorage.removeItem("@aljaber_guestCartKey")
+                        AsyncStorage.removeItem("@aljaber_guestCartID")
+                        AsyncStorage.setItem("@aljaber_userLoginData", "")
+                    }, 1000)
+                    // this.props.navigation.navigate("HomeScreen")
+
+                    this.setState({ loader: false, buttomButton: true });
+                }
+            })
+            .catch((error) => {
+                this.setState({ loader: false, buttomButton: true });
+
+                console.log(error, error.response);
+            });
+    };
     placeOrder = () => {
         var { userData: { guestcartkey, admintoken }, actions } = this.props
-        console.log("Payment Method---",  this.state.paymentMethodSelected);
+        console.log("Payment Method---", this.state.paymentMethodSelected);
         // console.log("token", token);
-        if(this.state.paymentMethodSelected == ""){
+        if (this.state.paymentMethodSelected == "") {
             return (alert("Select a Payment method"))
         }
         this.setState({ loader: true })
@@ -523,7 +523,7 @@ class Review_Payment_Guest extends Component {
 
             }).catch((err) => {
                 this.setState({ loader: false })
-                console.log("Create Guest Order API ERR",err.response, err.response.data.message)
+                console.log("Create Guest Order API ERR", err.response, err.response.data.message)
             })
 
     }
@@ -981,7 +981,15 @@ class Review_Payment_Guest extends Component {
                         </View>
                         <Text style={[styles.order_summary_texts_title, { marginTop: 5 }]}>{bill_ship_address?.addressInformation?.shipping_carrier_code == "flatrate" ? "FlatRate - FlatRate" : "Free Shipping"}</Text>
                         <View style={{ width: width - 40, borderWidth: 0.5, marginVertical: 10, }}></View>
-
+                        {/* Total Quantity */}
+                        <View
+                            style={[styles.order_summary_texts_row, { marginBottom: 0 }]}
+                        >
+                            <Text style={styles.order_summary_texts_title}>Total Quantity</Text>
+                            <Text style={styles.order_summary_texts_value}>
+                                {order_summary?.totals?.items_qty}
+                            </Text>
+                        </View>
                         {/* Order Total */}
                         <View style={[styles.order_summary_texts_row, { marginBottom: 40, }]}>
                             <Text style={styles.order_summary_texts_title}>Order Total</Text>
@@ -1002,11 +1010,11 @@ class Review_Payment_Guest extends Component {
 
                 {this.state.loader && <Loading screenName={""} />}
                 <PaymentWebView
-          flagforwebview={this.state?.flagforwebview}
-          source={this.state?.source}
-          buttomButton={this.state?.buttomButton}
-          navigation={this.props.navigation}
-        />
+                    flagforwebview={this.state?.flagforwebview}
+                    source={this.state?.source}
+                    buttomButton={this.state?.buttomButton}
+                    navigation={this.props.navigation}
+                />
             </View >
         )
     }

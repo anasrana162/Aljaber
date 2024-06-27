@@ -7,7 +7,8 @@ const width = Dimensions.get("screen").width
 const height = Dimensions.get("screen").height - HEIGHT
 export default class HomeHeader extends Component {
     render() {
-        var { navProps, openDrawer } = this.props
+        var { navProps, openDrawer, isLoggedIn } = this.props
+        // var {  } = this.props
         return (
             <View style={styles.mainContainer}>
                 {/* <View style={styles.colorView}></View> */}
@@ -43,8 +44,16 @@ export default class HomeHeader extends Component {
 
                     {/** Wishlist icon Button */}
                     <TouchableOpacity
-                     onPress={() => navProps.navigate("Wishlist")}
-                     style={styles.favourateIcon}>
+                        onPress={() => {
+                            if (isLoggedIn == false) {
+                                navProps.navigate("Account", { modal: "open" })
+                            } else {
+
+                                navProps.navigate("Wishlist")
+                            }
+                        }
+                        }
+                        style={styles.favourateIcon}>
                         <Ionicons name="heart-outline" size={30} color="#020621" />
                     </TouchableOpacity>
 

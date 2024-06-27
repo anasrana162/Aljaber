@@ -125,7 +125,7 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress, admintoken }) => {
                     >
                         {
                             tempArr?.map((item, index) => {
-                                console.log(item, "defaultCategoryItem")
+                                // console.log(item, "defaultCategoryItem")
                                 // switch (item?.id) {
                                 //     case 81:
                                 //         item.is_active = false

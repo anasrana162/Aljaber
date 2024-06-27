@@ -126,7 +126,8 @@ export default class Register extends Component {
                     }
                 }).catch((err) => {
                     alert("Network Error Code: (APR1)")
-                    alert(err.response?.data?.message)
+                    // alert(err.response?.data?.message)
+                    alert("Password must have lowerCase , UpperCase , Digits and special characers")
                     console.log("Register Api error: ", err.response?.data?.message)
                     setImmediate(() => {
                         this.setState({
@@ -166,9 +167,10 @@ export default class Register extends Component {
 
             case "password":
                 /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/.test(txt) == true ?
+                // txt.lenght < 8 ?
                     setImmediate(() => {
                         this.setState({
-                            passwordFlag: false
+                            passwordFlag: true
                         })
                     })
                     :

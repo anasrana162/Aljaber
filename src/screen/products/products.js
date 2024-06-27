@@ -37,7 +37,7 @@ class Products extends Component {
             original: null,
             loader: false,
             loaderFilter: false,
-            filterMenuLoad: false,
+            cartLoader: false,
             productApiCounter: 0,
             filterBoardOpen: false,
             filtered_product_ids: [],
@@ -205,7 +205,7 @@ class Products extends Component {
         //     this.setState({ breakLoop: "break", loopInProgress: false })
         // })
         setTimeout(() => {
-        this.props.navigation.pop()
+            this.props.navigation.pop()
         }, 500)
         return true;
     }
@@ -1747,18 +1747,23 @@ class Products extends Component {
     createSubData = async (selecteditem, index) => {
 
         var result = await api.get(custom_api_url + "func=get_category_products&cid=" + selecteditem?.id)
+        console.log("Result createSubData", result?.data);
+        if (result.data?.length == 0) {
+        } else {
+            var sorted = result.data.slice().sort(function (a, b) {
+                return a.price - b.price;
+            });
 
-        var sorted = result.data.slice().sort(function (a, b) {
-            return a.price - b.price;
-        });
+            var smallest = sorted[0],
+                largest = sorted[sorted.length - 1];
 
-        var smallest = sorted[0],
-            largest = sorted[sorted.length - 1];
+            // setting the products in the state once they are all done 
 
-        // setting the products in the state once they are all done 
+            // Reversing Array because data is showing from wrong end
+            // return
 
-        // Reversing Array because data is showing from wrong end
-        result.data = result?.data?.reverse()
+            result.data = result?.data?.reverse()
+        }
 
         // actions.savedProducts(sub_category_id.toString(), result.data)
         setImmediate(() => {
@@ -1980,6 +1985,11 @@ class Products extends Component {
 
     addToCart = (product, index) => {
 
+        setImmediate(() => {
+            this.setState({
+                cartLoader: true
+            })
+        })
         var { userData } = this.props
 
         if (userData?.token !== null || userData?.user?.cartID !== undefined) {
@@ -2000,34 +2010,68 @@ class Products extends Component {
                 },
             }).then((response) => {
                 // console.log("Add to cart Item API response : ", response?.data)
+                setImmediate(() => {
+                    this.setState({
+                        cartLoader: false
+                    })
+                })
                 alert("Product Added to Cart!")
             }).catch((err) => {
                 // alert(err?.response.data.message)
+                setImmediate(() => {
+                    this.setState({
+                        cartLoader: false
+                    })
+                })
                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                 console.log("Add to cart item api error:  ", err)
             })
 
         } else {
+            setImmediate(() => {
+                this.setState({
+                    cartLoader: false
+                })
+            })
             alert("Please Login to your account first!")
             this.props.navigation.navigate("Account", { modal: "open" })
         }
 
     }
 
-    isUserLoggedIn = (product, index) => {
+    isUserLoggedIn = (product, index, key) => {
         var { userData: { user, } } = this.props
-        if (Object.keys(user).length == 0) {
-            console.log("userLogged in");
-            this.addToCartGuest(product, index)
-        } else {
-            this.addToCart(product, index)
+        switch (key) {
+            case "cart":
+
+                if (Object.keys(user).length == 0) {
+                    console.log("userLogged in");
+                    this.addToCartGuest(product, index)
+                } else {
+                    this.addToCart(product, index)
+                }
+                break;
+
+            case "wishlist":
+                if (Object.keys(user).length == 0) {
+                    console.log("userLogged in");
+                    // this.addToWishList(product, index)
+                    alert("Please Login in to your account")
+                } else {
+                    this.addToWishList(product)
+                }
+                break;
         }
     }
 
     addToCartGuest = (product, index) => {
 
         var { userData } = this.props
-
+        setImmediate(() => {
+            this.setState({
+                cartLoader: true
+            })
+        })
         if (userData?.admintoken !== null || userData?.guestcartkey !== null) {
 
             var obj = {
@@ -2047,9 +2091,19 @@ class Products extends Component {
                 },
             }).then((response) => {
                 console.log(" Guest Add to cart Item API response : ", response?.data)
+                setImmediate(() => {
+                    this.setState({
+                        cartLoader: false
+                    })
+                })
                 alert("Product Added to Cart!")
             }).catch((err) => {
                 // alert(err?.response.data.message)
+                setImmediate(() => {
+                    this.setState({
+                        cartLoader: false
+                    })
+                })
                 this.props.navigation.navigate("ProductDetails", { product_details: product, product_index: index })
                 console.log("Add to cart item api error:  ", err)
             })
@@ -2058,6 +2112,11 @@ class Products extends Component {
 
         else {
             alert("Something Went wrong!")
+            setImmediate(() => {
+                this.setState({
+                    cartLoader: false
+                })
+            })
             // this.props.navigation.navigate("Account", { modal: "open" })
         }
 
@@ -2073,6 +2132,11 @@ class Products extends Component {
     addToWishList = (productId) => {
         var { userData: { user } } = this.props
         console.log("Product ID:   ", productId);
+        setImmediate(() => {
+            this.setState({
+                cartLoader: true
+            })
+        })
         const base64Credentials = base64encode(`${basis_auth.Username}:${basis_auth.Password}`);
         api.post(custom_api_url + "func=add_wishlist", {
             "productId": productId,
@@ -2084,8 +2148,18 @@ class Products extends Component {
             },
         }).then((res) => {
             console.log("Product added to widhlist Product Screen Result:   ", res?.data);
-            alert("Product Successfully Added")
+            alert("Product Successfully Added to Wishlist")
+            setImmediate(() => {
+                this.setState({
+                    cartLoader: false
+                })
+            })
         }).catch((err) => {
+            setImmediate(() => {
+                this.setState({
+                    cartLoader: false
+                })
+            })
             console.log("Product added to widhlist Product Screen Error:   ", err?.response?.data?.message);
         })
 
@@ -2095,12 +2169,12 @@ class Products extends Component {
     render() {
         var { item, imageLinkMain, otherCats } = this.props?.route?.params;
         var { contact_lens_diameter, contact_lens_base_curve, temple_size, filterKey, filteredPrice, highest_price, lowest_price, bridge_size, gender, temple_material, temple_color, frame_color, frame_material, frame_type, polarized, frame_shape, water_container_content, lense_color, contact_lens_usage, brands, size, model_no, box_content_pcs, color } = this.state;
-
+        var { userData: { user } } = this.props
         return (
 
             <View key={this.state.keyCat} style={styles.mainContainer} >
                 {/** Screen Header */}
-                < HomeHeader navProps={this.props.navigation} openDrawer={() => this.openDrawer()} />
+                < HomeHeader navProps={this.props.navigation} openDrawer={() => this.openDrawer()} isLoggedIn={Object.keys(user).length == 0 ? false : true} />
 
                 <Drawer
                     props={this.props}
@@ -2137,9 +2211,9 @@ class Products extends Component {
                     sortBY={(key) => this.sortBy(key)}
                     openFilterBoard={() => this.openFilterBoard()}
                     loaderFilter={this.state.loaderFilter}
-                    addToCart={(product, index) => this.isUserLoggedIn(product, index)}
+                    addToCart={(product, index) => this.isUserLoggedIn(product, index, "cart")}
                     totalProductsLength={this.state.productSkuLength}
-                    addToWishList={(id) => this.addToWishList(id)}
+                    addToWishList={(id) => this.isUserLoggedIn(id, "", "wishlist")}
                 />
 
 
@@ -2185,7 +2259,7 @@ class Products extends Component {
                         <ActivityIndicator size="small" color="black" />
                     </View>}
 
-                {/* {this.state.filterMenuLoad == true && <Loading />} */}
+                {this.state.cartLoader == true && <Loading />}
 
                 <TouchableOpacity
                     onPress={() => this.goBack()}

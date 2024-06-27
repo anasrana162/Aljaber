@@ -70,6 +70,8 @@ class ProductDetails extends Component {
             more_info_loader: false,
             refreshing: false,
             drawer: false,
+            original_price: 0,
+            priceKey: '',
         };
     }
 
@@ -81,9 +83,9 @@ class ProductDetails extends Component {
     getProductDetails = async () => {
         var { product_details, product_details: { sku }, screenName } = this.props.route.params
         var { userData: { admintoken, allproducts } } = this.props
-        console.log("product_details", sku.replace("/", "_"))
+        // console.log("product_details", sku.replace("/", "%2F"))
 
-
+        // var productSku = sku.replace("/", "%2F")
         var tempPRoducts = []
 
         setImmediate(() => {
@@ -91,8 +93,8 @@ class ProductDetails extends Component {
                 loader: true,
             })
         })
-
-        await api.get('/products/' + sku.replace("/", "_"), {
+        console.log("productSku", encodeURIComponent(sku))
+        await api.get(`products/${encodeURIComponent(sku)}`, {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
@@ -107,117 +109,15 @@ class ProductDetails extends Component {
 
                 if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
                     bigcheck = true
-                    await axios.get('https://aljaberoptical.com/pub/script/custom_api.php?func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
+                    await axios.get(custom_api_url + 'func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
                         prod.data.brand = data?.data
+                        // console.log("Prod",prod?.data);
                         setImmediate(() => {
                             this.setState({
                                 product_details: prod?.data
                             })
                         })
-                        // Condition for fetching products with type_id:"simple"
-
-                        // if (prod?.data?.visibility == 4 && prod?.data?.price > 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "simple") {
-                        //     setImmediate(() => {
-                        //         this.setState({
-                        //             product_details: prod?.data
-                        //         })
-                        //     })
-                        // }
-
-                        // // Condition for fetching products with type_id:"Configurable"
-
-                        // if (prod?.data?.price == 0 && prod?.data?.extension_attributes?.stock_item?.is_in_stock == true && prod?.data?.status == 1 && prod?.data?.type_id == "configurable") {
-
-                        //     setImmediate(() => {
-                        //         this.setState({
-                        //             product_details: prod?.data,
-                        //         })
-                        //     })
-
-                        //     // Checking value of configurable_product_links (product Varients)
-                        //     for (let tp = 0; tp < prod?.data?.extension_attributes?.configurable_product_links?.length; tp++) {
-
-                        //         // Comparing these ID's with the ID's of all products fetched redux which was from All products api from homescreen 
-                        //         var selected_products = ""
-                        //         if (allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0] == undefined) {
-                        //             alert("Error Fetching Data check network connection")
-                        //             this.props.navigation.pop()
-                        //         } else {
-                        //             selected_products = allproducts.filter((value) => value?.id == prod?.data?.extension_attributes?.configurable_product_links[tp])[0]
-                        //         }
-                        //         // Condition
-                        //         if (prod?.data?.extension_attributes?.configurable_product_links[tp] == selected_products?.id) {
-
-                        //             // if id's match then the value "sku" is picked up from the matching product object and then we run an api
-                        //             // to fetch details for the varient because they are not in the products object from all products api
-                        //             var check = false
-
-                        //             // Api for fetching product details
-
-                        //             await api.get('/products/' + selected_products?.sku, {
-                        //                 headers: {
-                        //                     Authorization: `Bearer ${admintoken}`,
-                        //                 },
-                        //             }).then(async (cfPD) => {
-
-                        //                 // once details are fetched we add brand value because its in custom_attributes object in product detail nested obj
-                        //                 // and we have to run loop to first fetch the key then its id then run another api to fetch the brand name which is
-                        //                 // long process already done above to save time while fetching for its main version of product
-
-                        //                 cfPD.data.brand = data?.data // brand value
-                        //                 cfPD.data.parent_product_id = prod?.data?.id
-                        //                 cfPD.data.options = prod?.data?.options
-                        //                 cfPD.data.type_id = prod?.data?.type_id
-                        //                 // then we push all these product varients into a temporary array so the loop is complete reaching all of the id's in
-                        //                 // the configurable_product_links then we push into main array otherwsie it will mix all the different products varients
-                        //                 // together
-
-                        //                 tempPRoducts.push(cfPD?.data)
-
-                        //                 // here's the condition once the configurable_product_links array reach its end
-                        //                 if (tp == prod?.data?.extension_attributes?.configurable_product_links?.length - 1) {
-
-                        //                     //we also change the value of price of the main product because products with type_id have "0" price
-                        //                     // so we take a price from its varient overwrite (Note price of all vareints are same)
-                        //                     prod.data.price = cfPD.data?.price
-
-                        //                     // then we create an of product_varients and push into main product's object to show and display the varients in
-                        //                     // product details screen
-                        //                     prod.data.product_varients = tempPRoducts
-
-                        //                     // then we push this product into main products array with all of these things so it can be displayed
-                        //                     // in the Products Detail screen
-
-                        //                     setImmediate(() => {
-                        //                         this.setState({
-                        //                             product_details: prod?.data
-                        //                         })
-                        //                     })
-
-                        //                     // Emptying the temporary array that we pushed products varients so the varients of other products
-                        //                     // dont get added in the other products
-                        //                     tempPRoducts = []
-
-                        //                     // setting value of check to true from false to break the loop once it reaches its end
-                        //                     check = true
-                        //                 }
-
-                        //             }).catch((err) => {
-                        //                 console.log("Configurable Product Details Api Error", err)
-                        //             })
-
-                        //             console.log("CHeck", check)
-                        //             // this condition break the loop from further adding more products
-                        //             if (check == true) {
-
-                        //                 break;
-                        //             }
-                        //         } else {
-
-                        //         }
-                        //     }
-
-                        // }
+   
                     }).catch((err) => {
                         console.log("DAta for Brands Api errr", err)
                     })
@@ -243,7 +143,7 @@ class ProductDetails extends Component {
 
 
         }).catch((err) => {
-            console.log("Product Detail Api error on:  ", sku, err)
+            console.log("Product Detail Api error on:  ", encodeURIComponent(sku), err.response.data)
             alert("Error Fetching Data Try again")
             this.props.navigation.pop()
             // this.getProductDetails()
@@ -329,6 +229,7 @@ class ProductDetails extends Component {
                         // in the Products Detail screen
                         setImmediate(() => {
                             this.setState({
+                                original_price: cfPD.data?.price,
                                 product_details,
                                 configurable_product_options_loader: false,
                             })
@@ -372,10 +273,10 @@ class ProductDetails extends Component {
             return console.log("No options for color custom options")
         } else {
             var { configurable_product_options } = extension_attributes
-            // console.log("configurable_product_options", configurable_product_options)
+            console.log("configurable_product_options", configurable_product_options)
 
             for (let cpo = 0; cpo < configurable_product_options.length; cpo++) {
-                // console.log("configurable_product_options[cpo]?.values", configurable_product_options[cpo]?.values)
+                console.log("configurable_product_options[cpo]?.values", configurable_product_options[cpo]?.values)
                 for (let cpov = 0; cpov < configurable_product_options[cpo]?.values.length; cpov++) {
                     var value_name = await axios.get(custom_api_url + "func=option_label&id=" + configurable_product_options[cpo]?.values[cpov]?.value_index)
                     configurable_product_options[cpo].values[cpov].value_name = value_name?.data
@@ -387,7 +288,7 @@ class ProductDetails extends Component {
                     // console.log("value_name", value_name?.data)
                 }
             }
-            // console.log("configurable_product_options", configurable_product_options)
+            console.log("configurable_product_options", configurable_product_options[0])?.values
 
             setImmediate(() => {
                 this.setState({
@@ -948,12 +849,12 @@ class ProductDetails extends Component {
         // var qty = stock_item?.qty
         // console.log("qty", qty, " ", quantity)
         // if (quantity <= qty) {
-            quantity = quantity + 1
-            setImmediate(() => {
-                this.setState({
-                    quantity
-                })
+        quantity = quantity + 1
+        setImmediate(() => {
+            this.setState({
+                quantity
             })
+        })
         // } else {
         //     console.log("Quantity Exceeded Maximum limit")
         // }
@@ -1453,7 +1354,7 @@ class ProductDetails extends Component {
                                 "name": product?.name,
                                 "price": product?.price,
                                 "product_type": product?.type_id == undefined ? product?.type : product?.type_id,
-                                "quote_id":guestcartid?.id,
+                                "quote_id": guestcartid?.id,
                                 "product_option": {
                                     "extension_attributes": {
                                         "custom_options": this.state.custom_options,
@@ -1699,7 +1600,23 @@ class ProductDetails extends Component {
 
     setWholeItemSelected = async (item, option_id) => {
 
-        var { custom_options, option_selected } = this.state
+
+        var { custom_options, option_selected, product_details, original_price, priceKey, product_varient_selected } = this.state
+
+        product_details.price = parseFloat(original_price) + parseFloat(item?.price)
+        if (product_varient_selected !== null) {
+            product_varient_selected.price = parseFloat(original_price) + parseFloat(item?.price)
+
+        }
+        console.log("product_details",
+            product_details.price);
+        // setImmediate = () => {
+        //     this.setState({
+
+        //         product_details,
+        //     })
+        // }
+
         let obj = {
             "option_id": option_id,
             "option_value": item?.option_type_id,
@@ -1718,6 +1635,8 @@ class ProductDetails extends Component {
             setImmediate(() => {
                 this.setState({
                     custom_options,
+                    product_details,
+                    priceKey: "updated",
                 })
             });
         } else {
@@ -1725,6 +1644,8 @@ class ProductDetails extends Component {
             setImmediate(() => {
                 this.setState({
                     custom_options,
+                    product_details,
+                    priceKey: "updated",
                 })
             });
         }
@@ -1775,7 +1696,7 @@ class ProductDetails extends Component {
             <View style={styles.mainContainer}>
                 {this.state.loader && <Loading />}
                 {/* Header */}
-                <HomeHeader navProps={this.props.navigation} openDrawer={() => this.openDrawer()} />
+                <HomeHeader navProps={this.props.navigation} openDrawer={() => this.openDrawer()} isLoggedIn={Object.keys(user).length == 0 ? false : true} />
 
                 <Drawer
                     props={this.props}
@@ -1836,9 +1757,11 @@ class ProductDetails extends Component {
                         />}
 
                     {/* Price , quantity, add to cart */}
-                    <View style={styles.row_cont}>
+                    {/* {console.log("product_details",
+                        product_details.price)} */}
+                    <View style={styles.row_cont} >
                         {/* Price */}
-                        <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_varient_selected !== null ? product_varient_selected?.price : product_details?.price}</Text>
+                        <Text style={[styles.product_name, { fontSize: 20 }]}>AED {product_varient_selected !== null ? product_varient_selected?.price : this.state.priceKey == "updated" ? this.state.product_details?.price : product_details?.price}</Text>
 
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
 
@@ -1847,11 +1770,11 @@ class ProductDetails extends Component {
                                 <>
                                     <View style={styles?.row_quantity}>
 
-                                        {/* Plus Button */}
+                                        {/* Minus Button */}
                                         <TouchableOpacity
-                                            onPress={() => this.plusOne()}
+                                            onPress={() => this.minusOne()}
                                             style={styles.quantityBox}>
-                                            <AntDesign name="plus" size={18} color="#020621" />
+                                            <AntDesign name="minus" size={18} color="#020621" />
                                         </TouchableOpacity>
 
                                         {/* Quantity Number */}
@@ -1860,11 +1783,11 @@ class ProductDetails extends Component {
                                             <Text style={styles.product_name}>{this.state.quantity}</Text>
                                         </View>
 
-                                        {/* Minus Button */}
+                                        {/* Plus Button */}
                                         <TouchableOpacity
-                                            onPress={() => this.minusOne()}
+                                            onPress={() => this.plusOne()}
                                             style={styles.quantityBox}>
-                                            <AntDesign name="minus" size={18} color="#020621" />
+                                            <AntDesign name="plus" size={18} color="#020621" />
                                         </TouchableOpacity>
                                     </View>
                                 </>

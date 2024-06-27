@@ -62,7 +62,7 @@ class Review_Payment extends Component {
         this.props?.route?.params?.bill_ship_address == undefined
           ? ""
           : this.props?.route.params.bill_ship_address?.addressInformation
-              ?.billing_address,
+            ?.billing_address,
       confirmBillingAddress: "",
       couponCode: "",
       couponLoader: false,
@@ -154,7 +154,7 @@ class Review_Payment extends Component {
       original_ship_bill_address: billing_shipping_address,
       country_billing_shipping: country,
     });
-    // console.log("bill_ship_address checkSummary:", bill_ship_address?.addressInformation?.shipping_address);
+    console.log("bill_ship_address checkSummary:", order_summary);
   };
   selectBillingAddress = (address) => {
     console.log("");
@@ -851,7 +851,7 @@ class Review_Payment extends Component {
                   ?.street[0] == undefined
                   ? ""
                   : bill_ship_address?.addressInformation?.shipping_address
-                      ?.street[0]}
+                    ?.street[0]}
               </Text>
               {/* City and Postal Code */}
               <Text style={styles.billingAddressText}>
@@ -900,7 +900,7 @@ class Review_Payment extends Component {
               {/* First and Last Name */}
               <Text style={[styles.billingAddressText, { marginBottom: 10 }]}>
                 {bill_ship_address?.addressInformation?.shipping_carrier_code ==
-                "flatrate"
+                  "flatrate"
                   ? "FlatRate - FlatRate"
                   : "Free Shipping"}
               </Text>
@@ -927,7 +927,7 @@ class Review_Payment extends Component {
                     style={styles.couponTxtInp}
                     placeholder="Enter discount code"
                     placeholderTextColor={"rgba(189, 189, 189)"}
-                    onChangeText={(txt) => {}}
+                    onChangeText={(txt) => { }}
                   />
                   <TouchableOpacity
                     disabled={this.state.couponLoader}
@@ -999,8 +999,8 @@ class Review_Payment extends Component {
 
             {/* Coupons */}
             {order_summary?.totals?.coupon_code == undefined ||
-            order_summary?.totals?.coupon_code == "" ||
-            order_summary?.totals?.coupon_code == null ? (
+              order_summary?.totals?.coupon_code == "" ||
+              order_summary?.totals?.coupon_code == null ? (
               <></>
             ) : (
               <>
@@ -1029,7 +1029,7 @@ class Review_Payment extends Component {
             </View>
             <Text style={[styles.order_summary_texts_title, { marginTop: 5 }]}>
               {bill_ship_address?.addressInformation?.shipping_carrier_code ==
-              "flatrate"
+                "flatrate"
                 ? "FlatRate - FlatRate"
                 : "Free Shipping"}
             </Text>
@@ -1041,6 +1041,15 @@ class Review_Payment extends Component {
               }}
             ></View>
 
+            {/* Total Quantity */}
+            <View
+              style={[styles.order_summary_texts_row, { marginBottom: 0 }]}
+            >
+              <Text style={styles.order_summary_texts_title}>Total Quantity</Text>
+              <Text style={styles.order_summary_texts_value}>
+                {order_summary?.totals?.items_qty}
+              </Text>
+            </View>
             {/* Order Total */}
             <View
               style={[styles.order_summary_texts_row, { marginBottom: 40 }]}

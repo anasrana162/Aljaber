@@ -458,7 +458,7 @@ const FilterBoard = ({
         })
     }
 
-    // console.log("otherCats", otherCats);
+    // console.log("otherCats", model_no);
     return (
         <>
             {filterBoardOpen == true ?
