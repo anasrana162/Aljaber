@@ -81,9 +81,9 @@ class ProductDetails extends Component {
     }
 
     getProductDetails = async () => {
-        var { product_details, product_details: { sku }, screenName } = this.props.route.params
+        var { product_details, product_details: { sku, id }, screenName } = this.props.route.params
         var { userData: { admintoken, allproducts } } = this.props
-        // console.log("product_details", sku.replace("/", "%2F"))
+        // console.log("product_details", id)
 
         // var productSku = sku.replace("/", "%2F")
         var tempPRoducts = []
@@ -93,57 +93,73 @@ class ProductDetails extends Component {
                 loader: true,
             })
         })
-        console.log("productSku", encodeURIComponent(sku))
-        await api.get(`products/${encodeURIComponent(sku)}`, {
+
+        // console.log("productSku", encodeURIComponent(sku))
+        await api.get(`products?searchCriteria[filterGroups][0][filters][0][field]=entity_id&searchCriteria[filterGroups][0][filters][0][condition_type]=eq&searchCriteria[filterGroups][0][filters][0][value]=${id}`, {
             headers: {
                 Authorization: `Bearer ${admintoken}`,
             },
         }).then(async (prod) => {
 
-            // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
-            // on the screen as it is not in the main body of the object
-            var bigcheck = false
-            for (let i = 0; i < prod?.data.custom_attributes.length; i++) {
+            var productData = prod?.data?.items[0]
+            console.log(" productData?.id", productData?.id);
+            await axios.get(custom_api_url + 'func=get_stock&pid=' + productData?.id)
+                .then(async (stock) => {
+                    console.log("stock,label", stock.data);
+                    productData.extension_attributes.stock_item = stock?.data[0]
+                    // then we check the array of custom_attributes in for loop to fetch the attribute Brand to show in the products
+                    // on the screen as it is not in the main body of the object
+                    var bigcheck = false
+                    for (let i = 0; i < productData?.custom_attributes.length; i++) {
 
-                // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
+                        // in the loop we check for on abject having attribute_code "brands" then pickup it value having ID
+                        // console.log("productData?.custom_attributes[i]", productData?.custom_attributes[i]);
+                        if (productData?.custom_attributes[i]?.attribute_code == 'brands') {
+                            bigcheck = true
+                            await axios.get(custom_api_url + 'func=option_label&id=' + productData?.custom_attributes[i]?.value,)
+                                .then(async (data) => {
+                                    // console.log("data,label", data);
+                                    productData.brand = data?.data
+                                    console.log("Prod @", productData.extension_attributes);
+                                    setImmediate(() => {
+                                        this.setState({
+                                            product_details: productData
+                                        })
+                                    })
 
-                if (prod?.data.custom_attributes[i].attribute_code == 'brands') {
-                    bigcheck = true
-                    await axios.get(custom_api_url + 'func=option_label&id=' + prod?.data?.custom_attributes[i].value,).then(async (data) => {
-                        prod.data.brand = data?.data
-                        // console.log("Prod",prod?.data);
-                        setImmediate(() => {
-                            this.setState({
-                                product_details: prod?.data
-                            })
+                                }).catch((err) => {
+                                    console.log("DAta for Brands Api errr", err)
+                                })
+                            break;
+                        }
+                        if (bigcheck == true) {
+                            break;
+                        }
+
+                    }
+                    setImmediate(() => {
+                        this.setState({
+                            loader: false,
+                            refreshing: false,
                         })
-   
-                    }).catch((err) => {
-                        console.log("DAta for Brands Api errr", err)
                     })
-                    break;
-                }
-                if (bigcheck == true) {
-                    break;
-                }
-            }
-            setImmediate(() => {
-                this.setState({
-                    loader: false,
-                    refreshing: false,
+                    this.createVarients()
+                    this.getDescription('prop')
+                    this.checkOptions('prop')
+                    this.getMain_Info('prop')
+                    // this.checkVarients('prop')
+                    this.productImages("prop")
+                    this.check_Configurable_Product_Options()
+
+                }).catch((err) => {
+                    console.log("DAta for Brands Api errr", err)
                 })
-            })
-            this.createVarients()
-            this.getDescription('prop')
-            this.checkOptions('prop')
-            this.getMain_Info('prop')
-            // this.checkVarients('prop')
-            this.productImages("prop")
-            // this.check_Configurable_Product_Options()
+            // console.log("prod", productData);
+
 
 
         }).catch((err) => {
-            console.log("Product Detail Api error on:  ", encodeURIComponent(sku), err.response.data)
+            console.log("Product Detail Api error on:  ", id, err.response.data)
             alert("Error Fetching Data Try again")
             this.props.navigation.pop()
             // this.getProductDetails()
@@ -1820,9 +1836,9 @@ class ProductDetails extends Component {
                         AVAILABILTY:
                         <Text style={[styles.product_name, {
                             fontSize: 12,
-                            color: this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? "#020621" : "red"
+                            color: this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == "1" ? "#020621" : "red"
                         }]}>
-                            {this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == true ? " IN STOCK" : " OUT OF STOCK"}
+                            {this.state.product_details?.extension_attributes?.stock_item?.is_in_stock == "1" ? " IN STOCK" : " OUT OF STOCK"}
                         </Text>
                     </Text>
 

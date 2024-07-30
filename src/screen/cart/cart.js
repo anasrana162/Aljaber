@@ -905,11 +905,12 @@ class Cart extends Component {
 
     }
     onEditItem = async (item) => {
-        // console.log("Item", item?.item)
+        console.log("Item", item?.item)
         this.setState({ loaderEdit: true, itemToEditSelected: item?.item?.item_id })
         var result = await api.get(custom_api_url + "func=get_cart_item_image&item_id=" + item?.item?.item_id)
-        // console.log("result API", result?.data)
+        console.log("result API", result?.data)
         item.item.sku = result?.data?.parent_sku
+        item.item.id = result?.data?.id
         this.setState({ loaderEdit: false })
         this.props.navigation.navigate("ProductDetails", { product_details: item.item, product_index: item?.index, screenName: "Cart" })
     }

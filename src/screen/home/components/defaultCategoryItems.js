@@ -166,7 +166,7 @@ const DefaultCategoryItems = ({ data, navProps, onNextPress, admintoken }) => {
                                                 }}>
 
                                                     {/* https://wpstaging51.a2zcreatorz.com/ */}
-                                                    <Image source={{ uri: item?.image }} style={{ width: "100%", height: "100%", }} />
+                                                    <Image source={{ uri: item?.image }} style={{ width: "100%", height: "100%", }} resizeMode='cover' />
                                                 </View>
                                                 <Text numberOfLines={2} style={styles.text_item}>{item?.name}</Text>
                                             </TouchableOpacity>

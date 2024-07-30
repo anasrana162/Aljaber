@@ -149,7 +149,7 @@ class Categories extends Component {
 
 
     render() {
-        // console.log("tempArray Outside", this.state.tempArray)
+        console.log("tempArray Outside", width)
         return (
             <View style={styles.mainContainer}>
                 {/* <HomeHeader /> */}
@@ -220,8 +220,8 @@ class Categories extends Component {
                                                     onPress={() => this.selectedItems(item, index, 'sub')}
 
                                                     style={{
-                                                        width: 180,
-                                                        height: 200,
+                                                        width: width / 2.5,
+                                                        height: 180,
                                                         borderColor: "#020621",
                                                         marginBottom: 20,
                                                         overflow: "hidden",
